@@ -1,5 +1,6 @@
 package org.interledger.cryptoconditions;
 
+import org.interledger.cryptoconditions.impl.ConditionBase;
 /**
  * Fulfillments are cryptographically verifiable messages that prove an event occurred. 
  * 
@@ -14,7 +15,7 @@ package org.interledger.cryptoconditions;
  * @author adrianhopebailie
  *
  */
-public interface Fulfillment<T extends Condition>  {
+public interface Fulfillment {
 	
 	/**
 	 * Get the type of condition that is fulfilled by this fulfillment
@@ -41,5 +42,5 @@ public interface Fulfillment<T extends Condition>  {
 	 * 
 	 * @return a Condition that is fulfilled by this object
 	 */
-	T generateCondition(); 
+	ConditionBase generateCondition(); 
 }

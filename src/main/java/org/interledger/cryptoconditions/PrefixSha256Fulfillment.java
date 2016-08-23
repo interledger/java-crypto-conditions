@@ -1,6 +1,7 @@
 package org.interledger.cryptoconditions;
 
 import java.io.ByteArrayOutputStream;
+
 import java.io.IOException;
 import java.util.EnumSet;
 
@@ -8,6 +9,7 @@ import org.interledger.cryptoconditions.encoding.ConditionOutputStream;
 import org.interledger.cryptoconditions.encoding.FulfillmentOutputStream;
 import org.interledger.cryptoconditions.util.Crypto;
 
+import org.interledger.cryptoconditions.impl.ConditionBase;
 /**
  * Implementation of a PREFIX-SHA-256 crypto-condition fulfillment
  * 
@@ -16,10 +18,10 @@ import org.interledger.cryptoconditions.util.Crypto;
  * @author adrianhopebailie
  *
  */
-public class PrefixSha256Fulfillment implements Fulfillment<PrefixSha256Condition> {
+public class PrefixSha256Fulfillment implements Fulfillment {
 	
 	private byte[] prefix;
-	private Fulfillment<?> subfulfillment;
+	private Fulfillment subfulfillment;
 
 	private byte[] payload;
 	
@@ -29,7 +31,7 @@ public class PrefixSha256Fulfillment implements Fulfillment<PrefixSha256Conditio
 		subfulfillment = null;
 	}
 	
-	public PrefixSha256Fulfillment(byte[] prefix, Fulfillment<?> subfulfillment) {
+	public PrefixSha256Fulfillment(byte[] prefix, Fulfillment subfulfillment) {
 		setPrefix(prefix);
 		setSubFulfillment(subfulfillment);
 	}
@@ -46,13 +48,13 @@ public class PrefixSha256Fulfillment implements Fulfillment<PrefixSha256Conditio
 		return prefix;
 	}
 			
-	public void setSubFulfillment(Fulfillment<?> fulfillment)
+	public void setSubFulfillment(Fulfillment fulfillment)
 	{
 		this.subfulfillment = fulfillment;
 		this.payload = null;
 	}
 	
-	public Fulfillment<?> getSubFulfillment()
+	public Fulfillment getSubFulfillment()
 	{
 		return subfulfillment;
 	}
@@ -71,11 +73,11 @@ public class PrefixSha256Fulfillment implements Fulfillment<PrefixSha256Conditio
 	}
 
 	@Override
-	public PrefixSha256Condition generateCondition() {
+	public ConditionBase generateCondition() {
 		
 		Condition subcondition = subfulfillment.generateCondition();
 		
-		EnumSet<FeatureSuite> features = subcondition.getFeatures();
+		EnumSet<FeatureSuite> subcondition_features = subcondition.getFeatures();
 		
 		byte[] fingerprint = Crypto.getSha256Hash(
 				calculateFingerPrintContent(
@@ -89,7 +91,10 @@ public class PrefixSha256Fulfillment implements Fulfillment<PrefixSha256Conditio
 				subcondition
 			);
 		
-		return new PrefixSha256Condition(fingerprint, features, maxFulfillmentLength);
+		EnumSet<FeatureSuite> features = EnumSet.of(FeatureSuite.SHA_256, FeatureSuite.PREFIX); // base features
+		features.addAll(subcondition_features);
+		
+		return new ConditionBase(ConditionType.PREFIX_SHA256, features, fingerprint, maxFulfillmentLength);
 	}
 
 	private byte[] calculatePayload()
