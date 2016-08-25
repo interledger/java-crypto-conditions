@@ -16,9 +16,9 @@ import org.interledger.cryptoconditions.util.Crypto;
  * @author adrianhopebailie
  *
  */
-public class PrefixSha256Fulfillment implements Fulfillment {
+public class PrefixSha256Fulfillment extends FulfillmentBase {
 	
-	private static ConditionType CONDITION_TYPE = ConditionType.PREFIX_SHA256;
+	public static final ConditionType CONDITION_TYPE = ConditionType.PREFIX_SHA256;
 	
 	private static EnumSet<FeatureSuite> BASE_FEATURES = EnumSet.of(
 			FeatureSuite.SHA_256, 
@@ -29,12 +29,6 @@ public class PrefixSha256Fulfillment implements Fulfillment {
 	private Fulfillment subfulfillment;
 
 	private byte[] payload;
-	
-	public PrefixSha256Fulfillment() {
-		prefix = new byte[0];
-		payload = null;
-		subfulfillment = null;
-	}
 	
 	public PrefixSha256Fulfillment(byte[] prefix, Fulfillment subfulfillment) {
 		setPrefix(prefix);
@@ -73,7 +67,7 @@ public class PrefixSha256Fulfillment implements Fulfillment {
 	public byte[] getPayload() {
 		if(payload == null) {
 			payload = calculatePayload();
-		}	
+		}
 		return payload;
 	}
 
@@ -103,8 +97,9 @@ public class PrefixSha256Fulfillment implements Fulfillment {
 				fingerprint, 
 				maxFulfillmentLength);
 	}
-
-	private byte[] calculatePayload()
+	
+	@Override
+	protected byte[] calculatePayload()
 	{
 		
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -164,5 +159,20 @@ public class PrefixSha256Fulfillment implements Fulfillment {
 			throw new IllegalArgumentException("Field lengths of greater than 16777215 are not supported.");
 		}
 		return length + subcondition.getMaxFulfillmentLength();
+	}
+
+	@Override
+	public boolean validate(byte[] message) {
+		if (this.subfulfillment == null)
+			throw new RuntimeException("subfulfillment not yet initialized ");
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+		try {
+			outputStream.write( this.prefix);
+			outputStream.write( message );
+		} catch (IOException e) {
+			throw new RuntimeException(e.toString());
+		}
+		
+		return this.subfulfillment.validate(outputStream.toByteArray());
 	}
 }

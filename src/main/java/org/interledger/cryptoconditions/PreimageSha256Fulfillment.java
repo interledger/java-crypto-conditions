@@ -12,16 +12,16 @@ import org.interledger.cryptoconditions.util.Crypto;
  * @author adrianhopebailie
  *
  */
-public class PreimageSha256Fulfillment implements Fulfillment {
+public class PreimageSha256Fulfillment extends FulfillmentBase {
 
-	private static ConditionType CONDITION_TYPE = ConditionType.PREIMAGE_SHA256;
+	public static final ConditionType CONDITION_TYPE = ConditionType.PREIMAGE_SHA256;
 	
 	private static EnumSet<FeatureSuite> BASE_FEATURES = EnumSet.of(
 			FeatureSuite.SHA_256, 
 			FeatureSuite.PREIMAGE
 		);
 
-	private byte[] preimage;
+	private byte[] preimage = null; // TODO:(0) Remove null
 			
 	public PreimageSha256Fulfillment(byte[] preimage) {
 		setPreimage(preimage);
@@ -34,6 +34,8 @@ public class PreimageSha256Fulfillment implements Fulfillment {
 	}
 	
 	public byte[] getPreimage() {
+		if (preimage == null) 
+			throw new RuntimeException("preimage not YET initialized");
 		//TODO - Should this object be immutable? Use ArrayCopy?
 		return preimage;
 	}
@@ -58,5 +60,27 @@ public class PreimageSha256Fulfillment implements Fulfillment {
 				BASE_FEATURES, 
 				fingerprint, 
 				maxFulfillmentLength);
+	}
+	
+	@Override
+	protected byte[] calculatePayload() {
+		return getPreimage();
+	}
+	
+	/**
+	 * Validate this fulfillment.
+	 *
+	 * Copy&Paste from five-bells-condition/src/types/preimage-sha256.js:
+	 * """
+	 * For a SHA256 hashlock fulfillment, successful parsing implies that the
+	 * fulfillment is valid, so this method is a no-op.
+	 * """
+	 *
+	 * @param {byte[]} Message (ignored in this condition type)
+	 * @return {boolean} Validation result
+	 */
+	@Override
+	public boolean validate(byte[] message) {
+		return true;
 	}
 }

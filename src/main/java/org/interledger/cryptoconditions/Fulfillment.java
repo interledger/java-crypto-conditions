@@ -1,5 +1,7 @@
 package org.interledger.cryptoconditions;
 
+import java.util.EnumSet;
+
 /**
  * Fulfillments are cryptographically verifiable messages that prove an event occurred. 
  * 
@@ -24,6 +26,15 @@ public interface Fulfillment  {
 	 * @return the type of the condition that this fulfills
 	 */
 	ConditionType getType();
+	
+	/**
+	 * Get the features requited for this fulfillment
+	 * 
+	 * @see FeatureSuite
+	 * 
+	 * @return the type of the condition that this fulfills
+	 */
+	EnumSet<FeatureSuite> getFeatures();
 		
 	/**
 	 * Get the fulfillment data
@@ -42,4 +53,22 @@ public interface Fulfillment  {
 	 * @return a Condition that is fulfilled by this object
 	 */
 	Condition generateCondition(); 
+	
+	/**
+	 * Serialize/Print to string the fulfillment
+	 * 
+	 * @return (ASCII-)URI representation of the Fulfillment
+	 */
+	public String toURI();
+	
+	/**
+	 * Validate this fulfillment.
+	 * 
+	 * Final classes must implement this method.
+	 * 
+	 * @return {boolean} Validation result 
+	 */
+	public boolean validate(byte[] message);
+
+
 }
