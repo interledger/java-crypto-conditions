@@ -52,7 +52,7 @@ public interface Fulfillment  {
 	 * 
 	 * @return a Condition that is fulfilled by this object
 	 */
-	Condition generateCondition(); 
+	Condition generateCondition(byte[] payload);
 	
 	/**
 	 * Serialize/Print to string the fulfillment

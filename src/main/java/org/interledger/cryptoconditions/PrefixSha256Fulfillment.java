@@ -19,6 +19,10 @@ import org.interledger.cryptoconditions.util.Crypto;
 public class PrefixSha256Fulfillment extends FulfillmentBase {
 	
 	public static final ConditionType CONDITION_TYPE = ConditionType.PREFIX_SHA256;
+
+	public PrefixSha256Fulfillment(ConditionType type, byte[] payload) {
+		super(type, payload);
+	}
 	
 	private static EnumSet<FeatureSuite> BASE_FEATURES = EnumSet.of(
 			FeatureSuite.SHA_256, 
@@ -65,6 +69,7 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 
 	@Override
 	public byte[] getPayload() {
+		// TODO:(0) Call in Constructor to make inmutable.
 		if(payload == null) {
 			payload = calculatePayload();
 		}
@@ -72,9 +77,9 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 	}
 
 	@Override
-	public Condition generateCondition() {
+	public Condition generateCondition(byte[] payload) {
 		
-		Condition subcondition = subfulfillment.generateCondition();
+		Condition subcondition = subfulfillment.generateCondition(payload);
 		
 		EnumSet<FeatureSuite> features = subcondition.getFeatures();
 		features.addAll(BASE_FEATURES);
@@ -98,10 +103,8 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 				maxFulfillmentLength);
 	}
 	
-	@Override
 	protected byte[] calculatePayload()
 	{
-		
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		FulfillmentOutputStream stream = new FulfillmentOutputStream(buffer);
 		

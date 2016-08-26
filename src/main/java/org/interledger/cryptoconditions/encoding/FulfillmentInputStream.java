@@ -55,7 +55,7 @@ public class FulfillmentInputStream extends OerInputStream {
 		
 		switch (type) {
 		case PREIMAGE_SHA256:
-			return new PreimageSha256Fulfillment(payload);
+			return new PreimageSha256Fulfillment(ConditionType.PREIMAGE_SHA256, payload);
 		case PREFIX_SHA256:
 			ByteArrayInputStream byteStream = new ByteArrayInputStream(payload);
 			FulfillmentInputStream innerStream = new FulfillmentInputStream(byteStream);
