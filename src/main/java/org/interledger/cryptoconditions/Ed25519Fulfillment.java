@@ -5,20 +5,18 @@ import java.util.EnumSet;
 
 
 
-import java.nio.charset.Charset;
+//import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
-import java.security.SignatureException;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.EdDSAEngine;
 
+// TODO:(0) Add dependencies in ed25519 external library.
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
@@ -33,7 +31,8 @@ import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
  *
  */
 public class Ed25519Fulfillment extends FulfillmentBase {
-    
+    // TODO:(?) Create utility classes to generate public/private keys
+	//     for example for a site that just one a one-time-use public/private key.
     public static final int PUBKEY_LENGTH = 32; 
     public static final int SIGNATURE_LENGTH = 64; 
     public static final int FULFILLMENT_LENGTH = PUBKEY_LENGTH + SIGNATURE_LENGTH;
@@ -75,12 +74,12 @@ public class Ed25519Fulfillment extends FulfillmentBase {
         // TODO:(0) This will fail now since generateCondition is invoqued in the
         // constructor before setPrivateKey is invoqued.
 
-        if (this.privateKey == null ) throw 
-            new RuntimeException("this.privateKey not yet defined ");
+        if (this.privateKey == null ) {
+        	// TODO:(0) This will fail now. generateCondition is called before privateKey is set
+            throw new RuntimeException("this.privateKey not yet defined ");
+        }
         EnumSet<FeatureSuite> features = EnumSet.of(FeatureSuite.ED25519); // TODO:(0) Recheck
 
-        // TODO:(0) Must be ed25519.sign(privateKey, message).
-        // TODO:(0) we can't set privateKey before calling the constructor.
          
         
         PrivateKey sKey = new EdDSAPrivateKey(
@@ -90,7 +89,7 @@ public class Ed25519Fulfillment extends FulfillmentBase {
             Signature sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
             sgr.initSign(sKey);
             sgr.update(this.message);
-            byte[] signature = null; // TODO:(0)
+            byte[] signature = sgr.sign(); // TODO:(0)
             return new ConditionImpl(
                     ConditionType.ED25519, 
                     features,
@@ -101,37 +100,25 @@ public class Ed25519Fulfillment extends FulfillmentBase {
         }
     }
 
-    // setPublicKey (publicKey /*Ed25519 public key */) {
-    //     if (publicKey.length !== 32) throw new Error('Public key must be 32 bytes, was: ' + publicKey.length);
-    //     // TODO Validate public key
-    //     this.publicKey = publicKey
-    //   }
-    // 
-    //   /** Instead of using the private key to sign using the sign() method, we can
-    //    * also generate the signature elsewhere and pass it in. */
-    //   setSignature (signature /* 64-byte signature */) {
-    //     if (signature.length !== 64) throw new Error('Signature must be 64 bytes, was: ' + signature.length)
-    //     this.signature = signature
-    //   }
-
     @Override
     public boolean validate(byte[] message) {
-        if (privateKey == null ) {
+        if (this.publicKey == null ) {
             throw new RuntimeException("privateKey is undefined. Validation can't continue");
         }
-
-        /**
-           * Verify the signature of this Ed25519 fulfillment.
-           *
-           * The signature of this Ed25519 fulfillment is verified against the provided
-           * message and public key.
-           *
-           */
-        //    if (ed25519) {
-        //      result = ed25519.Verify(message, this.signature, this.publicKey)
-        //    }
-
-        throw new RuntimeException("Not implemented");
-
+        if (this.signature == null ) {
+            throw new RuntimeException("privateKey is undefined. Validation can't continue");
+        }
+        try{
+            EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("ed25519-sha-512");
+            
+            EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(publicKey, spec);
+            PublicKey vKey = new EdDSAPublicKey(pubKey);
+            Signature sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
+            sgr.initVerify(vKey);
+            sgr.update(message);
+            return sgr.verify(signature);
+    	}catch(Exception e){
+    		throw new RuntimeException(e.toString(), e);
+    	}
     }
 }
