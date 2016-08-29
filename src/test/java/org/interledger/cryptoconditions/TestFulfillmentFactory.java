@@ -13,7 +13,6 @@ public class TestFulfillmentFactory {
 		String fulfillmentSha256 = "cf:0:AA";
 		
 		Fulfillment ff = FulfillmentFactory.getFulfillmentFromURI(fulfillmentSha256);
-System.out.println(fulfillmentSha256 + " equals " +ff.toURI());
 		assertTrue(fulfillmentSha256 + "equals " +ff.toURI(), fulfillmentSha256.equals(ff.toURI()));
 	}
 

@@ -38,7 +38,8 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 	public void setPrefix(byte[] prefix)
 	{
 		//TODO - Should this be immutable? Use ArrayCopy?
-		this.prefix = prefix;
+		this.prefix = prefix.clone();
+		// this.payload = null; TODO:(0)
 	}
 	
 	public byte[] getPrefix() {
@@ -49,6 +50,7 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 	public void setSubFulfillment(Fulfillment fulfillment)
 	{
 		this.subfulfillment = fulfillment;
+		// this.payload = null; TODO:(0) 
 	}
 	
 	public Fulfillment getSubFulfillment()
@@ -63,7 +65,7 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 
 	@Override
 	public byte[] getPayload() {
-		return payload;
+		return payload.clone();
 	}
 
 	@Override
