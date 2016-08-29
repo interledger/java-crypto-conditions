@@ -27,9 +27,10 @@ import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
  * 
  * TODO Safe synchronized access to members?
  * 
- * @author adrianhopebailie
+ * @author earizon<enrique.arizon.benito@everis.com>
  *
  */
+
 public class Ed25519Fulfillment extends FulfillmentBase {
     // TODO:(?) Create utility classes to generate public/private keys
 	//     for example for a site that just one a one-time-use public/private key.
@@ -39,7 +40,6 @@ public class Ed25519Fulfillment extends FulfillmentBase {
 
     private final byte[] publicKey;
     private final byte[] signature;
-    private final byte[] message;
     
     private byte[] privateKey = null;
 
@@ -49,8 +49,14 @@ public class Ed25519Fulfillment extends FulfillmentBase {
         if (payload.length != FULFILLMENT_LENGTH) throw new
             RuntimeException("payload length ("+payload.length+")"
                 + " doesn't match Ed25519 fulfillment length ("+FULFILLMENT_LENGTH+")");
+        /*
+         * REF: https://interledger.org/five-bells-condition/spec.html#rfc.section.4.5.2
+         * Ed25519FulfillmentPayload ::= SEQUENCE {
+         *     publicKey OCTET STRING (SIZE(32)),
+         *     signature OCTET STRING (SIZE(64))
+         * }
+         */
         this.publicKey = Arrays.copyOfRange(payload, 0, Ed25519Fulfillment.PUBKEY_LENGTH);
-        this.message   = new byte[]{}; // TODO:(0)
         this.signature = Arrays.copyOfRange(payload, Ed25519Fulfillment.PUBKEY_LENGTH, Ed25519Fulfillment.SIGNATURE_LENGTH);
     }
 
@@ -86,14 +92,10 @@ public class Ed25519Fulfillment extends FulfillmentBase {
                 new EdDSAPrivateKeySpec(
                         this.privateKey, EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512)));
         try {
-            Signature sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
-            sgr.initSign(sKey);
-            sgr.update(this.message);
-            byte[] signature = sgr.sign(); // TODO:(0)
             return new ConditionImpl(
                     ConditionType.ED25519, 
                     features,
-                    signature, 
+                    this.publicKey, 
                     FULFILLMENT_LENGTH);
         } catch (Exception e) {
             throw new RuntimeException(e.toString(), e);
