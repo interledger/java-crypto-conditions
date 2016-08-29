@@ -18,8 +18,6 @@ import org.interledger.cryptoconditions.util.Crypto;
  */
 public class PrefixSha256Fulfillment extends FulfillmentBase {
 	
-	public static final ConditionType CONDITION_TYPE = ConditionType.PREFIX_SHA256;
-
 	public PrefixSha256Fulfillment(ConditionType type, byte[] payload) {
 		super(type, payload);
 	}
@@ -97,7 +95,7 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 			);
 		
 		return new ConditionImpl(
-				CONDITION_TYPE, 
+				ConditionType.PREFIX_SHA256, 
 				features, 
 				fingerprint, 
 				maxFulfillmentLength);

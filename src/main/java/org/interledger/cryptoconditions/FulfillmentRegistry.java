@@ -6,8 +6,8 @@ public class FulfillmentRegistry {
 			new java.util.LinkedHashMap<ConditionType, Class<?>>();
 
 	static {
-		typeRegistry.put(PrefixSha256Fulfillment  .CONDITION_TYPE , PrefixSha256Fulfillment  .class);
-		typeRegistry.put(PreimageSha256Fulfillment.CONDITION_TYPE , PreimageSha256Fulfillment.class);
+		typeRegistry.put(ConditionType.PREFIX_SHA256  , PrefixSha256Fulfillment  .class);
+		typeRegistry.put(ConditionType.PREIMAGE_SHA256, PreimageSha256Fulfillment.class);
 		// TODO:(0) Add the other conditions.
 	}
 	

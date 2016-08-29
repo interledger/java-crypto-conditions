@@ -15,8 +15,6 @@ import org.interledger.cryptoconditions.util.Crypto;
  */
 public class PreimageSha256Fulfillment extends FulfillmentBase {
 
-	public static final ConditionType CONDITION_TYPE = ConditionType.PREIMAGE_SHA256;
-
 	public PreimageSha256Fulfillment(ConditionType type, byte[] payload) {
 		super(type, payload);
 	}
@@ -47,7 +45,7 @@ public class PreimageSha256Fulfillment extends FulfillmentBase {
 		int maxFulfillmentLength = this.getPreimage().length;
 	
 		return new ConditionImpl(
-				CONDITION_TYPE, 
+				ConditionType.PREIMAGE_SHA256, 
 				BASE_FEATURES, 
 				fingerprint, 
 				maxFulfillmentLength);
