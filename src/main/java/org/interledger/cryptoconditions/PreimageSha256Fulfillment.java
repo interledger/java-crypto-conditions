@@ -1,8 +1,5 @@
 package org.interledger.cryptoconditions;
 
-import java.util.Arrays;
-
-
 import java.util.EnumSet;
 
 import org.interledger.cryptoconditions.util.Crypto;
@@ -18,6 +15,13 @@ import org.interledger.cryptoconditions.types.*;
  */
 public class PreimageSha256Fulfillment extends FulfillmentBase {
 
+    byte[] preimage;
+    public static PreimageSha256Fulfillment BuildFromSecrets(byte[] preimage){
+        FulfillmentPayload payload = new FulfillmentPayload(Crypto.getSha256Hash(preimage));
+        PreimageSha256Fulfillment result = new PreimageSha256Fulfillment(ConditionType.PREIMAGE_SHA256, payload);
+        return result;
+    }
+
 	public PreimageSha256Fulfillment(ConditionType type, FulfillmentPayload payload) {
 		super(type, payload);
 	}
@@ -27,10 +31,10 @@ public class PreimageSha256Fulfillment extends FulfillmentBase {
 			FeatureSuite.PREIMAGE
 		);
 
-	public byte[] getPreimage() {
-		byte[] result = Arrays.copyOf(payload.payload, payload.payload.length);
-		return result;
-	}
+//	public byte[] getPreimage() {
+//		byte[] result = Arrays.copyOf(payload.payload, payload.payload.length);
+//		return result;
+//	}
 	
 	@Override
 	public ConditionType getType() {
@@ -39,13 +43,16 @@ public class PreimageSha256Fulfillment extends FulfillmentBase {
 
 	@Override
 	public FulfillmentPayload getPayload() {
-		return new FulfillmentPayload(getPreimage());
+		return payload;
 	}
 
 	@Override
 	public Condition generateCondition(FulfillmentPayload payload) {
-		byte[] fingerprint = Crypto.getSha256Hash(this.getPreimage());
-		int maxFulfillmentLength = this.getPreimage().length;
+	    if (preimage == null ) {
+	        throw new RuntimeException("preimage not initialized");
+	    }
+		byte[] fingerprint = Crypto.getSha256Hash(preimage);
+		int maxFulfillmentLength = preimage.length; // TODO:(0) Recheck
 	
 		return new ConditionImpl(
 				ConditionType.PREIMAGE_SHA256, 

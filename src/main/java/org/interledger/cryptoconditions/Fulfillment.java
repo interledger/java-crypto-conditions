@@ -74,5 +74,11 @@ public interface Fulfillment  {
 	 */
 	public boolean validate(MessagePayload message);
 
+	/*
+	 * TODO:(0)
+	 * Once the fulfillment has been generated, it's a good
+	 * practice to clear the secret (preimage, private password, ...)
+	 */
+	// public void clearSecrets();
 
 }
