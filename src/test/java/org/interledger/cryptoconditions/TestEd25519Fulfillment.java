@@ -23,7 +23,7 @@ import org.interledger.cryptoconditions.types.*;
 
 // TODO:(0) Complete tests
 
-public class TestFulfillmentEd25519 {
+public class TestEd25519Fulfillment {
 
     private static EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("ed25519-sha-512");
 
