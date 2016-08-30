@@ -103,7 +103,6 @@ public class Ed25519Fulfillment extends FulfillmentBase {
         return result;
     }
 
-    
     /*
      * public key and signarutes are extracted from the payload
      */
@@ -130,25 +129,7 @@ public class Ed25519Fulfillment extends FulfillmentBase {
     }
 
 
-    public Ed25519Fulfillment(PublicKey publicKey, SignaturePayload signature) {
-        if (publicKey.getEncoded().length!=PUBKEY_LENGTH) {
-        	throw new RuntimeException("publicKey length != "+PUBKEY_LENGTH);
-        }
-        if (signature.payload.length != SIGNATURE_LENGTH) {
-        	throw new RuntimeException("signature lenght != "+SIGNATURE_LENGTH);
-        }
-        this.publicKey = publicKey;
-        this.signature = signature;
 
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		try {
-			// buffer.write(publicKey); // TODO:(0)
-			buffer.write(signature.payload);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} 
-		// this.payload = buffer.toByteArray(); // TODO:(0) Compiler error
-    }
 
     @Override
     public ConditionType getType() {
