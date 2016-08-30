@@ -31,7 +31,6 @@ public class FulfillmentFactory {
 
 		// Get Fulfillment class (Sha256, PreimageSha256, ...)
 		Class<?> clazz = FulfillmentRegistry.getClass(type);
-System.out.println();
 		Constructor<?> constructor;
 		try {
 			constructor = clazz.getConstructor(ConditionType.class, byte[].class);
@@ -50,4 +49,8 @@ System.out.println();
 
 	}
 
+	/*
+	 * 
+	 */
+	
 }

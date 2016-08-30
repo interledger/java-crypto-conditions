@@ -23,7 +23,7 @@ import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
 /**
- * Implementation of a PREFIX-SHA-256 crypto-condition fulfillment
+ * Implementation of a PREFIX-SHA-512 crypto-condition fulfillment
  * 
  * TODO Safe synchronized access to members?
  * 
@@ -38,13 +38,24 @@ public class Ed25519Fulfillment extends FulfillmentBase {
     public static final int SIGNATURE_LENGTH = 64; 
     public static final int FULFILLMENT_LENGTH = PUBKEY_LENGTH + SIGNATURE_LENGTH;
 
-    private final byte[] publicKey;
+    private final PublicKey publicKey;
     private final byte[] signature;
     
     private byte[] privateKey = null;
+    
+    private static EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("ed25519-sha-512");
+
+
+    private static PublicKey _publicKeyFromByteArray(byte[] pub_key){
+        EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(pub_key, spec);
+        return new EdDSAPublicKey(pubKey);
+    }
 
     public Ed25519Fulfillment(ConditionType type, byte[] payload) {
         super(type, payload);
+        if (payload.length < FULFILLMENT_LENGTH) {
+        	throw new RuntimeException("payload.length <"+ FULFILLMENT_LENGTH);
+        }
         // TODO:(0) Test implementation correct.
         if (payload.length != FULFILLMENT_LENGTH) throw new
             RuntimeException("payload length ("+payload.length+")"
@@ -56,8 +67,22 @@ public class Ed25519Fulfillment extends FulfillmentBase {
          *     signature OCTET STRING (SIZE(64))
          * }
          */
-        this.publicKey = Arrays.copyOfRange(payload, 0, Ed25519Fulfillment.PUBKEY_LENGTH);
-        this.signature = Arrays.copyOfRange(payload, Ed25519Fulfillment.PUBKEY_LENGTH, Ed25519Fulfillment.SIGNATURE_LENGTH);
+        publicKey = _publicKeyFromByteArray(Arrays.copyOfRange(payload, 0, Ed25519Fulfillment.PUBKEY_LENGTH));
+        this.signature = Arrays.copyOfRange(payload, Ed25519Fulfillment.PUBKEY_LENGTH, Ed25519Fulfillment.FULFILLMENT_LENGTH);
+    }
+
+    public Ed25519Fulfillment(PublicKey publicKey, byte[] signature) {
+        if (publicKey.getEncoded().length!=PUBKEY_LENGTH) {
+        	throw new RuntimeException("publicKey length != "+PUBKEY_LENGTH);
+        }
+        if (signature.length != SIGNATURE_LENGTH) {
+        	throw new RuntimeException("signature lenght != "+SIGNATURE_LENGTH);
+        }
+        this.publicKey = publicKey;
+
+        this.signature = signature.clone();
+        
+        byte[] payload = new byte[]{} ; // TODO:(0) == publicKey "+" signature
     }
 
     @Override
@@ -77,25 +102,22 @@ public class Ed25519Fulfillment extends FulfillmentBase {
     @Override
     public Condition generateCondition(byte[] payload) 
     {
-        // TODO:(0) This will fail now since generateCondition is invoqued in the
-        // constructor before setPrivateKey is invoqued.
-
-        if (this.privateKey == null ) {
+        if (this.publicKey == null ) {
         	// TODO:(0) This will fail now. generateCondition is called before privateKey is set
-            throw new RuntimeException("this.privateKey not yet defined ");
+            throw new RuntimeException("this.publicKey not yet defined ");
         }
         EnumSet<FeatureSuite> features = EnumSet.of(FeatureSuite.ED25519); // TODO:(0) Recheck
 
          
         
-        PrivateKey sKey = new EdDSAPrivateKey(
-                new EdDSAPrivateKeySpec(
-                        this.privateKey, EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512)));
+//        PrivateKey sKey = new EdDSAPrivateKey(
+//                new EdDSAPrivateKeySpec(
+//                        this.privateKey, EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512)));
         try {
             return new ConditionImpl(
                     ConditionType.ED25519, 
                     features,
-                    this.publicKey, 
+                    this.publicKey.getEncoded(), 
                     FULFILLMENT_LENGTH);
         } catch (Exception e) {
             throw new RuntimeException(e.toString(), e);
@@ -104,19 +126,12 @@ public class Ed25519Fulfillment extends FulfillmentBase {
 
     @Override
     public boolean validate(byte[] message) {
-        if (this.publicKey == null ) {
-            throw new RuntimeException("privateKey is undefined. Validation can't continue");
-        }
-        if (this.signature == null ) {
-            throw new RuntimeException("privateKey is undefined. Validation can't continue");
-        }
+    	if (this.publicKey == null) {
+    		throw new RuntimeException("publicKey not initialized");
+    	}
         try{
-            EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("ed25519-sha-512");
-            
-            EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(publicKey, spec);
-            PublicKey vKey = new EdDSAPublicKey(pubKey);
             Signature sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
-            sgr.initVerify(vKey);
+            sgr.initVerify(this.publicKey);
             sgr.update(message);
             return sgr.verify(signature);
     	}catch(Exception e){

@@ -7,8 +7,13 @@ import org.interledger.cryptoconditions.encoding.Base64Url;
 
 public abstract class FulfillmentBase  implements Fulfillment {
 
-	protected final byte[] payload;	
-	protected final Condition condition;
+	protected final byte[] payload;
+	/*
+	 *  condition can't be declared final since it can't be initialized
+	 *  in the constructor. Nevertheless, we can force to init it in generateCondition
+	 *  by passing only final immutable parameters as input.
+	 */
+	private Condition condition;
 
 	/*
 	 * Default constructor. Raise exception to force use of child classes.
@@ -26,9 +31,18 @@ public abstract class FulfillmentBase  implements Fulfillment {
 			throw new RuntimeException("Implementation error. Type mismatch. "
 					+ "Expected "+this.getType()+" but URI indicates "+type.toString());
 		}
-		this.condition = this.generateCondition(payload);
+		// Can't generateCondition -> Derived classes must initialize internal members first
+		//   but the Java syntax force to call parent constructor before "anything else".
+		//
+		// this.condition = this.generateCondition(payload);
 	}
 
+	public Condition getCondition(){
+		if (condition == null) {
+			condition = generateCondition(payload);
+		}
+		return condition;
+	}
 	
 	@Override
 	public ConditionType getType() {

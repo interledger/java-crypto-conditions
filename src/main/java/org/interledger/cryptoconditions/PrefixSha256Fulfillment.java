@@ -17,11 +17,11 @@ import org.interledger.cryptoconditions.util.Crypto;
  *
  */
 public class PrefixSha256Fulfillment extends FulfillmentBase {
-	
+
 	public PrefixSha256Fulfillment(ConditionType type, byte[] payload) {
 		super(type, payload);
 	}
-	
+
 	private static EnumSet<FeatureSuite> BASE_FEATURES = EnumSet.of(
 			FeatureSuite.SHA_256, 
 			FeatureSuite.PREFIX
@@ -30,9 +30,13 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 	private byte[] prefix;
 	private Fulfillment subfulfillment;
 	
+	// TODO:(0) There are two different use-cases with two different constructors:
+	//   prefix, subfulfillment (or subfulfillmentURI) 
+	//   prefix, condition      (or conditionURI     )
 	public PrefixSha256Fulfillment(byte[] prefix, Fulfillment subfulfillment) {
 		setPrefix(prefix);
 		setSubFulfillment(subfulfillment);
+        // TODO:(0) Init this.payload, this.condition
 	}
 
 	public void setPrefix(byte[] prefix)
@@ -50,7 +54,7 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 	public void setSubFulfillment(Fulfillment fulfillment)
 	{
 		this.subfulfillment = fulfillment;
-		// this.payload = null; TODO:(0) 
+		// this.payload = null; TODO:(0)
 	}
 	
 	public Fulfillment getSubFulfillment()
@@ -70,7 +74,14 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 
 	@Override
 	public Condition generateCondition(byte[] payload) {
-		
+		// TODO:(0) parse subfulfillment
+		if (subfulfillment == null ) {
+			// TODO:(0)
+//			parsePayload (reader) {
+//				this.setPrefix(reader.readVarOctetString())
+//				this.setSubfulfillment(Fulfillment.fromBinary(reader))
+//			}
+		}
 		Condition subcondition = subfulfillment.generateCondition(payload);
 		
 		EnumSet<FeatureSuite> features = subcondition.getFeatures();

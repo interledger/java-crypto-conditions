@@ -30,6 +30,7 @@ public class TestFulfillmentEd25519 {
             EdDSAPrivateKeySpec privKey = new EdDSAPrivateKeySpec(TEST_SEED, spec);
             PrivateKey sKey = new EdDSAPrivateKey(privKey);
             sgr.initSign(sKey);
+
         }catch(Exception e){
             throw new RuntimeException(e.toString(), e);
         }
@@ -51,6 +52,7 @@ public class TestFulfillmentEd25519 {
 		} 
 		byte[] payload = buffer.toByteArray();
 		Fulfillment ff = new Ed25519Fulfillment(ConditionType.ED25519, payload);
+		ff.getCondition();
 		assertTrue("Fulfillment validates TEST_MSG", ff.validate(TEST_MSG));
 		
 	}
