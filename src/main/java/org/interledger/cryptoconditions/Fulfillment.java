@@ -2,6 +2,7 @@ package org.interledger.cryptoconditions;
 
 import java.util.EnumSet;
 
+import org.interledger.cryptoconditions.types.*;
 /**
  * Fulfillments are cryptographically verifiable messages that prove an event occurred. 
  * 
@@ -41,7 +42,7 @@ public interface Fulfillment  {
 	 * 
 	 * @return raw bytes representing the fulfillment
 	 */
-	byte[] getPayload();
+	FulfillmentPayload getPayload();
 			
 	
 	/**
@@ -53,7 +54,7 @@ public interface Fulfillment  {
 	 * @return a Condition that is fulfilled by this object
 	 */
 	// TODO:(0) Check if payload argument can be removed
-	Condition generateCondition(byte[] payload);
+	Condition generateCondition(FulfillmentPayload payload);
 	
 	Condition getCondition();
 	

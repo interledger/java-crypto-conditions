@@ -1,9 +1,11 @@
 package org.interledger.cryptoconditions;
 
 import java.util.Arrays;
+
 import java.util.EnumSet;
 
 import org.interledger.cryptoconditions.util.Crypto;
+import org.interledger.cryptoconditions.types.FulfillmentPayload;
 
 /**
  * Implementation of a PREIMAGE-SHA-256 crypto-condition fulfillment
@@ -15,7 +17,7 @@ import org.interledger.cryptoconditions.util.Crypto;
  */
 public class PreimageSha256Fulfillment extends FulfillmentBase {
 
-	public PreimageSha256Fulfillment(ConditionType type, byte[] payload) {
+	public PreimageSha256Fulfillment(ConditionType type, FulfillmentPayload payload) {
 		super(type, payload);
 	}
 
@@ -25,7 +27,7 @@ public class PreimageSha256Fulfillment extends FulfillmentBase {
 		);
 
 	public byte[] getPreimage() {
-		byte[] result = Arrays.copyOf(payload, payload.length);
+		byte[] result = Arrays.copyOf(payload.payload, payload.payload.length);
 		return result;
 	}
 	
@@ -35,12 +37,12 @@ public class PreimageSha256Fulfillment extends FulfillmentBase {
 	}
 
 	@Override
-	public byte[] getPayload() {
-		return getPreimage();
+	public FulfillmentPayload getPayload() {
+		return new FulfillmentPayload(getPreimage());
 	}
 
 	@Override
-	public Condition generateCondition(byte[] payload) {
+	public Condition generateCondition(FulfillmentPayload payload) {
 		byte[] fingerprint = Crypto.getSha256Hash(this.getPreimage());
 		int maxFulfillmentLength = this.getPreimage().length;
 	

@@ -47,14 +47,14 @@ public class Ed25519Fulfillment extends FulfillmentBase {
         return new EdDSAPublicKey(pubKey);
     }
 
-    public Ed25519Fulfillment(ConditionType type, byte[] payload) {
+    public Ed25519Fulfillment(ConditionType type, FulfillmentPayload payload) {
         super(type, payload);
-        if (payload.length < FULFILLMENT_LENGTH) {
+        if (payload.payload.length < FULFILLMENT_LENGTH) {
         	throw new RuntimeException("payload.length <"+ FULFILLMENT_LENGTH);
         }
         // TODO:(0) Test implementation correct.
-        if (payload.length != FULFILLMENT_LENGTH) throw new
-            RuntimeException("payload length ("+payload.length+")"
+        if (payload.payload.length != FULFILLMENT_LENGTH) throw new
+            RuntimeException("payload length ("+payload.payload.length+")"
                 + " doesn't match Ed25519 fulfillment length ("+FULFILLMENT_LENGTH+")");
         /*
          * REF: https://interledger.org/five-bells-condition/spec.html#rfc.section.4.5.2
@@ -64,9 +64,9 @@ public class Ed25519Fulfillment extends FulfillmentBase {
          * }
          */
         publicKey = _publicKeyFromByteArray(new KeyPayload(
-        Arrays.copyOfRange(payload, 0, Ed25519Fulfillment.PUBKEY_LENGTH)) );
+        Arrays.copyOfRange(payload.payload, 0, Ed25519Fulfillment.PUBKEY_LENGTH)) );
         this.signature = new SignaturePayload(
-        	Arrays.copyOfRange(payload, Ed25519Fulfillment.PUBKEY_LENGTH, Ed25519Fulfillment.FULFILLMENT_LENGTH));
+        	Arrays.copyOfRange(payload.payload, Ed25519Fulfillment.PUBKEY_LENGTH, Ed25519Fulfillment.FULFILLMENT_LENGTH));
     }
 
     public Ed25519Fulfillment(KeyPayload publicKeySource, KeyPayload privateKeySource, MessagePayload message) {
@@ -103,13 +103,13 @@ public class Ed25519Fulfillment extends FulfillmentBase {
     }
 
     @Override
-    public byte[] getPayload() 
+    public FulfillmentPayload getPayload() 
     {
-        return payload.clone();
+        return payload;
     }
 
     @Override
-    public Condition generateCondition(byte[] payload) 
+    public Condition generateCondition(FulfillmentPayload payload /* TODO:(0) not used*/) 
     {
         if (this.publicKey == null ) {
         	// TODO:(0) This will fail now. generateCondition is called before privateKey is set

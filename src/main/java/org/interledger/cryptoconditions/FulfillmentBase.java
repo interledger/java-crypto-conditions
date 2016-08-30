@@ -2,13 +2,15 @@ package org.interledger.cryptoconditions;
 
 import java.util.EnumSet;
 
+import org.interledger.cryptoconditions.types.*;
+
 
 import org.interledger.cryptoconditions.encoding.Base64Url;
 
 public abstract class FulfillmentBase  implements Fulfillment {
 
 	// TODO:(0) Wrap payload around FulfillmentPayload and ConditionPayload
-	protected final byte[] payload;
+	protected final FulfillmentPayload payload;
 	/*
 	 *  condition can't be declared final since it can't be initialized
 	 *  in the constructor. Nevertheless, we can force to init it in generateCondition
@@ -26,7 +28,7 @@ public abstract class FulfillmentBase  implements Fulfillment {
 	/*
 	 * Create from URI-encoded string
 	 */
-	public FulfillmentBase(ConditionType type, byte[] payload) {
+	public FulfillmentBase(ConditionType type, FulfillmentPayload payload) {
 		this.payload = payload;
 		if (! type.equals(this.getType())) {
 			throw new RuntimeException("Implementation error. Type mismatch. "
@@ -51,7 +53,7 @@ public abstract class FulfillmentBase  implements Fulfillment {
 	}
 
 	@Override
-	public byte[] getPayload() {
+	public FulfillmentPayload getPayload() {
 		if (this.payload == null)
 			throw new RuntimeException("Payload not YET initialized");
 		
@@ -70,7 +72,7 @@ public abstract class FulfillmentBase  implements Fulfillment {
 	public String toURI() {
 		return 	"cf"
 				+ ":" + Integer.toHexString(this.getType().getTypeCode())
-				+ ":" + Base64Url.encode(this.getPayload());
+				+ ":" + Base64Url.encode(this.getPayload().payload);
 	}
 	
 	@Override

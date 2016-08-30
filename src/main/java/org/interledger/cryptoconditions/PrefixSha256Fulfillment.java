@@ -1,12 +1,14 @@
 package org.interledger.cryptoconditions;
 
 import java.io.ByteArrayOutputStream;
+
 import java.io.IOException;
 import java.util.EnumSet;
 
 import org.interledger.cryptoconditions.encoding.ConditionOutputStream;
 import org.interledger.cryptoconditions.encoding.FulfillmentOutputStream;
 import org.interledger.cryptoconditions.util.Crypto;
+import org.interledger.cryptoconditions.types.FulfillmentPayload;
 
 /**
  * Implementation of a PREFIX-SHA-256 crypto-condition fulfillment
@@ -18,7 +20,7 @@ import org.interledger.cryptoconditions.util.Crypto;
  */
 public class PrefixSha256Fulfillment extends FulfillmentBase {
 
-	public PrefixSha256Fulfillment(ConditionType type, byte[] payload) {
+	public PrefixSha256Fulfillment(ConditionType type, FulfillmentPayload payload) {
 		super(type, payload);
 	}
 
@@ -68,12 +70,13 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 	}
 
 	@Override
-	public byte[] getPayload() {
-		return payload.clone();
+	public FulfillmentPayload getPayload() {
+		// TODO:(0) Use super class.?
+		return payload;
 	}
 
 	@Override
-	public Condition generateCondition(byte[] payload) {
+	public Condition generateCondition(FulfillmentPayload payload) {
 		// TODO:(0) parse subfulfillment
 		if (subfulfillment == null ) {
 			// TODO:(0)

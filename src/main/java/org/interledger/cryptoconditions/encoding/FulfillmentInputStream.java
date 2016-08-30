@@ -1,6 +1,7 @@
 package org.interledger.cryptoconditions.encoding;
 
 import java.io.ByteArrayInputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -11,6 +12,7 @@ import org.interledger.cryptoconditions.PreimageSha256Fulfillment;
 import org.interledger.cryptoconditions.UnsupportedConditionException;
 import org.interledger.cryptoconditions.UnsupportedLengthException;
 
+import org.interledger.cryptoconditions.types.*;
 /**
  * Reads and decodes Fulfillments from an underlying input stream.
  * 
@@ -51,13 +53,13 @@ public class FulfillmentInputStream extends OerInputStream {
 	        throws IOException, UnsupportedConditionException, OerDecodingException 
 	{
 		final ConditionType type = readConditiontype();
-		final byte[] payload = readFingerprint();
+		final FulfillmentPayload payload = new FulfillmentPayload(readFingerprint());
 		
 		switch (type) {
 		case PREIMAGE_SHA256:
 			return new PreimageSha256Fulfillment(ConditionType.PREIMAGE_SHA256, payload);
 		case PREFIX_SHA256:
-			ByteArrayInputStream byteStream = new ByteArrayInputStream(payload);
+			ByteArrayInputStream byteStream = new ByteArrayInputStream(payload.payload);
 			FulfillmentInputStream innerStream = new FulfillmentInputStream(byteStream);
 			byte[] prefix = innerStream.readOctetString();
 			Fulfillment subfulfillment = innerStream.readFulfillment();

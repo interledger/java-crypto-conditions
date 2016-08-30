@@ -19,6 +19,8 @@ import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 
 import org.interledger.cryptoconditions.Fulfillment;
+import org.interledger.cryptoconditions.types.*;
+
 
 public class TestFulfillmentEd25519 {
 
@@ -51,7 +53,7 @@ public class TestFulfillmentEd25519 {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} 
-		byte[] payload = buffer.toByteArray();
+		FulfillmentPayload payload = new FulfillmentPayload(buffer.toByteArray());
 		Fulfillment ff = new Ed25519Fulfillment(ConditionType.ED25519, payload);
 		ff.getCondition();
 		assertTrue("Fulfillment validates TEST_MSG", ff.validate(TEST_MSG));
