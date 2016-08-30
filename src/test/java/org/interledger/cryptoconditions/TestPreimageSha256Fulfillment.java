@@ -15,6 +15,7 @@ public class TestPreimageSha256Fulfillment {
     @Test
     public void testCreate() {
         String[][] testData = {
+            /* preimg , fulfillment, condition */
             { ""      , "cf:0:"    , "cc:0:3:47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU:0"},
             { "00"    , "cf:0:AA"  , "cc:0:3:bjQLnP-zepicpUTmu3gKLHiQHT-zNzh2hRGjBhevoB0:1"},
             { "ff"    , "cf:0:_w"  , "cc:0:3:qBAK5qoZQNC2Y7sxzUZhQuu9vVGHExuS2TgYmHgy64k:1"},
@@ -25,11 +26,11 @@ public class TestPreimageSha256Fulfillment {
             { "616263", "cf:0:YWJj", "cc:0:3:ungWv48Bz-pBQUDeXa4iI7ADYaOWF3qctBD_YfIAFa0:3"},
         };
 
-        String inputURI = testData[0][0];
-        FulfillmentPayload ffPayload = new FulfillmentPayload(inputURI.getBytes());
-        Fulfillment ff = new PreimageSha256Fulfillment(ConditionType.PREIMAGE_SHA256, ffPayload);
-System.out.println("deleteme inputURI:"+inputURI + ", ff.toURI():"+ff.toURI());
-        assertTrue("inputURI.equals(ff.toURI())", inputURI.equals(ff.toURI()) );
+        String preimage = testData[0][0], ffURI = testData[0][1], ccURI = testData[0][2];
+        Fulfillment ff = PreimageSha256Fulfillment.BuildFromSecrets(preimage.getBytes());
+        
+System.out.println("deleteme ccURI:"+ccURI + ", ff.getCondition().toURI():"+ff.getCondition().toURI());
+        assertTrue("ffURI.equals(ff.toURI())", ccURI.equals(ff.getCondition().toURI()) );
         
     }
 }

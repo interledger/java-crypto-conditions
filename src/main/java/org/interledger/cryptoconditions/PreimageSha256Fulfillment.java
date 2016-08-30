@@ -19,9 +19,13 @@ public class PreimageSha256Fulfillment extends FulfillmentBase {
     public static PreimageSha256Fulfillment BuildFromSecrets(byte[] preimage){
         FulfillmentPayload payload = new FulfillmentPayload(Crypto.getSha256Hash(preimage));
         PreimageSha256Fulfillment result = new PreimageSha256Fulfillment(ConditionType.PREIMAGE_SHA256, payload);
+        result.setPreimage(preimage);
         return result;
     }
 
+    private void setPreimage(byte[] preimage){
+        this.preimage = preimage;
+    }
 	public PreimageSha256Fulfillment(ConditionType type, FulfillmentPayload payload) {
 		super(type, payload);
 	}
