@@ -22,11 +22,12 @@ import org.interledger.cryptoconditions.Fulfillment;
 
 public class TestFulfillmentEd25519 {
 
+    private static EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("ed25519-sha-512");
+
 	static {
 	    final byte[] TEST_SEED = Utils.hexToBytes("0000000000000000000000000000000000000000000000000000000000000000");
         try {
             Signature sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
-            EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("ed25519-sha-512");
             EdDSAPrivateKeySpec privKey = new EdDSAPrivateKeySpec(TEST_SEED, spec);
             PrivateKey sKey = new EdDSAPrivateKey(privKey);
             sgr.initSign(sKey);

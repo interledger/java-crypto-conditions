@@ -2,26 +2,24 @@ package org.interledger.cryptoconditions;
 
 import java.util.Arrays;
 import java.util.EnumSet;
-
-
-
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 //import java.nio.charset.Charset;
 import java.security.MessageDigest;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 
 
-import net.i2p.crypto.eddsa.EdDSAPrivateKey;
+
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.EdDSAEngine;
 
 // TODO:(0) Add dependencies in ed25519 external library.
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
-import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
+import org.interledger.cryptoconditions.types.*;
 /**
  * Implementation of a PREFIX-SHA-512 crypto-condition fulfillment
  * 
@@ -39,15 +37,13 @@ public class Ed25519Fulfillment extends FulfillmentBase {
     public static final int FULFILLMENT_LENGTH = PUBKEY_LENGTH + SIGNATURE_LENGTH;
 
     private final PublicKey publicKey;
-    private final byte[] signature;
-    
-    private byte[] privateKey = null;
-    
+    private final SignaturePayload signature;
+
     private static EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("ed25519-sha-512");
 
 
-    private static PublicKey _publicKeyFromByteArray(byte[] pub_key){
-        EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(pub_key, spec);
+    private static PublicKey _publicKeyFromByteArray(KeySource pub_key){
+        EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(pub_key.payload, spec);
         return new EdDSAPublicKey(pubKey);
     }
 
@@ -67,22 +63,38 @@ public class Ed25519Fulfillment extends FulfillmentBase {
          *     signature OCTET STRING (SIZE(64))
          * }
          */
-        publicKey = _publicKeyFromByteArray(Arrays.copyOfRange(payload, 0, Ed25519Fulfillment.PUBKEY_LENGTH));
-        this.signature = Arrays.copyOfRange(payload, Ed25519Fulfillment.PUBKEY_LENGTH, Ed25519Fulfillment.FULFILLMENT_LENGTH);
+        publicKey = _publicKeyFromByteArray(new KeySource(
+        Arrays.copyOfRange(payload, 0, Ed25519Fulfillment.PUBKEY_LENGTH)) );
+        this.signature = new SignaturePayload(
+        	Arrays.copyOfRange(payload, Ed25519Fulfillment.PUBKEY_LENGTH, Ed25519Fulfillment.FULFILLMENT_LENGTH));
     }
 
-    public Ed25519Fulfillment(PublicKey publicKey, byte[] signature) {
+    public Ed25519Fulfillment(KeySource publicKeySource, KeySource privateKeySource, MessagePayload message) {
+        // const keyPair = ed25519.MakeKeypair(privateKey)
+		// this.signature = ed25519.Sign(message, keyPair)
+		SignaturePayload signature = null; // TODO:(0)
+		this.publicKey = _publicKeyFromByteArray(publicKeySource);
+        this.signature = signature;
+	}
+
+    public Ed25519Fulfillment(PublicKey publicKey, SignaturePayload signature) {
         if (publicKey.getEncoded().length!=PUBKEY_LENGTH) {
         	throw new RuntimeException("publicKey length != "+PUBKEY_LENGTH);
         }
-        if (signature.length != SIGNATURE_LENGTH) {
+        if (signature.payload.length != SIGNATURE_LENGTH) {
         	throw new RuntimeException("signature lenght != "+SIGNATURE_LENGTH);
         }
         this.publicKey = publicKey;
+        this.signature = signature;
 
-        this.signature = signature.clone();
-        
-        byte[] payload = new byte[]{} ; // TODO:(0) == publicKey "+" signature
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		try {
+			// buffer.write(publicKey); // TODO:(0)
+			buffer.write(signature.payload);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} 
+		// this.payload = buffer.toByteArray(); // TODO:(0) Compiler error
     }
 
     @Override
@@ -96,9 +108,6 @@ public class Ed25519Fulfillment extends FulfillmentBase {
         return payload.clone();
     }
 
-    public void setPrivateKey(byte[] privateKey) {
-        this.privateKey = privateKey;
-    }
     @Override
     public Condition generateCondition(byte[] payload) 
     {
@@ -108,8 +117,6 @@ public class Ed25519Fulfillment extends FulfillmentBase {
         }
         EnumSet<FeatureSuite> features = EnumSet.of(FeatureSuite.ED25519); // TODO:(0) Recheck
 
-         
-        
 //        PrivateKey sKey = new EdDSAPrivateKey(
 //                new EdDSAPrivateKeySpec(
 //                        this.privateKey, EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512)));
@@ -133,7 +140,7 @@ public class Ed25519Fulfillment extends FulfillmentBase {
             Signature sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
             sgr.initVerify(this.publicKey);
             sgr.update(message);
-            return sgr.verify(signature);
+            return sgr.verify(signature.payload);
     	}catch(Exception e){
     		throw new RuntimeException(e.toString(), e);
     	}
