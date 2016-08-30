@@ -28,6 +28,7 @@ public class PreimageSha256Fulfillment extends FulfillmentBase {
     }
 	public PreimageSha256Fulfillment(ConditionType type, FulfillmentPayload payload) {
 		super(type, payload);
+		this.preimage = payload.payload;
 	}
 
 	private static EnumSet<FeatureSuite> BASE_FEATURES = EnumSet.of(
