@@ -7,16 +7,19 @@ import java.io.IOException;
 //import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.PublicKey;
+import java.security.PrivateKey;
+
 import java.security.Signature;
 
 
 
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.EdDSAEngine;
-
+import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 // TODO:(0) Add dependencies in ed25519 external library.
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
+import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
 import org.interledger.cryptoconditions.types.*;
@@ -37,16 +40,73 @@ public class Ed25519Fulfillment extends FulfillmentBase {
     public static final int FULFILLMENT_LENGTH = PUBKEY_LENGTH + SIGNATURE_LENGTH;
 
     private final PublicKey publicKey;
-    private final SignaturePayload signature;
+    private SignaturePayload signature;
 
     private static EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("ed25519-sha-512");
 
 
-    private static PublicKey _publicKeyFromByteArray(KeyPayload pub_key){
+    private static PublicKey _publicKeyFromByteArray(KeyPayload pub_key)
+    {
         EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(pub_key.payload, spec);
         return new EdDSAPublicKey(pubKey);
     }
+    
+    private static PrivateKey _privateFromByteArray(KeyPayload priv_key)
+    {
+    	throw new RuntimeException("Not implemented"); // TODO:(0)
+    }
+    
 
+    /*
+     * Returns an initialized instance.
+     * 
+     * if publicKeySource is null it's generated from the privateKey.
+     */
+    public static Ed25519Fulfillment BuildFromSecrets(
+    		KeyPayload privateKeySource, KeyPayload publicKeySource, MessagePayload message)
+    {
+        if (java.math.BigDecimal.ONE.equals("")) throw new RuntimeException("Not implemented"); // TODO:(0)
+
+        // const keyPair = ed25519.MakeKeypair(privateKey)
+        // this.signature = ed25519.Sign(message, keyPair)
+    	PrivateKey privKey = _privateFromByteArray(privateKeySource);
+
+        PublicKey publicKey = null; // TODO:(0)
+        if (publicKeySource != null) {
+        	publicKey = _publicKeyFromByteArray(publicKeySource);
+        } else {
+        	// TODO:(0) Precalculate publicKey/publicKeySource from privKey
+        	publicKeySource = new KeyPayload(publicKey.getEncoded());
+        }
+        // Ref: EdDSAEngineTest.java
+        // TODO:(0) Check reuse of sgr
+        SignaturePayload signature;
+        try {
+            Signature sgr;
+            sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
+            sgr.initSign(privKey);
+            sgr.update(message.payload);
+            signature = new SignaturePayload(sgr.sign()); // TODO:(0) Check sgr.sign() "invented"
+        }catch(Exception e){
+        	throw new RuntimeException(e.toString(), e);
+        }
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try {
+            buffer.write(publicKeySource.payload);
+            buffer.write(signature.payload);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        Ed25519Fulfillment result = new 
+                Ed25519Fulfillment(ConditionType.ED25519, new FulfillmentPayload(buffer.toByteArray()));
+        return result;
+    }
+
+    
+    /*
+     * public key and signarutes are extracted from the payload
+     */
     public Ed25519Fulfillment(ConditionType type, FulfillmentPayload payload) {
         super(type, payload);
         if (payload.payload.length < FULFILLMENT_LENGTH) {
@@ -69,13 +129,6 @@ public class Ed25519Fulfillment extends FulfillmentBase {
         	Arrays.copyOfRange(payload.payload, Ed25519Fulfillment.PUBKEY_LENGTH, Ed25519Fulfillment.FULFILLMENT_LENGTH));
     }
 
-    public Ed25519Fulfillment(KeyPayload publicKeySource, KeyPayload privateKeySource, MessagePayload message) {
-        // const keyPair = ed25519.MakeKeypair(privateKey)
-		// this.signature = ed25519.Sign(message, keyPair)
-		SignaturePayload signature = null; // TODO:(0)
-		this.publicKey = _publicKeyFromByteArray(publicKeySource);
-        this.signature = signature;
-	}
 
     public Ed25519Fulfillment(PublicKey publicKey, SignaturePayload signature) {
         if (publicKey.getEncoded().length!=PUBKEY_LENGTH) {
