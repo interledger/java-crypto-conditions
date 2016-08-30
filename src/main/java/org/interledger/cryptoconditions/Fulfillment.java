@@ -54,7 +54,7 @@ public interface Fulfillment  {
 	 * @return a Condition that is fulfilled by this object
 	 */
 	// TODO:(0) Check if payload argument can be removed
-	Condition generateCondition(FulfillmentPayload payload);
+	Condition generateCondition();
 	
 	Condition getCondition();
 	

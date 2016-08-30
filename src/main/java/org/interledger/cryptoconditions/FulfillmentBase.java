@@ -42,7 +42,7 @@ public abstract class FulfillmentBase  implements Fulfillment {
 
 	public Condition getCondition(){
 		if (condition == null) {
-			condition = generateCondition(payload);
+			condition = generateCondition();
 		}
 		return condition;
 	}

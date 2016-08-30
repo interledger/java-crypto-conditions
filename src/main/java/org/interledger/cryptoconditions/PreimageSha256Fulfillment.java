@@ -51,13 +51,12 @@ public class PreimageSha256Fulfillment extends FulfillmentBase {
 	}
 
 	@Override
-	public Condition generateCondition(FulfillmentPayload payload) {
+	public Condition generateCondition() {
 	    if (preimage == null ) {
 	        throw new RuntimeException("preimage not initialized");
 	    }
 		byte[] fingerprint = Crypto.getSha256Hash(preimage);
 		int maxFulfillmentLength = preimage.length; // TODO:(0) Recheck
-	
 		return new ConditionImpl(
 				ConditionType.PREIMAGE_SHA256, 
 				BASE_FEATURES, 

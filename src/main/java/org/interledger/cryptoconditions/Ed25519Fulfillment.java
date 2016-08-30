@@ -15,11 +15,9 @@ import java.security.Signature;
 
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.EdDSAEngine;
-import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 // TODO:(0) Add dependencies in ed25519 external library.
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
-import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
 import org.interledger.cryptoconditions.types.*;
@@ -143,7 +141,7 @@ public class Ed25519Fulfillment extends FulfillmentBase {
     }
 
     @Override
-    public Condition generateCondition(FulfillmentPayload payload /* TODO:(0) not used*/) 
+    public Condition generateCondition() 
     {
         if (this.publicKey == null ) {
         	// TODO:(0) This will fail now. generateCondition is called before privateKey is set

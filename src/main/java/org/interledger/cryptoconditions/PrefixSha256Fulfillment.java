@@ -1,6 +1,7 @@
 package org.interledger.cryptoconditions;
 
 import java.io.ByteArrayInputStream;
+
 import java.io.ByteArrayOutputStream;
 
 
@@ -29,13 +30,12 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 			FeatureSuite.PREFIX
 		);
 
-	private final byte[] prefix; // TODO:(0) Wrap into PrefixPayload?
+	private byte[] prefix; // TODO:(0) Wrap into PrefixPayload?
 	private final Fulfillment subfulfillment;
 	
 	public PrefixSha256Fulfillment(ConditionType type, FulfillmentPayload payload) {
 		super(type, payload);
 		ByteArrayInputStream byteStream = new ByteArrayInputStream(payload.payload);
-
 		FulfillmentInputStream stream = new FulfillmentInputStream(byteStream);
 		try{
 			this.prefix = stream.readOctetString();
@@ -51,19 +51,28 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 		}
 	}
 
+
 	// TODO:(0) In the JS implementation there is also a Constructor (prefix, subcondition)
 	public static PrefixSha256Fulfillment Build(byte[] prefix, Fulfillment subfulfillment) {
-		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+		FulfillmentOutputStream ffOutputStream = new FulfillmentOutputStream(byteStream);
 		try {
-			buffer.write(prefix);
-			buffer.write(subfulfillment.getPayload().payload);
+			ffOutputStream.writeOctetString(prefix);
+			ffOutputStream.writeFulfillment(subfulfillment);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		} 
-		FulfillmentPayload ffPayload = new FulfillmentPayload(buffer.toByteArray());
+		} finally {
+			try {
+				ffOutputStream.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e.toString(), e);
+			}
+		}
+		FulfillmentPayload ffPayload = new FulfillmentPayload(byteStream.toByteArray());
 		PrefixSha256Fulfillment result = 
-				new PrefixSha256Fulfillment(ConditionType.PREFIX_SHA256, ffPayload);
+		new PrefixSha256Fulfillment(ConditionType.PREFIX_SHA256, ffPayload);
 		return result;
+
 	}
 
 	public byte[] getPrefix() {
@@ -86,9 +95,9 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 	}
 
 	@Override
-	public Condition generateCondition(FulfillmentPayload payload) {
+	public Condition generateCondition() {
 		// TODO:(0) parse subfulfillment
-		Condition subcondition = subfulfillment.generateCondition(payload);
+		Condition subcondition = subfulfillment.generateCondition();
 		
 		EnumSet<FeatureSuite> features = subcondition.getFeatures();
 		features.addAll(BASE_FEATURES);
