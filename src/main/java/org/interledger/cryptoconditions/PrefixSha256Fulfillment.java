@@ -1,12 +1,15 @@
 package org.interledger.cryptoconditions;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+
 
 import java.io.IOException;
 import java.util.EnumSet;
 
 import org.interledger.cryptoconditions.encoding.ConditionOutputStream;
 import org.interledger.cryptoconditions.encoding.FulfillmentOutputStream;
+import org.interledger.cryptoconditions.encoding.FulfillmentInputStream;
 import org.interledger.cryptoconditions.util.Crypto;
 import org.interledger.cryptoconditions.types.*;
 
@@ -20,45 +23,53 @@ import org.interledger.cryptoconditions.types.*;
  */
 public class PrefixSha256Fulfillment extends FulfillmentBase {
 
-	public PrefixSha256Fulfillment(ConditionType type, FulfillmentPayload payload) {
-		super(type, payload);
-	}
 
 	private static EnumSet<FeatureSuite> BASE_FEATURES = EnumSet.of(
 			FeatureSuite.SHA_256, 
 			FeatureSuite.PREFIX
 		);
 
-	private byte[] prefix; // TODO:(0) Wrap into PrefixPayload?
-	private Fulfillment subfulfillment;
+	private final byte[] prefix; // TODO:(0) Wrap into PrefixPayload?
+	private final Fulfillment subfulfillment;
 	
-	// TODO:(0) There are two different use-cases with two different constructors:
-	//   prefix, subfulfillment (or subfulfillmentURI) 
-	//   prefix, condition      (or conditionURI     )
-	public PrefixSha256Fulfillment(byte[] prefix, Fulfillment subfulfillment) {
-		setPrefix(prefix);
-		setSubFulfillment(subfulfillment);
-        // TODO:(0) Init this.payload, this.condition
+	public PrefixSha256Fulfillment(ConditionType type, FulfillmentPayload payload) {
+		super(type, payload);
+		ByteArrayInputStream byteStream = new ByteArrayInputStream(payload.payload);
+
+		FulfillmentInputStream stream = new FulfillmentInputStream(byteStream);
+		try{
+			this.prefix = stream.readOctetString();
+			this.subfulfillment = stream.readFulfillment();
+		}catch(Exception e){
+			throw new RuntimeException(e.toString(), e);
+		} finally {
+			try { 
+				stream.close(); 
+			}catch(Exception e){
+				throw new RuntimeException(e.toString(), e); // Can't recover
+			}
+		}
 	}
 
-	public void setPrefix(byte[] prefix)
-	{
-		//TODO - Should this be immutable? Use ArrayCopy?
-		this.prefix = prefix.clone();
-		// this.payload = null; TODO:(0)
+	// TODO:(0) In the JS implementation there is also a Constructor (prefix, subcondition)
+	public static PrefixSha256Fulfillment Build(byte[] prefix, Fulfillment subfulfillment) {
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		try {
+			buffer.write(prefix);
+			buffer.write(subfulfillment.getPayload().payload);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} 
+		FulfillmentPayload ffPayload = new FulfillmentPayload(buffer.toByteArray());
+		PrefixSha256Fulfillment result = 
+				new PrefixSha256Fulfillment(ConditionType.PREFIX_SHA256, ffPayload);
+		return result;
 	}
-	
+
 	public byte[] getPrefix() {
-		//TODO - Should this object be immutable? Use ArrayCopy?
-		return prefix;
+		return prefix.clone();
 	}
-			
-	public void setSubFulfillment(Fulfillment fulfillment)
-	{
-		this.subfulfillment = fulfillment;
-		// this.payload = null; TODO:(0)
-	}
-	
+
 	public Fulfillment getSubFulfillment()
 	{
 		return subfulfillment;
@@ -71,20 +82,12 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 
 	@Override
 	public FulfillmentPayload getPayload() {
-		// TODO:(0) Use super class.?
 		return payload;
 	}
 
 	@Override
 	public Condition generateCondition(FulfillmentPayload payload) {
 		// TODO:(0) parse subfulfillment
-		if (subfulfillment == null ) {
-			// TODO:(0)
-//			parsePayload (reader) {
-//				this.setPrefix(reader.readVarOctetString())
-//				this.setSubfulfillment(Fulfillment.fromBinary(reader))
-//			}
-		}
 		Condition subcondition = subfulfillment.generateCondition(payload);
 		
 		EnumSet<FeatureSuite> features = subcondition.getFeatures();
