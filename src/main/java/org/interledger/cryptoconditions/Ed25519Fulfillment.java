@@ -42,7 +42,7 @@ public class Ed25519Fulfillment extends FulfillmentBase {
     private static EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("ed25519-sha-512");
 
 
-    private static PublicKey _publicKeyFromByteArray(KeySource pub_key){
+    private static PublicKey _publicKeyFromByteArray(KeyPayload pub_key){
         EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(pub_key.payload, spec);
         return new EdDSAPublicKey(pubKey);
     }
@@ -63,13 +63,13 @@ public class Ed25519Fulfillment extends FulfillmentBase {
          *     signature OCTET STRING (SIZE(64))
          * }
          */
-        publicKey = _publicKeyFromByteArray(new KeySource(
+        publicKey = _publicKeyFromByteArray(new KeyPayload(
         Arrays.copyOfRange(payload, 0, Ed25519Fulfillment.PUBKEY_LENGTH)) );
         this.signature = new SignaturePayload(
         	Arrays.copyOfRange(payload, Ed25519Fulfillment.PUBKEY_LENGTH, Ed25519Fulfillment.FULFILLMENT_LENGTH));
     }
 
-    public Ed25519Fulfillment(KeySource publicKeySource, KeySource privateKeySource, MessagePayload message) {
+    public Ed25519Fulfillment(KeyPayload publicKeySource, KeyPayload privateKeySource, MessagePayload message) {
         // const keyPair = ed25519.MakeKeypair(privateKey)
 		// this.signature = ed25519.Sign(message, keyPair)
 		SignaturePayload signature = null; // TODO:(0)
