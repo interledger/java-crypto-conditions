@@ -3,11 +3,12 @@ package org.interledger.cryptoconditions;
 
 import static org.junit.Assert.*;
 
+import javax.xml.bind.DatatypeConverter;
+
 import org.junit.Test;
 
 
 import org.interledger.cryptoconditions.Fulfillment;
-import org.interledger.cryptoconditions.types.*;
 import org.interledger.cryptoconditions.PreimageSha256Fulfillment;
 // TODO:(0) Complete tests
 public class TestPreimageSha256Fulfillment {
@@ -26,10 +27,16 @@ public class TestPreimageSha256Fulfillment {
             { "616263", "cf:0:YWJj", "cc:0:3:ungWv48Bz-pBQUDeXa4iI7ADYaOWF3qctBD_YfIAFa0:3"},
         };
 
-        String preimage = testData[0][0], ffURI = testData[0][1], ccURI = testData[0][2];
-        Fulfillment ff = PreimageSha256Fulfillment.BuildFromSecrets(preimage.getBytes());
-        
-        assertTrue("ffURI.equals(ff.toURI())", ccURI.equals(ff.getCondition().toURI()) );
+        for (String[] testDataRow : testData) {
+            byte[] preimage = DatatypeConverter.parseHexBinary(testDataRow[0]);
+            String /* ffURI = testDataRow[1],*/ ccURI = testDataRow[2];
+            Fulfillment ff = PreimageSha256Fulfillment.BuildFromSecrets(preimage);
+            
+//            System.out.println("                    ccURI:"+ccURI);
+//            System.out.println("ff.getCondition().toURI():"+ff.getCondition().toURI());
+            
+            assertTrue("ffURI.equals(ff.toURI())", ccURI.equals(ff.getCondition().toURI()) );
+        }
         
     }
 }
