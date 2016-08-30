@@ -2,7 +2,9 @@ package org.interledger.cryptoconditions;
 
 import java.lang.reflect.Constructor;
 
+
 import org.interledger.cryptoconditions.encoding.Base64Url;
+import org.interledger.cryptoconditions.types.FulfillmentPayload;
 
 public class FulfillmentFactory {
 	private static final String FULFILLMENT_REGEX = "^cf:([1-9a-f][0-9a-f]{0,3}|0):[a-zA-Z0-9_-]*$";
@@ -27,13 +29,13 @@ public class FulfillmentFactory {
 		
 		ConditionType type = ConditionType.valueOf(Integer.parseInt(BASE16Type, 16));
 		
-		byte[] payload = Base64Url.decode(BASE64URLPayload);
+		FulfillmentPayload payload = new FulfillmentPayload(Base64Url.decode(BASE64URLPayload));
 
 		// Get Fulfillment class (Sha256, PreimageSha256, ...)
 		Class<?> clazz = FulfillmentRegistry.getClass(type);
 		Constructor<?> constructor;
 		try {
-			constructor = clazz.getConstructor(ConditionType.class, byte[].class);
+			constructor = clazz.getConstructor(ConditionType.class, FulfillmentPayload.class);
 		} catch (NoSuchMethodException e) {
 			
 			throw new RuntimeException(clazz.getCanonicalName() +
