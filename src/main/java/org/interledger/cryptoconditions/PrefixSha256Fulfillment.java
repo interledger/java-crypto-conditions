@@ -29,7 +29,7 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 			FeatureSuite.PREFIX
 		);
 
-	private byte[] prefix;
+	private byte[] prefix; // TODO:(0) Wrap into PrefixPayload?
 	private Fulfillment subfulfillment;
 	
 	// TODO:(0) There are two different use-cases with two different constructors:
