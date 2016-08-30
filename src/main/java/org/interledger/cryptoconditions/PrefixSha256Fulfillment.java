@@ -8,7 +8,7 @@ import java.util.EnumSet;
 import org.interledger.cryptoconditions.encoding.ConditionOutputStream;
 import org.interledger.cryptoconditions.encoding.FulfillmentOutputStream;
 import org.interledger.cryptoconditions.util.Crypto;
-import org.interledger.cryptoconditions.types.FulfillmentPayload;
+import org.interledger.cryptoconditions.types.*;
 
 /**
  * Implementation of a PREFIX-SHA-256 crypto-condition fulfillment
@@ -171,17 +171,17 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 	}
 
 	@Override
-	public boolean validate(byte[] message) {
+	public boolean validate(MessagePayload message) {
 		if (this.subfulfillment == null)
 			throw new RuntimeException("subfulfillment not yet initialized ");
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
 		try {
 			outputStream.write( this.prefix);
-			outputStream.write( message );
+			outputStream.write( message.payload );
 		} catch (IOException e) {
 			throw new RuntimeException(e.toString());
 		}
 		
-		return this.subfulfillment.validate(outputStream.toByteArray());
+		return this.subfulfillment.validate(new MessagePayload(outputStream.toByteArray()));
 	}
 }

@@ -2,10 +2,11 @@ package org.interledger.cryptoconditions;
 
 import java.util.Arrays;
 
+
 import java.util.EnumSet;
 
 import org.interledger.cryptoconditions.util.Crypto;
-import org.interledger.cryptoconditions.types.FulfillmentPayload;
+import org.interledger.cryptoconditions.types.*;
 
 /**
  * Implementation of a PREIMAGE-SHA-256 crypto-condition fulfillment
@@ -67,7 +68,9 @@ public class PreimageSha256Fulfillment extends FulfillmentBase {
 	 * @return {boolean} Validation result
 	 */
 	@Override
-	public boolean validate(byte[] message) {
+	public boolean validate(MessagePayload message) {
+		// TODO:(0) recheck
+		// TODO:(0) Create unit tests.
 		return true;
 	}
 }

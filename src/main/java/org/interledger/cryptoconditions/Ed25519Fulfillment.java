@@ -132,14 +132,14 @@ public class Ed25519Fulfillment extends FulfillmentBase {
     }
 
     @Override
-    public boolean validate(byte[] message) {
+    public boolean validate(MessagePayload message) {
     	if (this.publicKey == null) {
     		throw new RuntimeException("publicKey not initialized");
     	}
         try{
             Signature sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
             sgr.initVerify(this.publicKey);
-            sgr.update(message);
+            sgr.update(message.payload);
             return sgr.verify(signature.payload);
     	}catch(Exception e){
     		throw new RuntimeException(e.toString(), e);

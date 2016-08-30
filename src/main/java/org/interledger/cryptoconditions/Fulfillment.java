@@ -72,7 +72,7 @@ public interface Fulfillment  {
 	 * 
 	 * @return {boolean} Validation result 
 	 */
-	public boolean validate(byte[] message);
+	public boolean validate(MessagePayload message);
 
 
 }

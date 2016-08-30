@@ -21,6 +21,7 @@ import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import org.interledger.cryptoconditions.Fulfillment;
 import org.interledger.cryptoconditions.types.*;
 
+// TODO:(0) Complete tests
 
 public class TestFulfillmentEd25519 {
 
@@ -56,7 +57,7 @@ public class TestFulfillmentEd25519 {
 		FulfillmentPayload payload = new FulfillmentPayload(buffer.toByteArray());
 		Fulfillment ff = new Ed25519Fulfillment(ConditionType.ED25519, payload);
 		ff.getCondition();
-		assertTrue("Fulfillment validates TEST_MSG", ff.validate(TEST_MSG));
+		assertTrue("Fulfillment validates TEST_MSG", ff.validate(new MessagePayload(TEST_MSG)));
 		
 	}
 
