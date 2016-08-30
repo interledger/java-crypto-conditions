@@ -29,7 +29,6 @@ public class TestPreimageSha256Fulfillment {
         String preimage = testData[0][0], ffURI = testData[0][1], ccURI = testData[0][2];
         Fulfillment ff = PreimageSha256Fulfillment.BuildFromSecrets(preimage.getBytes());
         
-System.out.println("deleteme ccURI:"+ccURI + ", ff.getCondition().toURI():"+ff.getCondition().toURI());
         assertTrue("ffURI.equals(ff.toURI())", ccURI.equals(ff.getCondition().toURI()) );
         
     }
