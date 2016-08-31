@@ -9,8 +9,7 @@ import org.interledger.cryptoconditions.encoding.Base64Url;
 
 public abstract class FulfillmentBase  implements Fulfillment {
 
-	// TODO:(0) Wrap payload around FulfillmentPayload and ConditionPayload
-	protected final FulfillmentPayload payload;
+	protected FulfillmentPayload payload;
 	/*
 	 *  condition can't be declared final since it can't be initialized
 	 *  in the constructor. Nevertheless, we can force to init it in generateCondition

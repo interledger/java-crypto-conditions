@@ -30,7 +30,7 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 			FeatureSuite.PREFIX
 		);
 
-	private byte[] prefix; // TODO:(0) Wrap into PrefixPayload?
+	private final byte[] prefix; // TODO:(0) Wrap into PrefixPayload?
 	private final Fulfillment subfulfillment;
 	
 	public PrefixSha256Fulfillment(ConditionType type, FulfillmentPayload payload) {
@@ -51,28 +51,35 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 		}
 	}
 
+	/*
+	 * 
+	 */
+	private PrefixSha256Fulfillment(byte[] prefix, Fulfillment subfulfillment) {
+	    this.prefix = prefix.clone();
+	    this.subfulfillment = subfulfillment;
+	    
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        FulfillmentOutputStream ffOutputStream = new FulfillmentOutputStream(byteStream);
+        try {
+            ffOutputStream.writeOctetString(prefix);
+            ffOutputStream.writeFulfillment(subfulfillment);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                ffOutputStream.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e.toString(), e);
+            }
+        }
+        this.payload = new FulfillmentPayload(byteStream.toByteArray());
+//        PrefixSha256Fulfillment result = 
+    }
 
 	// TODO:(0) In the JS implementation there is also a Constructor (prefix, subcondition)
-	public static PrefixSha256Fulfillment Build(byte[] prefix, Fulfillment subfulfillment) {
-		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		FulfillmentOutputStream ffOutputStream = new FulfillmentOutputStream(byteStream);
-		try {
-			ffOutputStream.writeOctetString(prefix);
-			ffOutputStream.writeFulfillment(subfulfillment);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} finally {
-			try {
-				ffOutputStream.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e.toString(), e);
-			}
-		}
-		FulfillmentPayload ffPayload = new FulfillmentPayload(byteStream.toByteArray());
-		PrefixSha256Fulfillment result = 
-		new PrefixSha256Fulfillment(ConditionType.PREFIX_SHA256, ffPayload);
-		return result;
-
+	public static PrefixSha256Fulfillment BuildFromParams(byte[] prefix, Fulfillment subfulfillment) {
+	    PrefixSha256Fulfillment result = new PrefixSha256Fulfillment(prefix, subfulfillment);
+        return result;
 	}
 
 	public byte[] getPrefix() {
@@ -96,7 +103,6 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 
 	@Override
 	public Condition generateCondition() {
-		// TODO:(0) parse subfulfillment
 		Condition subcondition = subfulfillment.generateCondition();
 		
 		EnumSet<FeatureSuite> features = subcondition.getFeatures();

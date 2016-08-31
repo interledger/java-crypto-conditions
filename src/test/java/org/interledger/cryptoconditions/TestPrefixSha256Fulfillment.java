@@ -16,9 +16,8 @@ public class TestPrefixSha256Fulfillment {
     	String preimage = "616263";
         Fulfillment PreimageSubff = PreimageSha256Fulfillment.BuildFromSecrets(preimage.getBytes());
         byte[] prefix = {1,2,3,4};
-        Fulfillment ffPrefix = PrefixSha256Fulfillment.Build(prefix, PreimageSubff);
+        Fulfillment ffPrefix = PrefixSha256Fulfillment.BuildFromParams(prefix, PreimageSubff);
         String ffPrefixURI = ffPrefix.getCondition().toURI();
         assertTrue("ffPrefixURI equals TODO:(0)", ffPrefixURI.length()>0);
-System.out.println("deleteme: ffPrefixURI:"+ffPrefixURI);
     }
 }
