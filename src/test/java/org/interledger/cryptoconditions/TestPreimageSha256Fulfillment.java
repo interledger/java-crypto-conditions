@@ -29,14 +29,14 @@ public class TestPreimageSha256Fulfillment {
 
         for (String[] testDataRow : testData) {
             byte[] preimage = DatatypeConverter.parseHexBinary(testDataRow[0]);
-            String /* ffURI = testDataRow[1],*/ ccURI = testDataRow[2];
+            String ffURI = testDataRow[1], ccURI = testDataRow[2];
             Fulfillment ff = PreimageSha256Fulfillment.BuildFromSecrets(preimage);
-            
+//            System.out.println("                    ffURI:"+ffURI);
+//            System.out.println("ff.toURI()               :"+ff.toURI());
 //            System.out.println("                    ccURI:"+ccURI);
 //            System.out.println("ff.getCondition().toURI():"+ff.getCondition().toURI());
-            
-            assertTrue("ffURI.equals(ff.toURI())", ccURI.equals(ff.getCondition().toURI()) );
+            assertTrue("ffURI.equals(ff.toURI())"               , ffURI.equals(ff.               toURI()) );
+            assertTrue("ccURI.equals(ff.getCondition().toURI())", ccURI.equals(ff.getCondition().toURI()) );
         }
-        
     }
 }
