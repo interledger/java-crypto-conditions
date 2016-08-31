@@ -51,9 +51,11 @@ public class PrefixSha256Fulfillment extends FulfillmentBase {
 		}
 	}
 
-	/*
-	 * 
-	 */
+    /*
+     * Make private and use static constructor BuildFromParams. 
+     * That hide many Java specific details with variable scope and makes 
+     * it easy to port to other languages.
+     */
 	private PrefixSha256Fulfillment(byte[] prefix, Fulfillment subfulfillment) {
 	    this.prefix = prefix.clone();
 	    this.subfulfillment = subfulfillment;
