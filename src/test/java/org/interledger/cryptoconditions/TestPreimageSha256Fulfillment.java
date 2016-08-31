@@ -15,7 +15,8 @@ public class TestPreimageSha256Fulfillment {
 
     @Test
     public void testCreate() {
-        String[][] testData = {
+        // TODO:(?) Create unified test data for all different implementations (JS, java, Python, ...)
+        String[][] testData = { // Copy & Paste from five-bells-condition test data
             /* preimg , fulfillment, condition */
             { ""      , "cf:0:"    , "cc:0:3:47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU:0"},
             { "00"    , "cf:0:AA"  , "cc:0:3:bjQLnP-zepicpUTmu3gKLHiQHT-zNzh2hRGjBhevoB0:1"},
