@@ -7,27 +7,26 @@ package org.interledger.cryptoconditions;
  */
 public class FulfillmentException extends RuntimeException {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructs an instance of {@code FulfillmentException} with the specified
-     * detail message.
-     *
-     * @param msg the detail message.
-     */
-    public FulfillmentException(String msg) {
-        super(msg);
-    }
+  /**
+   * Constructs an instance of {@code FulfillmentException} with the specified detail message.
+   *
+   * @param msg the detail message.
+   */
+  public FulfillmentException(String msg) {
+    super(msg);
+  }
 
-    /**
-     * Constructs an instance of {@code FulfillmentException} with the specified
-     * detail message and {@code Throwable} cause.
-     *
-     * @param msg the detail message.
-     * @param cause the {@code Throwable} cause
-     */
-    public FulfillmentException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
+  /**
+   * Constructs an instance of {@code FulfillmentException} with the specified detail message and
+   * {@code Throwable} cause.
+   *
+   * @param msg the detail message.
+   * @param cause the {@code Throwable} cause
+   */
+  public FulfillmentException(String msg, Throwable cause) {
+    super(msg, cause);
+  }
 
 }

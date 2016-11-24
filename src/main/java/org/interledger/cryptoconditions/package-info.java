@@ -4,4 +4,4 @@
  */
 package org.interledger.cryptoconditions;
 
-//rest of the file is empty
+// rest of the file is empty

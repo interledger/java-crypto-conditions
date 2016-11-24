@@ -1,50 +1,49 @@
 package org.interledger.cryptoconditions;
 
+import java.util.EnumSet;
+
 /**
  * Enumeration of crypto-condition types
- *
+ * 
  * @author adrianhopebailie
  *
  */
 public enum ConditionType {
 
-    PREIMAGE_SHA256(0),
-    PREFIX_SHA256(1),
-    THRESHOLD_SHA256(2),
-    RSA_SHA256(3),
-    ED25519(4);
+  PREIMAGE_SHA256(0, "PREIMAGE-SHA-256"), PREFIX_SHA256(1, "PREFIX-SHA-256"), THRESHOLD_SHA256(2,
+      "THRESHOLD-SHA-256"), RSA_SHA256(3, "RSA-SHA-256"), ED25519(4, "ED25519");
 
-    private final int typeCode;
 
-    ConditionType(int typeCode) {
-        this.typeCode = typeCode;
+  private final int typeCode;
+  private final String name;
+
+  ConditionType(int typeCode, String algorithmName) {
+    this.typeCode = typeCode;
+    this.name = algorithmName;
+  }
+
+  /**
+   * Get the ASN.1 enum code for this type
+   * 
+   * @return the ASN.1 enumeration number
+   */
+  public int getTypeCode() {
+    return this.typeCode;
+  }
+
+  @Override
+  public String toString() {
+    return this.name;
+  }
+
+  public static ConditionType valueOf(int typeCode) {
+
+    for (ConditionType conditionType : EnumSet.allOf(ConditionType.class)) {
+      if (typeCode == conditionType.typeCode)
+        return conditionType;
     }
 
-    /**
-     * Get the ASN.1 enum code for this type
-     *
-     * @return the ASN.1 enumeration
-     */
-    public int getTypeCode() {
-        return this.typeCode;
-    }
-
-    public static ConditionType valueOf(int typeCode) {
-        switch (typeCode) {
-            case 0:
-                return ConditionType.PREIMAGE_SHA256;
-            case 1:
-                return ConditionType.PREFIX_SHA256;
-            case 2:
-                return ConditionType.THRESHOLD_SHA256;
-            case 3:
-                return ConditionType.RSA_SHA256;
-            case 4:
-                return ConditionType.ED25519;
-
-            default:
-                throw new IllegalArgumentException("Invalid Condition Type code " + typeCode);
-        }
-    }
+    throw new IllegalArgumentException("Invalid Condition Type code.");
+  }
 
 }
