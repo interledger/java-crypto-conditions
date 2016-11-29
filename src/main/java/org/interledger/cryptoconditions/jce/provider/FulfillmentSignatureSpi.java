@@ -18,12 +18,13 @@ import org.interledger.cryptoconditions.oer.FulfillmentOerOutputStream;
 import org.interledger.cryptoconditions.oer.OerDecodingException;
 import org.interledger.cryptoconditions.oer.OerUtil;
 
-public abstract class FulfillmentSignatureSpi extends SignatureSpi implements Fulfillment {
+public abstract class FulfillmentSignatureSpi extends SignatureSpi /*implements Fulfillment*/ {
 
   private ConditionPublicKey condition = null;
   private PrivateKey privateKey = null;
   private Signature internalSignature;
   private ByteArrayOutputStream buffer;
+  private Fulfillment fulfillment; // TODO: FIXME use set or constructor
 
   protected void setInternalSignature(Signature signature) {
     this.internalSignature = signature;
@@ -42,15 +43,15 @@ public abstract class FulfillmentSignatureSpi extends SignatureSpi implements Fu
     condition = (ConditionPublicKey) publicKey;
 
     // Sanity check the condition
-    if (!getType().equals(condition.getType())) {
+    if (!fulfillment.getType().equals(condition.getType())) {
       throw new InvalidKeyException("Supplied key is not a Condition of the correct type.");
     }
 
-    if (!getFeatures().containsAll(condition.getFeatures())) {
+    if (!fulfillment.getFeatures().containsAll(condition.getFeatures())) {
       throw new InvalidKeyException("Supplied condition has unsupported features.");
     }
 
-    if (getSafeFulfillmentLength() < condition.getMaxFulfillmentLength()) {
+    if (fulfillment.getSafeFulfillmentLength() < condition.getMaxFulfillmentLength()) {
       throw new InvalidKeyException(
           "Supplied condition has a maximum fulfillment length that is too high (unsafe).");
     }
@@ -190,7 +191,7 @@ public abstract class FulfillmentSignatureSpi extends SignatureSpi implements Fu
 
     // Fail fast if types are different
     // TODO: Is this an exception?
-    if (fulfillment.getType() != this.getType())
+    if (fulfillment.getType() != this.fulfillment.getType())
       return false;
 
     // Get public key

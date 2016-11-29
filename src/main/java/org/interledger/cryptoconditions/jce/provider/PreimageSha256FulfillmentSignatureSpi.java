@@ -6,16 +6,12 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.util.EnumSet;
 
-import org.interledger.cryptoconditions.ConditionType;
-import org.interledger.cryptoconditions.FeatureSuite;
 import org.interledger.cryptoconditions.Fulfillment;
 import org.interledger.cryptoconditions.PreimageSha256Fulfillment;
 import org.interledger.cryptoconditions.impl.PreimageSha256FulfillmentImpl;
 import org.interledger.cryptoconditions.jce.provider.keys.Sha256DigestPrivateKey;
 import org.interledger.cryptoconditions.jce.provider.keys.Sha256DigestPublicKey;
-import org.interledger.cryptoconditions.oer.OerUtil;
 
 public class PreimageSha256FulfillmentSignatureSpi extends FulfillmentSignatureSpi {
 
@@ -29,21 +25,6 @@ public class PreimageSha256FulfillmentSignatureSpi extends FulfillmentSignatureS
 
   private Signature getSha256DigestSignature() throws NoSuchAlgorithmException {
     return Signature.getInstance("SHA256withNONE");
-  }
-
-  @Override
-  public ConditionType getType() {
-    return PreimageSha256Fulfillment.TYPE;
-  }
-
-  @Override
-  public EnumSet<FeatureSuite> getFeatures() {
-    return PreimageSha256Fulfillment.FEATURES;
-  }
-
-  @Override
-  public int getSafeFulfillmentLength() {
-    return OerUtil.MAX_INT;
   }
 
   @Override
