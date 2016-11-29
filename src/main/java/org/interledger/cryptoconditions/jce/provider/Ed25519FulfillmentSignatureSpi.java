@@ -33,21 +33,6 @@ public class Ed25519FulfillmentSignatureSpi extends FulfillmentSignatureSpi {
   }
 
   @Override
-  public ConditionType getType() {
-    return Ed25519Fulfillment.TYPE;
-  }
-
-  @Override
-  public EnumSet<FeatureSuite> getFeatures() {
-    return Ed25519Fulfillment.FEATURES;
-  }
-
-  @Override
-  public int getSafeFulfillmentLength() {
-    return OerUtil.MAX_INT;
-  }
-
-  @Override
   protected void validatePrivateKey(PrivateKey privateKey) throws InvalidKeyException {
 
     if (!(privateKey instanceof EdDSAPrivateKey)) {

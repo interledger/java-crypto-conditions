@@ -2,8 +2,14 @@ package org.interledger.cryptoconditions.impl;
 
 import java.util.EnumSet;
 
+
+import org.interledger.cryptoconditions.Condition;
+
+import org.interledger.cryptoconditions.impl.ConditionImpl;
+
 import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.Ed25519Fulfillment;
+import org.interledger.cryptoconditions.Fulfillment;
 import org.interledger.cryptoconditions.FeatureSuite;
 import org.interledger.cryptoconditions.oer.OerUtil;
 
@@ -17,7 +23,7 @@ import org.interledger.cryptoconditions.oer.OerUtil;
  *
  */
 
-public class Ed25519FulfillmentImpl implements Ed25519Fulfillment {
+public class Ed25519FulfillmentImpl implements Ed25519Fulfillment , Fulfillment {
 
   private byte[] publicKey;
   private byte[] signature;
@@ -55,6 +61,11 @@ public class Ed25519FulfillmentImpl implements Ed25519Fulfillment {
     this.signature = signature.clone();
   }
 
+  @Override
+  public Condition getCondition() {
+	  byte[] fingerprint = this.getPublicKey();
+	  return new ConditionImpl(TYPE, FEATURES, fingerprint, getSafeFulfillmentLength());
+  }
   // @Override
   // public Condition computeCondition() {
   // if (getPublicKey() == null) {

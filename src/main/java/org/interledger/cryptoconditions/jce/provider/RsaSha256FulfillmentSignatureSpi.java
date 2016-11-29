@@ -42,21 +42,6 @@ public class RsaSha256FulfillmentSignatureSpi extends FulfillmentSignatureSpi {
   }
 
   @Override
-  public ConditionType getType() {
-    return RsaSha256Fulfillment.TYPE;
-  }
-
-  @Override
-  public EnumSet<FeatureSuite> getFeatures() {
-    return RsaSha256Fulfillment.FEATURES;
-  }
-
-  @Override
-  public int getSafeFulfillmentLength() {
-    return OerUtil.MAX_INT;
-  }
-
-  @Override
   protected void validatePrivateKey(PrivateKey privateKey) throws InvalidKeyException {
 
     if (!(privateKey instanceof RSAPrivateKey)) {

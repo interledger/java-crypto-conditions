@@ -58,16 +58,16 @@ public class FulfillmentOerInputStream extends OerInputStream {
     ConditionType type = readConditiontype();
     switch (type) {
       case PREIMAGE_SHA256:
-        return readPreimageSha256FulfillmentPayload();
+        return (Fulfillment)readPreimageSha256FulfillmentPayload();
 
       case PREFIX_SHA256:
-        return readPrefixSha256FulfillmentPayload();
+        return (Fulfillment)readPrefixSha256FulfillmentPayload();
 
       case RSA_SHA256:
-        return readRsaSha256FulfillmentPayload();
+        return (Fulfillment)readRsaSha256FulfillmentPayload();
 
       case ED25519:
-        return readEd25519FulfillmentPayload();
+        return (Fulfillment)readEd25519FulfillmentPayload();
 
       case THRESHOLD_SHA256:
         // TODO return readThresholdSha256Fulfillment;

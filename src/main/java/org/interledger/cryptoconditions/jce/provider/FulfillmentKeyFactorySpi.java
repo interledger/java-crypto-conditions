@@ -10,7 +10,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
 import org.interledger.cryptoconditions.Condition;
-import org.interledger.cryptoconditions.ConditionFactory;
 import org.interledger.cryptoconditions.Fulfillment;
 import org.interledger.cryptoconditions.IllegalFulfillmentException;
 import org.interledger.cryptoconditions.UnsupportedConditionException;
@@ -32,7 +31,7 @@ public class FulfillmentKeyFactorySpi extends KeyFactorySpi {
       try {
         final Fulfillment fulfillment =
             OerUtil.getFullfillment(((OerEncodedFulfillmentKeySpec) keySpec).getEncoded());
-        final Condition condition = ConditionFactory.getCondition(fulfillment);
+        final Condition condition = fulfillment.getCondition();
 
         return new DefaultConditionPublicKey(new ConditionKeySpec(condition));
 

@@ -2,7 +2,7 @@ package org.interledger.cryptoconditions;
 
 import java.util.EnumSet;
 
-public interface PrefixSha256Fulfillment extends Fulfillment {
+public interface PrefixSha256Fulfillment {
 
   static final ConditionType TYPE = ConditionType.PREFIX_SHA256;
   static final EnumSet<FeatureSuite> FEATURES =

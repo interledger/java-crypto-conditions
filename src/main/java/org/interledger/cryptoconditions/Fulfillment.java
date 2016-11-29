@@ -30,5 +30,7 @@ public interface Fulfillment {
   EnumSet<FeatureSuite> getFeatures();
 
   int getSafeFulfillmentLength();
+  
+  Condition getCondition();
 
 }
