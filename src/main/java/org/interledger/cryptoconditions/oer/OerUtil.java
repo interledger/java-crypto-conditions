@@ -13,7 +13,7 @@ public class OerUtil {
 
   public static int MAX_INT = 16777215;
 
-  public static byte[] getLengthPrefixedOctetString(byte[] input) throws IOException {
+  public static byte[] getLengthPrefixedOctetString(byte[] input) {
 
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
     OerOutputStream stream = new OerOutputStream(buffer);
@@ -22,8 +22,10 @@ public class OerUtil {
       stream.writeOctetString(input);
       stream.flush();
       return buffer.toByteArray();
+    } catch(IOException e){
+        throw new RuntimeException(e.toString(), e);
     } finally {
-      stream.close();
+        try { stream.close(); }catch(IOException e) {/* can't fix in a close */}
     }
   }
 

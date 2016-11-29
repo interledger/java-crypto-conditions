@@ -2,7 +2,7 @@ package org.interledger.cryptoconditions;
 
 import java.util.EnumSet;
 
-public interface Ed25519Fulfillment extends Fulfillment {
+public interface Ed25519Fulfillment {
 
   static final ConditionType TYPE = ConditionType.ED25519;
   static final EnumSet<FeatureSuite> FEATURES =

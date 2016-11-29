@@ -3,7 +3,7 @@ package org.interledger.cryptoconditions;
 import java.math.BigInteger;
 import java.util.EnumSet;
 
-public interface RsaSha256Fulfillment extends Fulfillment {
+public interface RsaSha256Fulfillment {
 
   static final ConditionType TYPE = ConditionType.RSA_SHA256;
   static final EnumSet<FeatureSuite> FEATURES =

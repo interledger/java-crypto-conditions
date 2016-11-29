@@ -3,8 +3,10 @@ package org.interledger.cryptoconditions.impl;
 import java.math.BigInteger;
 import java.util.EnumSet;
 
+import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.FeatureSuite;
+import org.interledger.cryptoconditions.Fulfillment;
 import org.interledger.cryptoconditions.RsaSha256Fulfillment;
 import org.interledger.cryptoconditions.oer.OerUtil;
 
@@ -14,7 +16,7 @@ import org.interledger.cryptoconditions.oer.OerUtil;
  * @author adrianhopebailie
  *
  */
-public class RsaSha256FulfillmentImpl implements RsaSha256Fulfillment {
+public class RsaSha256FulfillmentImpl implements Fulfillment, RsaSha256Fulfillment {
 
   private BigInteger modulus;
   private byte[] signature = null;
@@ -51,6 +53,14 @@ public class RsaSha256FulfillmentImpl implements RsaSha256Fulfillment {
   public void setSignature(byte[] signature) {
     this.signature = signature.clone();
   }
+  
+  @Override
+  public Condition getCondition() {
+      byte[] modulus = getModulus().toByteArray();
+      byte[] fingerprint = OerUtil.getLengthPrefixedOctetString(modulus);
+      return new ConditionImpl(TYPE, FEATURES, fingerprint, getSafeFulfillmentLength());
+  }
+
 
   // @Override
   // public Condition computeCondition() {

@@ -1,7 +1,10 @@
 package org.interledger.cryptoconditions.impl;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.EnumSet;
 
+import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.FeatureSuite;
 import org.interledger.cryptoconditions.Fulfillment;
@@ -14,7 +17,7 @@ import org.interledger.cryptoconditions.oer.OerUtil;
  * @author adrianhopebailie
  *
  */
-public class PrefixSha256FulfillmentImpl implements PrefixSha256Fulfillment {
+public class PrefixSha256FulfillmentImpl implements Fulfillment, PrefixSha256Fulfillment {
 
 
   private byte[] prefix;
@@ -60,6 +63,19 @@ public class PrefixSha256FulfillmentImpl implements PrefixSha256Fulfillment {
     return this.subfulfillment;
   }
 
+  @Override
+  public Condition getCondition() {
+      try {
+          byte[] prefix = OerUtil.getLengthPrefixedOctetString(getPrefix());
+          byte[] subcondtion =
+              OerUtil.getOerEncodedCondition(getSubfulfillment().getCondition());
+          byte[] fingerprint = Arrays.copyOf(prefix, prefix.length + subcondtion.length);
+          System.arraycopy(subcondtion, 0, fingerprint, prefix.length, subcondtion.length);
+          return new ConditionImpl(TYPE, FEATURES, fingerprint, getSafeFulfillmentLength());
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+      }
+  }
   // @Override
   // public Condition computeCondition() {
   // Condition subcondition = subfulfillment.computeCondition();
