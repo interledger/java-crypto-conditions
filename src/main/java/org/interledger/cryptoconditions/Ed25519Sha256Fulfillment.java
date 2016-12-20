@@ -3,21 +3,24 @@ package org.interledger.cryptoconditions;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.interfaces.RSAPublicKey;
 
 import org.interledger.cryptoconditions.der.DEROutputStream;
 import org.interledger.cryptoconditions.der.DERTags;
 
-public class RsaSha256Fulfillment implements Fulfillment {
+import net.i2p.crypto.eddsa.EdDSAEngine;
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
 
-  private RsaSha256Condition condition;
-  private RSAPublicKey publicKey;
+public class Ed25519Sha256Fulfillment implements Fulfillment {
+
+  private Ed25519Sha256Condition condition;
+  private EdDSAPublicKey publicKey;
   private byte[] signature;
   
-  public RsaSha256Fulfillment(RSAPublicKey publicKey, byte[] signature) {
+  public Ed25519Sha256Fulfillment(EdDSAPublicKey publicKey, byte[] signature) {
     this.signature = new byte[signature.length];
     System.arraycopy(signature, 0, this.signature, 0, signature.length);
     this.publicKey = publicKey;
@@ -25,7 +28,7 @@ public class RsaSha256Fulfillment implements Fulfillment {
   
   @Override
   public ConditionType getType() {
-    return ConditionType.RSA_SHA256;
+    return ConditionType.ED25519_SHA256;
   }
 
   @Override
@@ -34,7 +37,7 @@ public class RsaSha256Fulfillment implements Fulfillment {
       //Build preimage sequence
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       DEROutputStream out = new DEROutputStream(baos);
-      out.writeTaggedObject(0, UnsignedBigInteger.toUnsignedByteArray(publicKey.getModulus()));
+      out.writeTaggedObject(0, publicKey.getA().toByteArray());
       out.writeTaggedObject(1, signature);
       out.close();
       byte[] buffer = baos.toByteArray();
@@ -67,9 +70,9 @@ public class RsaSha256Fulfillment implements Fulfillment {
   }
 
   @Override
-  public RsaSha256Condition getCondition() {
+  public Ed25519Sha256Condition getCondition() {
     if(condition == null) {
-      condition = new RsaSha256Condition(publicKey);
+      condition = new Ed25519Sha256Condition(publicKey);
     }
     return condition;
   }
@@ -78,11 +81,11 @@ public class RsaSha256Fulfillment implements Fulfillment {
   public boolean verify(Condition condition, byte[] message) {
     
     if(condition == null) {
-      throw new IllegalArgumentException("Can't verify a RsaSha256Fulfillment against an null condition.");
+      throw new IllegalArgumentException("Can't verify a Ed25519Sha256Fulfillment against an null condition.");
     }
     
-    if(!(condition instanceof RsaSha256Condition)) {
-      throw new IllegalArgumentException("Must verify a RsaSha256Fulfillment against RsaSha256Condition.");
+    if(!(condition instanceof Ed25519Sha256Condition)) {
+      throw new IllegalArgumentException("Must verify a Ed25519Sha256Fulfillment against Ed25519Sha256Condition.");
     }
 
     if(!getCondition().equals(condition)) {
@@ -90,16 +93,29 @@ public class RsaSha256Fulfillment implements Fulfillment {
     }
     
     try {
-      Signature rsaSigner = Signature.getInstance("SHA256withRSA/PSS");
-      rsaSigner.initVerify(publicKey);
-      rsaSigner.update(message);
-      return rsaSigner.verify(signature);
-    } catch (InvalidKeyException | NoSuchAlgorithmException | SignatureException e) {
+      Signature edDsaSigner = new EdDSAEngine(getSha512Digest());
+      edDsaSigner.initVerify(publicKey);
+      edDsaSigner.update(message);
+      return edDsaSigner.verify(signature);
+    } catch (InvalidKeyException | SignatureException e) {
       // TODO Log error or throw?
       e.printStackTrace();
       return false;
     }
     
   }
+  
+  private static MessageDigest _DIGEST;
+  
+  private static MessageDigest getSha512Digest() {
+    if (_DIGEST == null) {
+      try {
+        _DIGEST = MessageDigest.getInstance("SHA-512");
+      } catch (NoSuchAlgorithmException e) {
+        throw new RuntimeException(e);
+      }
+    }
 
+    return _DIGEST;
+  }
 }

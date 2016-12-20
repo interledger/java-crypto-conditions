@@ -3,15 +3,12 @@ apply plugin: 'eclipse'
 apply plugin: 'maven'
 apply plugin: 'checkstyle'
 
-targetCompatibility = 1.6
-sourceCompatibility = 1.6
+targetCompatibility = 1.8
+sourceCompatibility = 1.8
 
 group = 'org.interledger'
 version = '0.6.0-SNAPSHOT'
 description = 'Crypto Conditions'
-
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
 
 checkstyle {
     configFile file('google_checks.xml')
@@ -35,7 +32,6 @@ dependencies {
 	testCompile 'junit:junit:4.12'
 	compile 'net.i2p.crypto:eddsa:0.1.0'
 	compile 'org.bouncycastle:bcprov-jdk16:1.46'
-	compile 'com.google.code.gson:gson:2.7'
 }
 
 //Maven pom compatibility task:

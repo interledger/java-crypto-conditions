@@ -1,6 +1,6 @@
 package org.interledger.cryptoconditions;
 
-import java.util.EnumSet;
+import java.net.URI;
 
 /**
  * Crypto-conditions are distributable event descriptions. This means crypto-conditions say how to
@@ -21,18 +21,6 @@ public interface Condition {
    * @return the type of this condition
    */
   ConditionType getType();
-
-  /**
-   * The set of feature suites an implementation must support in order to be able to successfully
-   * parse the fulfillment to this condition.
-   * 
-   * <p>
-   * This is the boolean OR of the featureBitmask values of the top-level condition type and all
-   * subcondition types, recursively.
-   * 
-   * @return the set of features required to parse and validate this condition and its fulfillment
-   */
-  EnumSet<FeatureSuite> getFeatures();
 
   /**
    * A binary string uniquely representing the condition with respect to other conditions of the
@@ -59,6 +47,10 @@ public interface Condition {
    * 
    * @return the maximum length (in bytes) of this condition's fulfillment
    */
-  int getMaxFulfillmentLength();
+  long getCost();
+  
+  byte[] getEncoded();
+  
+  URI getURI();
 
 }
