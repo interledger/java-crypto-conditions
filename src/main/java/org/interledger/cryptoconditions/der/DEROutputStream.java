@@ -33,21 +33,17 @@ public class DEROutputStream extends FilterOutputStream {
       write((byte) length);
     }
   }
-  
-  public void writeEncoded(
-      int     tag,
-      byte[]  bytes)
-      throws IOException
-  {
-      write(tag);
-      writeLength(bytes.length);
-      write(bytes);
+
+  public void writeEncoded(int tag, byte[] bytes) throws IOException {
+    write(tag);
+    writeLength(bytes.length);
+    write(bytes);
   }
-  
+
   public void writeInteger(BigInteger value) throws IOException {
     writeEncoded(DERTags.INTEGER.getTag(), value.toByteArray());
   }
-  
+
   public void writeOctetString(byte[] octets) throws IOException {
     writeEncoded(DERTags.OCTET_STRING.getTag(), octets);
   }
@@ -63,16 +59,15 @@ public class DEROutputStream extends FilterOutputStream {
   public void writeBitString(byte[] bitStringData) throws IOException {
     writeEncoded(DERTags.BIT_STRING.getTag(), bitStringData);
   }
-  
+
   public void writeBitString(byte[] bitString, int unusedBits) {
-    byte[]  bytes = new byte[bitString.length + 1];
+    byte[] bytes = new byte[bitString.length + 1];
 
     bytes[0] = (byte) unusedBits;
     System.arraycopy(bitString, 0, bytes, 1, bytes.length - 1);
-    
+
   }
-  
-  
+
 
 
 }

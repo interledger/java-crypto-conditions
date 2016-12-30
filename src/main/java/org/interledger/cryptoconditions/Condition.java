@@ -3,12 +3,9 @@ package org.interledger.cryptoconditions;
 import java.net.URI;
 
 /**
- * Crypto-conditions are distributable event descriptions. This means crypto-conditions say how to
- * recognize a message without saying exactly what the message is. You can transmit a
- * crypto-condition freely, but you cannot forge the message it describes.
- * 
- * <p>
- * For convenience, we hash the description so that the crypto-condition can be a fixed size.
+ * Java implementation of Crypto-conditions
+ *
+ * @see<a href="https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/">https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/</a>
  * 
  * @author adrianhopebailie
  *
@@ -16,7 +13,7 @@ import java.net.URI;
 public interface Condition {
 
   /**
-   * The numeric type identifier representing the condition type.
+   * The type identifier representing the condition type.
    * 
    * @return the type of this condition
    */
@@ -29,28 +26,34 @@ public interface Condition {
    * have the same fingerprint.
    * 
    * <p>
-   * The length and contents of the fingerprint are defined by the condition type. For most
-   * condition types, the fingerprint is a cryptographically secure hash of the data which defines
-   * the condition, such as a public key.
+   * The length and contents of the fingerprint are defined by the condition type. The fingerprint is 
+   * a cryptographically secure hash of the data which defines the condition, such as a public key.
    * 
    * @return the unique fingerprint of this condition
    */
   byte[] getFingerprint();
 
   /**
-   * The maximum length of the fulfillment payload that can fulfill this condition, in bytes. The
-   * payload size is measured unencoded. (The size of the payload is larger in BASE64URL format.)
+   * The estimated "cost" of processing a fulfillment of this condition. For details of how to calculate
+   * this number see the Crypto-conditions specification.
    * 
-   * <p>
-   * When a crypto-condition is submitted to an implementation, this implementation MUST verify that
-   * it will be able to process a fulfillment with a payload of size maxFulfillmentLength.
    * 
-   * @return the maximum length (in bytes) of this condition's fulfillment
+   * @return the cost of validating the fulfillment of this conditon
    */
   long getCost();
-  
-  byte[] getEncoded();
-  
-  URI getURI();
 
+  /**
+   * Get the DER encoded condition
+   * 
+   * @return the DER encoded condition
+   */
+  byte[] getEncoded();
+
+  /**
+   * Get the Named Information URL that describes this condition
+   * 
+   * @return an ni:// URI that identifes this condition
+   */
+  URI getUri();
+  
 }

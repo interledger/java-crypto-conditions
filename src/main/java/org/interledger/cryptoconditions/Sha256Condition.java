@@ -2,56 +2,60 @@ package org.interledger.cryptoconditions;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
-public abstract class Sha256Condition extends EncodedCondition {
+/**
+ * Abstract base class for the *-SHA-256 condition types.
+ * 
+ * Provides concrete implementation of generation of 
+ * SHA256 fingerprint via a shared static digest.
+ *  
+ * @author adrianhopebailie
+ *
+ */
+public abstract class Sha256Condition extends ConditionBase {
 
-  private long cost;
-  private byte[] fingerprint;  
-  
-  public Sha256Condition(long cost) {
-    this.cost = cost;
+  private byte[] fingerprint;
+
+  protected Sha256Condition(long cost) {
+    super(cost);
   }
-  
-  @Override
-  public abstract ConditionType getType();
 
+  protected Sha256Condition(byte[] fingerprint, long cost) {
+    super(cost);
+    this.fingerprint = fingerprint;
+    
+    if(fingerprint.length != 32) {
+      throw new IllegalArgumentException("Fingerprint must be 32 bytes.");
+    }
+  }
+
+  /**
+   * Super-classes must provide the un-hashed fingerprint content
+   * for this condition as defined in the specification.
+   * 
+   * @return
+   */
   protected abstract byte[] getFingerprintContents();
-  
+
+  /**
+   * Generates and caches the fingerprint on first call.
+   * 
+   * Returns a copy of the internally cached fingerprint.
+   */
   @Override
   public byte[] getFingerprint() {
-    if(fingerprint == null) {
-      fingerprint = getDigest(getFingerprintContents());    
+    if (fingerprint == null) {
+      fingerprint = getDigest(getFingerprintContents());
     }
     
-    return fingerprint.clone();
-  }
-  
-  @Override
-  public long getCost() {
-    return cost;
-  }
-  
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    Sha256Condition other = (Sha256Condition) obj;
-    if (getType() != other.getType())
-      return false;
-    if (getCost() != other.getCost())
-      return false;
-    if (!Arrays.equals(getFingerprint(), other.getFingerprint()))
-      return false;
-    return true;
+    byte[] returnVal = new byte[fingerprint.length];
+    System.arraycopy(fingerprint, 0, returnVal, 0, fingerprint.length);
+    
+    return returnVal;
   }
 
   private static MessageDigest _DIGEST;
-  
+
   private static byte[] getDigest(byte[] input) {
     if (_DIGEST == null) {
       try {
@@ -63,5 +67,5 @@ public abstract class Sha256Condition extends EncodedCondition {
 
     return _DIGEST.digest(input);
   }
-  
+
 }

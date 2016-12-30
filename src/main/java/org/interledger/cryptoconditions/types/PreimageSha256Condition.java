@@ -1,13 +1,21 @@
-package org.interledger.cryptoconditions;
+package org.interledger.cryptoconditions.types;
+
+import org.interledger.cryptoconditions.ConditionType;
+import org.interledger.cryptoconditions.Sha256Condition;
+import org.interledger.cryptoconditions.SimpleCondition;
 
 public class PreimageSha256Condition extends Sha256Condition implements SimpleCondition {
-  
+
   private byte[] preimage;
-  
+
   public PreimageSha256Condition(byte[] preimage) {
     super(calculateCost(preimage));
     this.preimage = new byte[preimage.length];
     System.arraycopy(preimage, 0, this.preimage, 0, preimage.length);
+  }
+
+  public PreimageSha256Condition(byte[] fingerprint, long cost) {
+    super(fingerprint, cost);
   }
 
   @Override
@@ -22,7 +30,7 @@ public class PreimageSha256Condition extends Sha256Condition implements SimpleCo
   protected byte[] getFingerprintContents() {
     return preimage;
   }
-  
+
   /**
    * cost = length in bytes
    * 
@@ -32,4 +40,5 @@ public class PreimageSha256Condition extends Sha256Condition implements SimpleCo
   private static long calculateCost(byte[] preimage) {
     return preimage.length;
   }
+
 }

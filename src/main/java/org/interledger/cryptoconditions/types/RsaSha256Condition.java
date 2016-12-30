@@ -1,10 +1,15 @@
-package org.interledger.cryptoconditions;
+package org.interledger.cryptoconditions.types;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.math.BigInteger;
 import java.security.interfaces.RSAPublicKey;
 
+import org.interledger.cryptoconditions.ConditionType;
+import org.interledger.cryptoconditions.Sha256Condition;
+import org.interledger.cryptoconditions.SimpleCondition;
+import org.interledger.cryptoconditions.UnsignedBigInteger;
 import org.interledger.cryptoconditions.der.DEROutputStream;
 import org.interledger.cryptoconditions.der.DERTags;
 
@@ -14,19 +19,24 @@ public class RsaSha256Condition extends Sha256Condition implements SimpleConditi
 
   public RsaSha256Condition(RSAPublicKey key) {
     super(calculateCost(key));
-    
-    //Validate key
-    if(key.getPublicExponent().compareTo(BigInteger.valueOf(65537)) != 0 ) {
+
+    // Validate key
+    if (key.getPublicExponent().compareTo(BigInteger.valueOf(65537)) != 0) {
       throw new IllegalArgumentException("Public Exponent of RSA key must be 65537.");
     }
-    
-    if(key.getModulus().bitLength() <= 1017 || key.getModulus().bitLength() > 4096) {
-      throw new IllegalArgumentException("Modulus of RSA key must be greater than 128 bytes and less than 512 bytes.");
+
+    if (key.getModulus().bitLength() <= 1017 || key.getModulus().bitLength() > 4096) {
+      throw new IllegalArgumentException(
+          "Modulus of RSA key must be greater than 128 bytes and less than 512 bytes.");
     }
-    
+
     this.key = key;
   }
-  
+
+  public RsaSha256Condition(byte[] fingerprint, long cost) {
+    super(fingerprint, cost);
+  }
+
   @Override
   public ConditionType getType() {
     return ConditionType.RSA_SHA256;
@@ -35,26 +45,23 @@ public class RsaSha256Condition extends Sha256Condition implements SimpleConditi
   @Override
   protected byte[] getFingerprintContents() {
     try {
-      //Build modulus
+      // Build modulus
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       DEROutputStream out = new DEROutputStream(baos);
       out.writeOctetString(UnsignedBigInteger.toUnsignedByteArray(key.getModulus()));
       out.close();
       byte[] buffer = baos.toByteArray();
 
-      //Wrap SEQUENCE
+      // Wrap SEQUENCE
       baos = new ByteArrayOutputStream();
       out = new DEROutputStream(baos);
-      out.writeEncoded(
-          DERTags.CONSTRUCTED.getTag() + 
-          DERTags.SEQUENCE.getTag(),
-          buffer);
+      out.writeEncoded(DERTags.CONSTRUCTED.getTag() + DERTags.SEQUENCE.getTag(), buffer);
       out.close();
       return baos.toByteArray();
-      
+
     } catch (IOException e) {
-      throw new RuntimeException("DER Encoding Error", e);
-    }  
+      throw new UncheckedIOException("DER Encoding Error", e);
+    }
   }
 
   /**
