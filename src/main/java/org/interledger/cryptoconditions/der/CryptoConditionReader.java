@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigInteger;
-import java.net.URI;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -100,10 +99,6 @@ public class CryptoConditionReader {
     throw new DEREncodingException("Unrecogized tag: " + tag);
 
   }
-
-  public static Condition fromUri(URI niUri) {
-    throw new UnsupportedOperationException("Not implemented yet.");
-  }
     
   public static Fulfillment readFulfillment(byte[] buffer) throws DEREncodingException {
     return readFulfillment(buffer, 0, buffer.length);
@@ -141,6 +136,9 @@ public class CryptoConditionReader {
     ConditionType type = ConditionType.valueOf(tag);
     int length = in.readLength(bytesRead);
 
+    if(length == 0) {
+      throw new DEREncodingException("Encountered an empty fulfillment.");      
+    }
 
     AtomicInteger innerBytesRead = new AtomicInteger();
     switch (type) {
