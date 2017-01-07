@@ -90,18 +90,23 @@ public abstract class ConditionBase implements Condition {
 
   @Override
   public URI getUri() {
-
+    //FIXME: these strings should be constants somewhere, maybe use the ones in 
+    //CryptoConditionURIParser (or move those to here?)
+    
     if(uri == null) {
       
       StringBuilder sb = new StringBuilder();
-      sb.append("ni://").append("/sha-256;")
+      sb.append("ni://").append("sha-256;")
           .append(Base64.getUrlEncoder().withoutPadding().encodeToString(getFingerprint()))
-          .append("?").append("fht=").append(getType().toString().toLowerCase()).append("&cost=")
+          .append("?").append("fpt=").append(getType().toString().toLowerCase()).append("&cost=")
           .append(getCost());
 
       if (this instanceof CompoundCondition) {
-        sb.append("&subtypes=")
-            .append(ConditionType.getEnumOfTypesAsString(((CompoundCondition) this).getSubtypes()));
+        CompoundCondition cc = (CompoundCondition)this;
+        if (cc.getSubtypes() != null && !cc.getSubtypes().isEmpty()) {
+          sb.append("&subtypes=")
+            .append(ConditionType.getEnumOfTypesAsString(cc.getSubtypes()));
+        }
       }
 
       uri = URI.create(sb.toString());

@@ -12,6 +12,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -79,7 +80,7 @@ public class CryptoConditionReader {
             .longValue();
     EnumSet<ConditionType> subtypes = null;
     if (type == ConditionType.PREFIX_SHA256 || type == ConditionType.THRESHOLD_SHA256) {
-      subtypes = getEnumOfTypesFromBitString(
+      subtypes = ConditionType.getEnumOfTypesFromBitString(
           in.readTaggedObject(2, length - innerBytesRead.get(), innerBytesRead).getValue());
     }
     bytesRead.addAndGet(innerBytesRead.get());
@@ -101,8 +102,9 @@ public class CryptoConditionReader {
 
   }
 
-  public static Condition fromUri(URI niUri) {
-    throw new UnsupportedOperationException("Not implemented yet.");
+  public static Condition fromUri(URI niUri) throws URIEncodingException {
+    //TODO: why is this in the DER package if its not DER encoded??
+    return CryptoConditionURIParser.parse(niUri);
   }
     
   public static Fulfillment readFulfillment(byte[] buffer) throws DEREncodingException {
@@ -247,45 +249,4 @@ public class CryptoConditionReader {
     throw new DEREncodingException("Unrecogized tag: " + tag);
 
   }
-
-  /**
-   * Get the set of types represented by
-   * 
-   * @param bitStringData a raw BIT STRING including the padding bit count in the first byte
-   * @return
-   */
-  private static EnumSet<ConditionType> getEnumOfTypesFromBitString(byte[] bitStringData) {
-
-    // We only have 5 known types so shouldn't be more than a padding byte and the bitmap
-    if (bitStringData.length > 2) {
-      throw new IllegalArgumentException("Unknown types in bit string.");
-    }
-
-    if (bitStringData.length == 1) {
-      throw new IllegalArgumentException("Corrupt bit string.");
-    }
-
-    EnumSet<ConditionType> subtypes = EnumSet.noneOf(ConditionType.class);
-    if (bitStringData.length == 0) {
-      return subtypes;
-    }
-
-    int padBits = bitStringData[0];
-
-    // We only have 5 known types so should have at least 3 padding bits
-    if (padBits < 3) {
-      throw new IllegalArgumentException("Unknown types in bit string.");
-    }
-
-    // We only expect 1 byte of data so let's keep it simple
-    for (ConditionType type : ConditionType.values()) {
-      if ((bitStringData[1] & type.getFlag()) == type.getFlag()) {
-        subtypes.add(type);
-      }
-    }
-
-    return subtypes;
-
-  }
-
 }
