@@ -1,4 +1,4 @@
-package org.interledger.cryptoconditions.der;
+package org.interledger.cryptoconditions.uri;
 
 public class URIEncodingException extends Exception {
  

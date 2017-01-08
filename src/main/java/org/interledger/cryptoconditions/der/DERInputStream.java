@@ -44,7 +44,11 @@ public class DERInputStream extends FilterInputStream {
     }
     bytesRead.addAndGet(innerBytesRead.get());
     
-    obj.setValue(readValue(obj.getLength(), bytesRead));
+    if(obj.getLength() > 0) {
+      obj.setValue(readValue(obj.getLength(), bytesRead));
+    } else {
+      obj.setValue(new byte[]{});
+    }
     return obj;
   }
 

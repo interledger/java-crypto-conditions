@@ -10,20 +10,22 @@ import java.util.EnumSet;
  */
 public enum ConditionType {
 
-  PREIMAGE_SHA256(0, "PREIMAGE-SHA-256", 0x01), 
-  PREFIX_SHA256(1, "PREFIX-SHA-256", 0x02), 
-  THRESHOLD_SHA256(2, "THRESHOLD-SHA-256", 0x04), 
-  RSA_SHA256(3, "RSA-SHA-256", 0x08), 
-  ED25519_SHA256(4, "ED25519-SHA-256", 0x10);
+  PREIMAGE_SHA256(0, "PREIMAGE-SHA-256", 0x80, 0), 
+  PREFIX_SHA256(1, "PREFIX-SHA-256", 0x40, 0), 
+  THRESHOLD_SHA256(2, "THRESHOLD-SHA-256", 0x20, 0), 
+  RSA_SHA256(3, "RSA-SHA-256", 0x10, 0), 
+  ED25519_SHA256(4, "ED25519-SHA-256", 0x08, 0);
 
   private final int typeCode;
   private final String name;
-  private final int flag;
+  private final int bitMask;
+  private final int byteIndex;
 
-  ConditionType(int typeCode, String algorithmName, int flag) {
+  ConditionType(int typeCode, String algorithmName, int bitMask, int byteIndex) {
     this.typeCode = typeCode;
     this.name = algorithmName;
-    this.flag = flag;
+    this.bitMask = bitMask; 
+    this.byteIndex = byteIndex;
   }
 
   /**
@@ -40,8 +42,17 @@ public enum ConditionType {
     return this.name;
   }
 
-  public int getFlag() {
-    return this.flag;
+  public int getMask() {
+    return this.bitMask;
+  }
+  
+  public int getByteIndex() {
+    return this.byteIndex;
+  }
+  
+  public boolean isBitSet(byte[] bitString) {
+    return bitString.length - 2 >= byteIndex &&
+        ((bitString[byteIndex + 1] & bitMask) == bitMask);
   }
 
   public static ConditionType valueOf(int typeCode) {
@@ -65,39 +76,38 @@ public enum ConditionType {
    */
   public static byte[] getEnumOfTypesAsBitString(EnumSet<ConditionType> types) {
 
-    int data = 0;
+    byte[] data = new byte[2];
     int lastUsedBit = -1;
     
     //No guarantee that iterating through the types will be done in order so just test for each
     if(types.contains(PREIMAGE_SHA256)){
-      data += ConditionType.PREIMAGE_SHA256.getFlag();
+      data[1] += ConditionType.PREIMAGE_SHA256.getMask();
       lastUsedBit = PREIMAGE_SHA256.getTypeCode();
     }
     
     if(types.contains(PREFIX_SHA256)){
-      data += ConditionType.PREFIX_SHA256.getFlag();
+      data[1] += ConditionType.PREFIX_SHA256.getMask();
       lastUsedBit = PREFIX_SHA256.getTypeCode();
     }
     
     if(types.contains(THRESHOLD_SHA256)){
-      data += ConditionType.THRESHOLD_SHA256.getFlag();
+      data[1] += ConditionType.THRESHOLD_SHA256.getMask();
       lastUsedBit = THRESHOLD_SHA256.getTypeCode();
     }
     
     if(types.contains(RSA_SHA256)){
-      data += ConditionType.RSA_SHA256.getFlag();
+      data[1] += ConditionType.RSA_SHA256.getMask();
       lastUsedBit = RSA_SHA256.getTypeCode();
     }
     
     if(types.contains(ED25519_SHA256)){
-      data += ConditionType.ED25519_SHA256.getFlag();
+      data[1] += ConditionType.ED25519_SHA256.getMask();
       lastUsedBit = ED25519_SHA256.getTypeCode();
     }
     
     if(lastUsedBit > -1) {
-      //the bit strings are *right* padded with binary 0.
-      data = data << (7 - lastUsedBit);
-      return new byte[] {(byte) (7 - lastUsedBit), (byte) data};
+      data[0] = (byte) (7 - lastUsedBit);
+      return data;
     }
     else
     {
@@ -188,22 +198,10 @@ public enum ConditionType {
     if (padBits < 3) {
       throw new IllegalArgumentException("Unknown types in bit string.");
     }
-    
-    //our flags are based on *right aligned* boundaries, but the byte we have has been 
-    //*right padded*, so we arent looking in the correct place. we must shift the entire bit mask
-    //over to the right by the number of padding bits. by way of example, our bit string is just '1'
-    // this is padded ON THE RIGHT to the nearest 8 bit boundary: '1 000 0000'
-    // the number of bits added as padding is then prefixed, producing: 0x 07 80.
-    //clearly, the 1 we are looking for as the LEAST SIGNIFICANT bit has been shifted.
-    
-    //shift everything over so that we are back to being right aligned.
-    //sadly java's bytes are 2's complements, so direct shifting gives very odd results.
-    //try 0x80 >> 7 vs ((byte)0x80) >> 7
-    int mask = (Byte.toUnsignedInt(bitStringData[1]) >> padBits);
 
     // We only expect 1 byte of data so let's keep it simple
     for (ConditionType type : ConditionType.values()) {
-      if ((mask & type.getFlag()) == type.getFlag()) {
+      if (type.isBitSet(bitStringData)) {
         subtypes.add(type);
       }
     }

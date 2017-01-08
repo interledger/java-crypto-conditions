@@ -65,7 +65,7 @@ public abstract class ConditionBase implements Condition {
         if (this instanceof CompoundCondition) {
           byte[] bitStringData =
               ConditionType.getEnumOfTypesAsBitString(((CompoundCondition) this).getSubtypes());
-          out.writeBitString(bitStringData);
+          out.writeTaggedObject(2, bitStringData);
         }
         out.close();
         byte[] buffer = baos.toByteArray();
@@ -91,12 +91,12 @@ public abstract class ConditionBase implements Condition {
   @Override
   public URI getUri() {
     //FIXME: these strings should be constants somewhere, maybe use the ones in 
-    //CryptoConditionURIParser (or move those to here?)
+    //CryptoConditionUri (or move those to here?)
     
     if(uri == null) {
       
       StringBuilder sb = new StringBuilder();
-      sb.append("ni://").append("sha-256;")
+      sb.append("ni:///").append("sha-256;")
           .append(Base64.getUrlEncoder().withoutPadding().encodeToString(getFingerprint()))
           .append("?").append("fpt=").append(getType().toString().toLowerCase()).append("&cost=")
           .append(getCost());

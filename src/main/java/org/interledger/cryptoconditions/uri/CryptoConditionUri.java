@@ -1,4 +1,4 @@
-package org.interledger.cryptoconditions.der;
+package org.interledger.cryptoconditions.uri;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -23,11 +23,11 @@ import org.interledger.cryptoconditions.types.ThresholdSha256Condition;
 /**
  * This class is responsible for parsing a uri-formatted crypto-condition
  */
-public class CryptoConditionURIParser {
+public class CryptoConditionUri {
   
   //This is a stricter version based on limitations of the current
   //implementation. Specifically, we can't handle bitmasks greater than 32 bits.
-  public static final String CONDITION_REGEX_STRICT = "^ni://sha-256;([a-zA-Z0-9_-]{0,86})\\?(.+)$";
+  public static final String CONDITION_REGEX_STRICT = "^ni://([A-Za-z0-9_-]?)/sha-256;([a-zA-Z0-9_-]{0,86})\\?(.+)$";
   
   public static class QueryParams {
     public static final String COST = "cost";
@@ -60,10 +60,14 @@ public class CryptoConditionURIParser {
     
     Map<String, List<String>> queryParams = null;
     try {
-      queryParams = splitQuery(m.group(2));
+      queryParams = splitQuery(uri.getQuery());
     } catch (UnsupportedEncodingException x) {
       throw new URIEncodingException("Invalid condition format");
     }    
+    
+    if(!queryParams.containsKey(QueryParams.TYPE)){
+      throw new URIEncodingException("No fingerprint type provided");
+    }
     
     ConditionType type = ConditionType.fromString(queryParams.get(QueryParams.TYPE).get(0));
     
@@ -74,11 +78,15 @@ public class CryptoConditionURIParser {
       throw new URIEncodingException("No or invalid cost provided");
     }
     
-    byte[] fingerprint = Base64.getUrlDecoder().decode(m.group(1));
+    byte[] fingerprint = Base64.getUrlDecoder().decode(m.group(2));
     
     EnumSet<ConditionType> subtypes = null;
     if (type == ConditionType.PREFIX_SHA256 || type == ConditionType.THRESHOLD_SHA256) {
 
+      if(!queryParams.containsKey(QueryParams.SUBTYPES)){
+        throw new URIEncodingException("No subtypes provided");
+      }
+      
       subtypes = ConditionType.getEnumOfTypesFromString(queryParams.get(QueryParams.SUBTYPES).get(0));
     }
 
@@ -100,7 +108,7 @@ public class CryptoConditionURIParser {
   
   //Lightly adapted from http://stackoverflow.com/questions/13592236/parse-a-uri-string-into-name-value-collection
   //so that we dont need an external library.
-  public static Map<String, List<String>> splitQuery(String queryParams)
+  private static Map<String, List<String>> splitQuery(String queryParams)
       throws UnsupportedEncodingException {
     final Map<String, List<String>> query_pairs = new LinkedHashMap<String, List<String>>();
     final String[] pairs = queryParams.split("&");
