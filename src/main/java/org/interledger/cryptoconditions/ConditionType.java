@@ -95,6 +95,8 @@ public enum ConditionType {
     }
     
     if(lastUsedBit > -1) {
+      //the bit strings are *right* padded with binary 0.
+      data = data << (7 - lastUsedBit);
       return new byte[] {(byte) (7 - lastUsedBit), (byte) data};
     }
     else
@@ -114,11 +116,98 @@ public enum ConditionType {
     String[] names = new String[types.size()];
     int i = 0;
     for (ConditionType conditionType : types) {
-      names[i++] = conditionType.name().toLowerCase();
+      names[i++] = conditionType.toString().toLowerCase();
     }
 
     return String.join(",", names);
 
   }
 
+  /**
+   * Returns the Condition type identified by its name, in a *case-insensitive* manner.
+   *
+   * @param typeName
+   *  The name of the condition type, e.g. 'rsa-sha-256'
+   * @return
+   *  The Condition type with matching name, if any.
+   */
+  public static ConditionType fromString(String typeName) {
+    for (ConditionType conditionType : EnumSet.allOf(ConditionType.class)) {
+      if (conditionType.name.equalsIgnoreCase(typeName))
+        return conditionType;
+    }
+
+    throw new IllegalArgumentException("Invalid Condition Type name.");
+  }
+  
+  /**
+   * Convert a comma separated list of types into a set of types
+   * 
+   * @param types comma separated list of type names
+   */
+  public static EnumSet<ConditionType> getEnumOfTypesFromString(String subtypes) {
+    EnumSet<ConditionType> types = EnumSet.noneOf(ConditionType.class);
+    
+    if (subtypes == null || subtypes.trim().isEmpty()) {
+      return types;
+    }
+    
+    String[] names = subtypes.split(",");
+    for (String typeName : names) {
+      types.add(ConditionType.fromString(typeName));
+    }
+
+    return types;
+  }  
+  
+  /**
+   * Get the set of types represented by
+   * 
+   * @param bitStringData a raw BIT STRING including the padding bit count in the first byte
+   * @return
+   */
+  public static EnumSet<ConditionType> getEnumOfTypesFromBitString(byte[] bitStringData) {
+
+    // We only have 5 known types so shouldn't be more than a padding byte and the bitmap
+    if (bitStringData.length > 2) {
+      throw new IllegalArgumentException("Unknown types in bit string.");
+    }
+
+    if (bitStringData.length == 1) {
+      throw new IllegalArgumentException("Corrupt bit string.");
+    }
+
+    EnumSet<ConditionType> subtypes = EnumSet.noneOf(ConditionType.class);
+    if (bitStringData.length == 0) {
+      return subtypes;
+    }
+
+    int padBits = bitStringData[0];
+
+    // We only have 5 known types so should have at least 3 padding bits
+    if (padBits < 3) {
+      throw new IllegalArgumentException("Unknown types in bit string.");
+    }
+    
+    //our flags are based on *right aligned* boundaries, but the byte we have has been 
+    //*right padded*, so we arent looking in the correct place. we must shift the entire bit mask
+    //over to the right by the number of padding bits. by way of example, our bit string is just '1'
+    // this is padded ON THE RIGHT to the nearest 8 bit boundary: '1 000 0000'
+    // the number of bits added as padding is then prefixed, producing: 0x 07 80.
+    //clearly, the 1 we are looking for as the LEAST SIGNIFICANT bit has been shifted.
+    
+    //shift everything over so that we are back to being right aligned.
+    //sadly java's bytes are 2's complements, so direct shifting gives very odd results.
+    //try 0x80 >> 7 vs ((byte)0x80) >> 7
+    int mask = (Byte.toUnsignedInt(bitStringData[1]) >> padBits);
+
+    // We only expect 1 byte of data so let's keep it simple
+    for (ConditionType type : ConditionType.values()) {
+      if ((mask & type.getFlag()) == type.getFlag()) {
+        subtypes.add(type);
+      }
+    }
+
+    return subtypes;
+  }  
 }
