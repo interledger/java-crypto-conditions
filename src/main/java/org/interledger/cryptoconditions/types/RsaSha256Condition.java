@@ -65,7 +65,7 @@ public class RsaSha256Condition extends Sha256Condition implements SimpleConditi
   }
 
   /**
-   * cost = (modulus size in bits)^2 / 64
+   * cost = (modulus size in bytes) ^ 2
    * 
    * @param key
    * @return cost

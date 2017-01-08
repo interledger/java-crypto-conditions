@@ -94,9 +94,9 @@ public abstract class ConditionBase implements Condition {
     if(uri == null) {
       
       StringBuilder sb = new StringBuilder();
-      sb.append("ni://").append("/sha-256;")
+      sb.append("ni:///").append("/sha-256;")
           .append(Base64.getUrlEncoder().withoutPadding().encodeToString(getFingerprint()))
-          .append("?").append("fht=").append(getType().toString().toLowerCase()).append("&cost=")
+          .append("?").append("fpt=").append(getType().toString().toLowerCase()).append("&cost=")
           .append(getCost());
 
       if (this instanceof CompoundCondition) {
