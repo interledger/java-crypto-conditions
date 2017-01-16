@@ -96,4 +96,9 @@ public class TestVector {
   public void setMessage(String message) {
     this.message = message;
   }
+  
+  @Override
+  public String toString() {
+    return getName();
+  }
 }
