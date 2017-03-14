@@ -85,7 +85,7 @@ public class PrefixSha256Condition extends CompoundSha256Condition implements Co
    * max_message_length + subcondition_cost + 1024
    * 
    * @param prefix The prefix included in this condition.
-   * @param maxMessageLength The maximum lenght of the message.
+   * @param maxMessageLength The maximum length of the message.
    * @param subconditionCost The cost of the sub condition.
    * @return The calculated cost of this condition.
    */

@@ -115,11 +115,10 @@ public class ThresholdSha256Fulfillment implements Fulfillment {
   public ThresholdSha256Condition getCondition() {
     if (condition == null) {
 
-      // Copy all subconditions into another array along with the conditions derived from all
+      // Copy all subconditions into another array along with the conditions *derived* from all
       // subfulfillments
       Condition[] allConditions = new Condition[subconditions.length + subfulfillments.length];
       System.arraycopy(subconditions, 0, allConditions, 0, subconditions.length);
-      //TODO: why not just arraycopy again?
       int idx = subconditions.length;
       for (int i = 0; i < subfulfillments.length; i++) {
         allConditions[idx] = subfulfillments[i].getCondition();
