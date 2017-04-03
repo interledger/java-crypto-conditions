@@ -31,7 +31,7 @@ public interface Condition {
    * 
    * @return the unique fingerprint of this condition
    */
-  byte[] getFingerprint();
+  byte[] getFingerprint(); // TODO:(?) wrap in Fingerprint data-type to avoid errors with other byte[] types
 
   /**
    * The estimated "cost" of processing a fulfillment of this condition. For details of how to calculate
@@ -40,7 +40,7 @@ public interface Condition {
    * 
    * @return the cost of validating the fulfillment of this conditon
    */
-  long getCost();
+  long getCost(); // TODO:(?) wrap in Fingerprint data-type to avoid errors with other byte[] types
 
   /**
    * Get the DER encoded condition

@@ -136,6 +136,7 @@ public class HexDump {
   }
 
   public static byte[] hexStringToByteArray(String hexString) {
+    // TODO:(?) Check hexString != null && hexString.length >=2 && hexString.length even
     int length = hexString.length();
     byte[] buffer = new byte[length / 2];
     for (int i = 0; i < length; i += 2) {
