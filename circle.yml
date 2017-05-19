@@ -3,6 +3,9 @@ machine:
     version: oraclejdk8
 
 test:
+  override:
+    # we override the standard circleci test to force it to pick gradle (since there is a pom.xml file checked in too)
+    - if [ -e ./gradlew ]; then ./gradlew test;else gradle test;fi
   post:
     # run the checkstyle checks
     - if [ -e ./gradlew ]; then ./gradlew check;else gradle check ;fi
