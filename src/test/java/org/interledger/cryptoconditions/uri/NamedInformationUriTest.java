@@ -130,6 +130,9 @@ public class NamedInformationUriTest {
     final String actual = NamedInformationUri.getUri(HASH_FUNCTION, HASH, queryParams)
         .toString();
     assertThat(actual,
-        is("ni:///sha-256;dGVzdA?subtypes=prefix-sha-256,ed25519-sha-256,preimage-sha-256,spa+ce,%21%40%23%24%25%5E%26*"));
+        is(
+          "ni:///sha-256;dGVzdA?subtypes=prefix-sha-256,ed25519-sha-256,preimage-sha-256,spa+ce,"
+            + "%21%40%23%24%25%5E%26*"
+        ));
   }
 }
