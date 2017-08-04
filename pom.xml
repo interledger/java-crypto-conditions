@@ -6,7 +6,7 @@
   <artifactId>java-crypto-conditions</artifactId>
   <version>0.2.1-SNAPSHOT</version>
   <name>Crypto Conditions (Java)</name>
-  <description>Java implementation of the Crypto-Conditions RFC found at https://tools.ietf.org/html/draft-thomas-crypto-conditions-02.</description>
+  <description>Java implementation of the Crypto-Conditions RFC.</description>
   <url>http://github.com/interledger/java-crypto-conditions</url>
   <inceptionYear>2016</inceptionYear>
   <licenses>
