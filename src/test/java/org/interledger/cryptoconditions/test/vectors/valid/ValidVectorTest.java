@@ -5,10 +5,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.BaseEncoding;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.Fulfillment;
-import org.interledger.cryptoconditions.HexDump;
 import org.interledger.cryptoconditions.UnsignedBigInteger;
 import org.interledger.cryptoconditions.der.CryptoConditionReader;
 import org.interledger.cryptoconditions.der.DerEncodingException;
@@ -46,7 +46,7 @@ import java.util.List;
 public class ValidVectorTest {
 
   private TestVector testVector;
-  
+
   public ValidVectorTest(TestVector testVector) throws Exception {
     this.testVector = testVector;
   }
@@ -71,11 +71,9 @@ public class ValidVectorTest {
         vectors.add(vector);
       }
     }
-    
+
     return vectors;
   }
-
-
 
   // according to the source of the test 'vectors' (https://github.com/rfcs/crypto-conditions),
   // we should test by
@@ -102,8 +100,8 @@ public class ValidVectorTest {
   @Test
   public void testFingerPrintContent() throws DerEncodingException {
 
-    byte[] testFingerprintContents =
-        HexDump.hexStringToByteArray(testVector.getFingerprintContents());
+    byte[] testFingerprintContents = BaseEncoding.base16()
+        .decode(testVector.getFingerprintContents());
     byte[] encodedFingerprintContents = TestConditionFactory
         .getTestConditionFromTestVectorJson(testVector.getJson()).getUnhashedFingerprint();
     assertArrayEquals(
@@ -115,7 +113,7 @@ public class ValidVectorTest {
   public void testParseCondition() throws UriEncodingException, DerEncodingException {
 
     Condition binaryCondition = CryptoConditionReader
-        .readCondition(HexDump.hexStringToByteArray(testVector.getConditionBinary()));
+        .readCondition(BaseEncoding.base16().decode(testVector.getConditionBinary()));
     Condition testCondition =
         TestConditionFactory.getTestConditionFromTestVectorJson(testVector.getJson());
 
@@ -129,7 +127,7 @@ public class ValidVectorTest {
       throws UriEncodingException, DerEncodingException, UnsupportedEncodingException {
 
     Condition binaryCondition = CryptoConditionReader
-        .readCondition(HexDump.hexStringToByteArray(testVector.getConditionBinary()));
+        .readCondition(BaseEncoding.base16().decode(testVector.getConditionBinary()));
 
     CryptoConditionAssert.assertUriEqual(testVector.getName() + " [binary condition => uri]",
         URI.create(testVector.getConditionUri()), binaryCondition.getUri());
@@ -140,13 +138,13 @@ public class ValidVectorTest {
 
     Condition uriCondition = CryptoConditionUri.parse(URI.create(testVector.getConditionUri()));
     assertEquals(testVector.getName() + " [condition uri => binary]",
-        testVector.getConditionBinary(), HexDump.toHexString(uriCondition.getEncoded()));
+        testVector.getConditionBinary(), BaseEncoding.base16().encode(uriCondition.getEncoded()));
 
   }
 
   @Test
   public void testParseFulfillmentAndCheckProperties() throws Exception {
-    byte[] fulfillmentBytes = HexDump.hexStringToByteArray(testVector.getFulfillment());
+    byte[] fulfillmentBytes = BaseEncoding.base16().decode(testVector.getFulfillment());
     Fulfillment fulfillment = CryptoConditionReader.readFulfillment(fulfillmentBytes);
 
     switch (fulfillment.getType()) {
@@ -207,7 +205,7 @@ public class ValidVectorTest {
   @Test
   public void testParseFulfillmentAndReserialize()
       throws UriEncodingException, DerEncodingException {
-    byte[] fulfillmentBytes = HexDump.hexStringToByteArray(testVector.getFulfillment());
+    byte[] fulfillmentBytes = BaseEncoding.base16().decode(testVector.getFulfillment());
     Fulfillment binaryFulfillment = CryptoConditionReader.readFulfillment(fulfillmentBytes);
     assertArrayEquals(testVector.getName() + " [fulfillment deserialize/reserialize]",
         fulfillmentBytes, binaryFulfillment.getEncoded());
@@ -216,7 +214,7 @@ public class ValidVectorTest {
   @Test
   public void testParseFulfillmentAndGenerateCondtion()
       throws UriEncodingException, DerEncodingException {
-    byte[] fulfillmentBytes = HexDump.hexStringToByteArray(testVector.getFulfillment());
+    byte[] fulfillmentBytes = BaseEncoding.base16().decode(testVector.getFulfillment());
     Fulfillment fulfillment = CryptoConditionReader.readFulfillment(fulfillmentBytes);
     Condition derivedCondition = fulfillment.getCondition();
     Condition condition = CryptoConditionUri.parse(URI.create(testVector.getConditionUri()));
@@ -227,9 +225,9 @@ public class ValidVectorTest {
 
   @Test
   public void testParseFulfillmentAndValidate() throws UriEncodingException, DerEncodingException {
-    byte[] fulfillmentBytes = HexDump.hexStringToByteArray(testVector.getFulfillment());
+    byte[] fulfillmentBytes = BaseEncoding.base16().decode(testVector.getFulfillment());
     byte[] message = (testVector.getMessage() != null)
-        ? HexDump.hexStringToByteArray(testVector.getMessage()) : new byte[] {};
+        ? BaseEncoding.base16().decode(testVector.getMessage()) : new byte[]{};
 
     Fulfillment fulfillment = CryptoConditionReader.readFulfillment(fulfillmentBytes);
     Condition condition = CryptoConditionUri.parse(URI.create(testVector.getConditionUri()));

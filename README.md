@@ -24,14 +24,13 @@ For ED25519 the library depends on [net.i2p.crypto.eddsa](https://github.com/str
 ## Usage
 
 ### Requirements
-This project uses Gradle to manage dependencies and other aspects of the build.  
-To install Gradle, follow the instructions at [https://gradle.org](https://gradle.org/).
+This project uses Maven to manage dependencies and other aspects of the build.  
+To install Maven, follow the instructions at [https://maven.apache.org/install.html](https://maven.apache.org/install.html).
 
 ### Get the code
 
 ``` sh
 git clone https://github.com/interledger/java-crypto-conditions
-
 cd java-crypto-conditions
 ```
 
@@ -39,20 +38,11 @@ cd java-crypto-conditions
 To build the project, execute the following command:
 
 ```bash
-$ gradle build test
+$ mvn clean install
 ```
 
 #### Checkstyle
-The project uses checkstyle to keep code style consistent. To run the style checks:
-
-```bash
-$ gradle build check
-```
-
-#### Maven is also supported:
-```
-mvn clean install [checkstyle:check]
-```
+The project uses checkstyle to keep code style consistent. All Checkstyle checks are run by default during the build.
 
 ### Step 3: Use
 

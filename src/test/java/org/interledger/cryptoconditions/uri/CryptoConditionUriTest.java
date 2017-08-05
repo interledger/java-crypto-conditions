@@ -3,15 +3,13 @@ package org.interledger.cryptoconditions.uri;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.io.BaseEncoding;
+import java.net.URI;
+import java.util.EnumSet;
 import org.interledger.cryptoconditions.CompoundCondition;
 import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
-import org.interledger.cryptoconditions.HexDump;
-import org.interledger.cryptoconditions.uri.CryptoConditionUri;
 import org.junit.Test;
-
-import java.net.URI;
-import java.util.EnumSet;
 
 /**
  * JUnit tests to exercise the {@link CryptoConditionUri} class. Directly translated from
@@ -28,7 +26,7 @@ public class CryptoConditionUriTest {
 
     assertEquals(ConditionType.PREIMAGE_SHA256, condition.getType());
     assertEquals("E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
-        HexDump.toHexString(condition.getFingerprint()));
+        BaseEncoding.base16().encode(condition.getFingerprint()));
     assertEquals(0, condition.getCost());
   }
 
@@ -36,13 +34,13 @@ public class CryptoConditionUriTest {
   public void test_parse_prefix_sha_256() throws UriEncodingException {
     URI uri = URI.create(
         "ni:///sha-256;47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU?fpt=prefix-sha-256&cost=0"
-        + "&subtypes=preimage-sha-256,prefix-sha-256");
+            + "&subtypes=preimage-sha-256,prefix-sha-256");
 
     Condition condition = CryptoConditionUri.parse(uri);
 
     assertEquals(ConditionType.PREFIX_SHA256, condition.getType());
     assertEquals("E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
-        HexDump.toHexString(condition.getFingerprint()));
+        BaseEncoding.base16().encode(condition.getFingerprint()));
     assertEquals(0, condition.getCost());
 
     assertTrue(condition instanceof CompoundCondition);
