@@ -22,6 +22,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,13 +43,15 @@ import org.interledger.cryptoconditions.test.types.TestVectorConditionFactory;
 import org.interledger.cryptoconditions.test.vectors.TestVector;
 import org.interledger.cryptoconditions.test.vectors.TestVectorJson;
 import org.interledger.cryptoconditions.types.Ed25519Sha256Fulfillment;
+import org.interledger.cryptoconditions.types.PrefixSha256Condition;
 import org.interledger.cryptoconditions.types.PrefixSha256Fulfillment;
+import org.interledger.cryptoconditions.types.PreimageSha256Condition;
 import org.interledger.cryptoconditions.types.PreimageSha256Fulfillment;
 import org.interledger.cryptoconditions.types.RsaSha256Fulfillment;
+import org.interledger.cryptoconditions.types.ThresholdSha256Condition;
 import org.interledger.cryptoconditions.types.ThresholdSha256Fulfillment;
 import org.interledger.cryptoconditions.uri.CryptoConditionUri;
 import org.interledger.cryptoconditions.uri.UriEncodingException;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -273,24 +276,22 @@ public class ValidVectorTest {
   }
 
   /**
-   * This create a fulfillment from json, serializes the fulfillment, and then checks to ensure that
-   * the serialized fulfillment matches json.fulfillment.
+   * This creates a fulfillment from json, creates a condition, and then asserts that the binary
+   * fulfillment in JSON.fulfillment (which may not have all subfulfillments) fulfills the
+   * condition.
    */
   @Test
-  @Ignore
   public void testParseJsonFulfillment() throws Exception {
     // Used to recursively assemble subfulfillments if they exist in the JSON test vector file.
     final Fulfillment controlFulfillment = CryptoConditionReader
         .readFulfillment(BaseEncoding.base16().decode(testVector.getFulfillment()));
 
-    final String encodedControlFulfillment = BaseEncoding.base64Url()
-        .encode(controlFulfillment.getEncoded());
+    // A fully-assembled fulfillment, used to generate a condition.
+    final Condition conditionToFulfill = this.getConditionFromJson(testVector.getJson());
 
-    final Fulfillment fulfillmentFromJson = this.getFulfillmentFromJson(testVector.getJson());
-    final String encodedFulfillmentFromJson = BaseEncoding.base64Url()
-        .encode(fulfillmentFromJson.getEncoded());
-
-    assertThat(encodedControlFulfillment, is(encodedFulfillmentFromJson));
+    assertThat(controlFulfillment
+            .verify(conditionToFulfill, BaseEncoding.base16().decode(testVector.getMessage())),
+        is(true));
   }
 
   @Test
@@ -386,29 +387,6 @@ public class ValidVectorTest {
         );
       }
 
-      case "threshold-sha-256": {
-        final Set<Fulfillment> subFulfillments = Arrays
-            .stream(testVectorJson.getSubfulfillments())
-            .map(subfulfillment -> {
-                  try {
-                    return getFulfillmentFromJson(subfulfillment);
-                  } catch (Exception e) {
-                    throw new RuntimeException(e);
-                  }
-                }
-            )
-            .collect(Collectors.toSet());
-
-        final Set<Condition> subConditions = subFulfillments.stream()
-            .map(Fulfillment::getCondition)
-            .collect(Collectors.toSet());
-
-        return new ThresholdSha256Fulfillment(
-            subConditions.toArray(new Condition[]{}),
-            subFulfillments.toArray(new Fulfillment[]{})
-        );
-      }
-
       case "rsa-sha-256": {
         final BigInteger modulus = new BigInteger(
             BaseEncoding.base64Url().decode(testVectorJson.getModulus()));
@@ -438,6 +416,29 @@ public class ValidVectorTest {
         );
       }
 
+      case "threshold-sha-256": {
+        final Set<Fulfillment> subFulfillments = Arrays
+            .stream(testVectorJson.getSubfulfillments())
+            .map(subfulfillment -> {
+                  try {
+                    return getFulfillmentFromJson(subfulfillment);
+                  } catch (Exception e) {
+                    throw new RuntimeException(e);
+                  }
+                }
+            )
+            .collect(Collectors.toSet());
+
+//        final Set<Condition> subConditions = subFulfillments.stream()
+//            .map(Fulfillment::getCondition)
+//            .collect(Collectors.toSet());
+
+        return new ThresholdSha256Fulfillment(
+            new Condition[0],
+            subFulfillments.toArray(new Fulfillment[]{})
+        );
+      }
+
       default: {
         throw new RuntimeException(String.format("Unhandled Type %s", testVectorJson.getType()));
       }
@@ -448,84 +449,90 @@ public class ValidVectorTest {
    * Assembles an instance of {@link Fulfillment} from the information provided in an instance of
    * {@link TestVectorJson}, which is ultimately assembled from a JSON file in this test harness.
    */
-//  private Condition getConditionFromJson(final TestVectorJson testVectorJson) throws Exception {
-//    Objects.requireNonNull(testVectorJson);
-//
-//    switch (testVectorJson.getType()) {
-//
-//      case "preimage-sha-256": {
-//        return new PreimageSha256Condition(
-//            BaseEncoding.base64Url().decode(testVectorJson.getPreimage())
-//        );
-//      }
-//
-//      case "prefix-sha-256": {
-//        return new PrefixSha256Condition(
-//            BaseEncoding.base64Url().decode(testVectorJson.getPrefix()),
-//            testVectorJson.getMaxMessageLength(),
-//            getConditionFromJson(testVectorJson.getSubfulfillment())
-//        );
-//      }
-//
-//      case "threshold-sha-256": {
-//        final List<Fulfillment> subFulfillments = Arrays
-//            .stream(testVectorJson.getSubfulfillments())
-//            .map(subfulfillment -> {
-//                  try {
-//                    return getFulfillmentFromJson(subfulfillment);
-//                  } catch (Exception e) {
-//                    throw new RuntimeException(e);
-//                  }
-//                }
-//            )
-//            .collect(Collectors.toList());
-//
-//        final List<Condition> subConditions = subFulfillments.stream()
-//            .map(Fulfillment::getCondition)
-//            .collect(Collectors.toList());
-//
-//        return new ThresholdSha256Condition(
-//            testVectorJson.getThreshold(),
-//            subConditions.toArray(new Condition[0])
-//        );
-//      }
-//
-//      case "rsa-sha-256": {
-//        final BigInteger modulus = new BigInteger(
-//            BaseEncoding.base64Url().decode(testVectorJson.getModulus()));
-//        byte[] rsaSignature = BaseEncoding.base64Url().decode(testVectorJson.getSignature());
-//        final RSAPublicKeySpec rsaSpec = new RSAPublicKeySpec(modulus,
-//            RsaSha256Fulfillment.PUBLIC_EXPONENT);
-//
-//        try {
-//          final KeyFactory rsaKeyFactory = KeyFactory.getInstance("RSA");
-//          final PublicKey publicKey = rsaKeyFactory.generatePublic(rsaSpec);
-//          return new RsaSha256Fulfillment(
-//              (RSAPublicKey) publicKey,
-//              rsaSignature
-//          ).getCondition();
-//        } catch (Exception e) {
-//          throw new RuntimeException(e);
-//        }
-//      }
-//
-//      case "ed25519-sha-256": {
-//        final EdDSANamedCurveSpec params = EdDSANamedCurveTable.getByName("Ed25519");
-//        final EdDSAPublicKeySpec keyspec = new EdDSAPublicKeySpec(
-//            BaseEncoding.base64Url().decode(testVectorJson.getPublicKey()),
-//            params
-//        );
-//        final EdDSAPublicKeySpec pubKeySpec = new EdDSAPublicKeySpec(keyspec.getA(), params);
-//
-//        return new Ed25519Sha256Fulfillment(
-//            new EdDSAPublicKey(pubKeySpec),
-//            BaseEncoding.base64Url().decode(testVectorJson.getSignature())
+  private Condition getConditionFromJson(final TestVectorJson testVectorJson) throws Exception {
+    Objects.requireNonNull(testVectorJson);
+
+    switch (testVectorJson.getType()) {
+
+      case "preimage-sha-256": {
+        return new PreimageSha256Condition(
+            BaseEncoding.base64Url().decode(testVectorJson.getPreimage())
+        );
+      }
+
+      case "prefix-sha-256": {
+        return new PrefixSha256Condition(
+            BaseEncoding.base64Url().decode(testVectorJson.getPrefix()),
+            testVectorJson.getMaxMessageLength(),
+            getConditionFromJson(testVectorJson.getSubfulfillment())
+        );
+      }
+
+      case "rsa-sha-256": {
+        final BigInteger modulus = new BigInteger(
+            BaseEncoding.base64Url().decode(testVectorJson.getModulus()));
+        byte[] rsaSignature = BaseEncoding.base64Url().decode(testVectorJson.getSignature());
+        final RSAPublicKeySpec rsaSpec = new RSAPublicKeySpec(modulus,
+            RsaSha256Fulfillment.PUBLIC_EXPONENT);
+
+        try {
+          final KeyFactory rsaKeyFactory = KeyFactory.getInstance("RSA");
+          final PublicKey publicKey = rsaKeyFactory.generatePublic(rsaSpec);
+          return new RsaSha256Fulfillment(
+              (RSAPublicKey) publicKey,
+              rsaSignature
+          ).getCondition();
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      }
+
+      case "ed25519-sha-256": {
+        final EdDSANamedCurveSpec params = EdDSANamedCurveTable.getByName("Ed25519");
+        final EdDSAPublicKeySpec keyspec = new EdDSAPublicKeySpec(
+            BaseEncoding.base64Url().decode(testVectorJson.getPublicKey()),
+            params
+        );
+        final EdDSAPublicKeySpec pubKeySpec = new EdDSAPublicKeySpec(keyspec.getA(), params);
+
+        return new Ed25519Sha256Fulfillment(
+            new EdDSAPublicKey(pubKeySpec),
+            BaseEncoding.base64Url().decode(testVectorJson.getSignature())
+        ).getCondition();
+      }
+
+      case "threshold-sha-256": {
+        final List<Fulfillment> subFulfillments = Arrays
+            .stream(testVectorJson.getSubfulfillments())
+            .map(subfulfillment -> {
+                  try {
+                    return getFulfillmentFromJson(subfulfillment);
+                  } catch (Exception e) {
+                    throw new RuntimeException(e);
+                  }
+                }
+            )
+            .collect(Collectors.toList());
+
+//        return new ThresholdSha256Fulfillment(
+//            new Condition[0],
+//            subFulfillments.toArray(new Fulfillment[0])
 //        ).getCondition();
-//      }
-//
-//      default: {
-//        throw new RuntimeException(String.format("Unhandled Type %s", testVectorJson.getType()));
-//      }
-//    }
-//  }
+
+        final List<Condition> subConditions = subFulfillments.stream()
+            .map(Fulfillment::getCondition)
+            .collect(Collectors.toList());
+
+
+        return new ThresholdSha256Condition(
+            testVectorJson.getThreshold(),
+            subConditions.toArray(new Condition[0])
+        );
+      }
+
+      default: {
+        throw new RuntimeException(String.format("Unhandled Type %s", testVectorJson.getType()));
+      }
+    }
+  }
 }
