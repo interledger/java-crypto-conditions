@@ -1,15 +1,15 @@
 package org.interledger.cryptoconditions.types;
 
-import org.interledger.cryptoconditions.Condition;
-import org.interledger.cryptoconditions.ConditionType;
-import org.interledger.cryptoconditions.Fulfillment;
-import org.interledger.cryptoconditions.der.DerOutputStream;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Objects;
+import org.interledger.cryptoconditions.Condition;
+import org.interledger.cryptoconditions.ConditionType;
+import org.interledger.cryptoconditions.Fulfillment;
+import org.interledger.cryptoconditions.der.DerOutputStream;
 
 /**
  * Implementation of a fulfillment based on a prefix, a sub fulfillment, and the SHA-256 function.
@@ -24,10 +24,10 @@ public class PrefixSha256Fulfillment implements Fulfillment {
 
   /**
    * Constructs an instance of the fulfillment.
-   * 
-   * @param prefix The prefix associated with the condition and fulfillment
+   *
+   * @param prefix           The prefix associated with the condition and fulfillment
    * @param maxMessageLength The maximum length of a message.
-   * @param subfulfillment The sub fulfillments that this fulfillment depends on.
+   * @param subfulfillment   The sub fulfillments that this fulfillment depends on.
    */
   public PrefixSha256Fulfillment(byte[] prefix, long maxMessageLength, Fulfillment subfulfillment) {
     this.prefix = new byte[prefix.length];
@@ -102,12 +102,9 @@ public class PrefixSha256Fulfillment implements Fulfillment {
   }
 
   @Override
-  public boolean verify(Condition condition, byte[] message) {
-
-    if (condition == null) {
-      throw new IllegalArgumentException(
-          "Can't verify a PrefixSha256Fulfillment against an null condition.");
-    }
+  public boolean verify(final Condition condition, final byte[] message) {
+    Objects.requireNonNull(condition,
+        "Can't verify a PrefixSha256Fulfillment against a null condition!");
 
     if (!(condition instanceof PrefixSha256Condition)) {
       throw new IllegalArgumentException(
@@ -116,7 +113,9 @@ public class PrefixSha256Fulfillment implements Fulfillment {
 
     if (message.length > maxMessageLength) {
       throw new IllegalArgumentException(
-          "Message length exceeds maximum message length of " + maxMessageLength + ".");
+          String
+              .format("Message length (%s) exceeds maximum message length of (%s).", message.length,
+                  maxMessageLength));
     }
 
     if (!getCondition().equals(condition)) {
@@ -130,4 +129,47 @@ public class PrefixSha256Fulfillment implements Fulfillment {
     return subfulfillment.verify(subcondition, prefixedMessage);
   }
 
+  /**
+   * The {@link #condition} field in this class is not part of this equals method because it is a
+   * value derived from this fulfillment, and is lazily initialized (so it's occasionally null until
+   * {@link #getCondition()} is called.
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    PrefixSha256Fulfillment that = (PrefixSha256Fulfillment) o;
+
+    if (maxMessageLength != that.maxMessageLength) {
+      return false;
+    }
+    if (subfulfillment != null ? !subfulfillment.equals(that.subfulfillment)
+        : that.subfulfillment != null) {
+      return false;
+    }
+    return Arrays.equals(prefix, that.prefix);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = subfulfillment != null ? subfulfillment.hashCode() : 0;
+    result = 31 * result + (int) (maxMessageLength ^ (maxMessageLength >>> 32));
+    result = 31 * result + Arrays.hashCode(prefix);
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("PrefixSha256Fulfillment{");
+    sb.append("maxMessageLength=").append(maxMessageLength);
+    sb.append(", prefix=").append(Arrays.toString(prefix));
+    sb.append(", type=").append(getType());
+    sb.append('}');
+    return sb.toString();
+  }
 }

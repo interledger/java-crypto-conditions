@@ -1,23 +1,5 @@
 package org.interledger.cryptoconditions;
 
-import net.i2p.crypto.eddsa.EdDSAEngine;
-import net.i2p.crypto.eddsa.EdDSAPublicKey;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import org.interledger.cryptoconditions.der.CryptoConditionReader;
-import org.interledger.cryptoconditions.der.DerEncodingException;
-import org.interledger.cryptoconditions.types.Ed25519Sha256Condition;
-import org.interledger.cryptoconditions.types.Ed25519Sha256Fulfillment;
-import org.interledger.cryptoconditions.types.PrefixSha256Condition;
-import org.interledger.cryptoconditions.types.PrefixSha256Fulfillment;
-import org.interledger.cryptoconditions.types.PreimageSha256Condition;
-import org.interledger.cryptoconditions.types.PreimageSha256Fulfillment;
-import org.interledger.cryptoconditions.types.RsaSha256Condition;
-import org.interledger.cryptoconditions.types.RsaSha256Fulfillment;
-import org.interledger.cryptoconditions.types.ThresholdSha256Condition;
-import org.interledger.cryptoconditions.types.ThresholdSha256Fulfillment;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -33,11 +15,28 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAKeyGenParameterSpec;
+import net.i2p.crypto.eddsa.EdDSAEngine;
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.interledger.cryptoconditions.der.CryptoConditionReader;
+import org.interledger.cryptoconditions.der.DerEncodingException;
+import org.interledger.cryptoconditions.types.Ed25519Sha256Condition;
+import org.interledger.cryptoconditions.types.Ed25519Sha256Fulfillment;
+import org.interledger.cryptoconditions.types.PrefixSha256Condition;
+import org.interledger.cryptoconditions.types.PrefixSha256Fulfillment;
+import org.interledger.cryptoconditions.types.PreimageSha256Condition;
+import org.interledger.cryptoconditions.types.PreimageSha256Fulfillment;
+import org.interledger.cryptoconditions.types.RsaSha256Condition;
+import org.interledger.cryptoconditions.types.RsaSha256Fulfillment;
+import org.interledger.cryptoconditions.types.ThresholdSha256Condition;
+import org.interledger.cryptoconditions.types.ThresholdSha256Fulfillment;
 
 
 /**
  * Playground / test class. Will be removed at a future date.
  */
+@Deprecated
+// TODO: Turn this into a unit test?
 public class Application {
 
   public static void main(String[] args) throws NoSuchAlgorithmException,
@@ -80,7 +79,7 @@ public class Application {
     PrefixSha256Condition prefixConditionOnEd25519Condition =
         new PrefixSha256Condition(prefix, 1000, ed25519Condition);
     ThresholdSha256Condition thresholdCondition = new ThresholdSha256Condition(2,
-        new Condition[] {preimageCondition, rsaCondition, prefixConditionOnEd25519Condition});
+        new Condition[]{preimageCondition, rsaCondition, prefixConditionOnEd25519Condition});
 
     PreimageSha256Fulfillment preimageFulfillment = new PreimageSha256Fulfillment(preimage);
     RsaSha256Fulfillment rsaFulfillment =
@@ -90,8 +89,8 @@ public class Application {
     PrefixSha256Fulfillment prefixFulfillmentOnEd25519Fulfillment =
         new PrefixSha256Fulfillment(prefix, 1000, ed25519Fulfillment);
     ThresholdSha256Fulfillment thresholdFulfillment =
-        new ThresholdSha256Fulfillment(new Condition[] {rsaCondition},
-            new Fulfillment[] {preimageFulfillment, prefixFulfillmentOnEd25519Fulfillment});
+        new ThresholdSha256Fulfillment(new Condition[]{rsaCondition},
+            new Fulfillment[]{preimageFulfillment, prefixFulfillmentOnEd25519Fulfillment});
 
     hexDump("preimage", preimage);
     hexDump("prefix", prefix);
@@ -118,9 +117,10 @@ public class Application {
     byte[] encodedPreimageFulfillment = preimageFulfillment.getEncoded();
     byte[] encodedEd25519Fulfillment = ed25519Fulfillment.getEncoded();
     byte[] encodedRsaFulfillment = rsaFulfillment.getEncoded();
-    byte[] encodedPrefixFulfillmentOnEd25519Fulfillment = prefixFulfillmentOnEd25519Fulfillment.getEncoded();
+    byte[] encodedPrefixFulfillmentOnEd25519Fulfillment = prefixFulfillmentOnEd25519Fulfillment
+        .getEncoded();
     byte[] encodedThresholdFulfillment = thresholdFulfillment.getEncoded();
-    
+
     hexDump("preimage_fulfillment", encodedPreimageFulfillment);
     hexDump("ed25519_fulfillment", encodedEd25519Fulfillment);
     hexDump("rsa_fulfillment", encodedRsaFulfillment);
@@ -135,16 +135,21 @@ public class Application {
         + (ed25519Fulfillment.verify(ed25519Condition, prefixedMessage) ? "VERIFIED" : "FAILED"));
     System.out.println("prefix on ed25519 : "
         + (prefixFulfillmentOnEd25519Fulfillment.verify(prefixConditionOnEd25519Condition, message)
-            ? "VERIFIED" : "FAILED"));
+        ? "VERIFIED" : "FAILED"));
     System.out.println("threshold : "
         + (thresholdFulfillment.verify(thresholdCondition, message) ? "VERIFIED" : "FAILED"));
 
-    PreimageSha256Fulfillment preimageFulfillment2 = (PreimageSha256Fulfillment) CryptoConditionReader.readFulfillment(encodedPreimageFulfillment);    
-    PrefixSha256Fulfillment prefixFulfillment2 = (PrefixSha256Fulfillment) CryptoConditionReader.readFulfillment(encodedPrefixFulfillmentOnEd25519Fulfillment);    
-    ThresholdSha256Fulfillment thresholdFulfillment2 = (ThresholdSha256Fulfillment) CryptoConditionReader.readFulfillment(encodedThresholdFulfillment);    
-    RsaSha256Fulfillment rsaFulfillment2 = (RsaSha256Fulfillment) CryptoConditionReader.readFulfillment(encodedRsaFulfillment);    
-    Ed25519Sha256Fulfillment ed25519Fulfillment2 = (Ed25519Sha256Fulfillment) CryptoConditionReader.readFulfillment(encodedEd25519Fulfillment);    
-    
+    PreimageSha256Fulfillment preimageFulfillment2 = (PreimageSha256Fulfillment) CryptoConditionReader
+        .readFulfillment(encodedPreimageFulfillment);
+    PrefixSha256Fulfillment prefixFulfillment2 = (PrefixSha256Fulfillment) CryptoConditionReader
+        .readFulfillment(encodedPrefixFulfillmentOnEd25519Fulfillment);
+    ThresholdSha256Fulfillment thresholdFulfillment2 = (ThresholdSha256Fulfillment) CryptoConditionReader
+        .readFulfillment(encodedThresholdFulfillment);
+    RsaSha256Fulfillment rsaFulfillment2 = (RsaSha256Fulfillment) CryptoConditionReader
+        .readFulfillment(encodedRsaFulfillment);
+    Ed25519Sha256Fulfillment ed25519Fulfillment2 = (Ed25519Sha256Fulfillment) CryptoConditionReader
+        .readFulfillment(encodedEd25519Fulfillment);
+
     System.out.println("decoded preimage: " + preimageFulfillment2.toString());
     System.out.println("decoded prefix: " + prefixFulfillment2.toString());
     System.out.println("decoded threshold: " + thresholdFulfillment2.toString());

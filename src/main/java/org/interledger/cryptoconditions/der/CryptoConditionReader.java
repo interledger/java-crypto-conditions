@@ -43,7 +43,7 @@ public class CryptoConditionReader {
 
   /**
    * Reads a DER encoded condition from the buffer.
-   * 
+   *
    * @param buffer contains the raw DER encoded condition.
    * @return The condition read from the buffer.
    */
@@ -53,7 +53,7 @@ public class CryptoConditionReader {
 
   /**
    * Reads a DER encoded condition from the buffer.
-   * 
+   *
    * @param buffer contains the raw DER encoded condition.
    * @param offset the position within the buffer to begin reading the condition.
    * @param length the number of bytes to read.
@@ -80,7 +80,7 @@ public class CryptoConditionReader {
 
   /**
    * Reads a DER encoded condition from the input stream.
-   * 
+   *
    * @param in The input stream containing the DER encoded condition.
    * @return The condition read from the stream.
    */
@@ -108,7 +108,7 @@ public class CryptoConditionReader {
         in.readTaggedObject(0, length - innerBytesRead.get(), innerBytesRead).getValue();
     long cost = new BigInteger(
         in.readTaggedObject(1, length - innerBytesRead.get(), innerBytesRead).getValue())
-            .longValue();
+        .longValue();
     EnumSet<ConditionType> subtypes = null;
     if (type == ConditionType.PREFIX_SHA256 || type == ConditionType.THRESHOLD_SHA256) {
       subtypes = ConditionType.getEnumOfTypesFromBitString(
@@ -268,26 +268,29 @@ public class CryptoConditionReader {
 
       case RSA_SHA256:
 
-        BigInteger modulus = UnsignedBigInteger.fromUnsignedByteArray(
-            in.readTaggedObject(0, length - innerBytesRead.get(), innerBytesRead).getValue());
-        byte[] rsaSignature =
-            in.readTaggedObject(1, length - innerBytesRead.get(), innerBytesRead).getValue();
+        final BigInteger modulus = UnsignedBigInteger.fromUnsignedByteArray(
+            in.readTaggedObject(0, length - innerBytesRead.get(), innerBytesRead).getValue()
+        );
+
+        final byte[] rsaSignature = in.readTaggedObject(
+            1, length - innerBytesRead.get(), innerBytesRead
+        ).getValue();
 
         bytesRead.addAndGet(innerBytesRead.get());
 
-        RSAPublicKeySpec rsaSpec =
-            new RSAPublicKeySpec(modulus, RsaSha256Fulfillment.PUBLIC_EXPONENT);
+        final RSAPublicKeySpec rsaSpec = new RSAPublicKeySpec(
+            modulus, RsaSha256Fulfillment.PUBLIC_EXPONENT
+        );
 
         try {
-          KeyFactory rsaKeyFactory = KeyFactory.getInstance("RSA");
-          PublicKey publicKey = rsaKeyFactory.generatePublic(rsaSpec);
+          final KeyFactory rsaKeyFactory = KeyFactory.getInstance("RSA");
+          final PublicKey publicKey = rsaKeyFactory.generatePublic(rsaSpec);
 
           return new RsaSha256Fulfillment((RSAPublicKey) publicKey, rsaSignature);
 
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
           throw new RuntimeException("Error creating RSA key.", e);
         }
-
 
       case ED25519_SHA256:
         byte[] ed25519key =

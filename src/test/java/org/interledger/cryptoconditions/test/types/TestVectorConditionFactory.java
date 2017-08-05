@@ -1,16 +1,5 @@
 package org.interledger.cryptoconditions.test.types;
 
-import net.i2p.crypto.eddsa.EdDSAPublicKey;
-import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
-import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
-
-import org.interledger.cryptoconditions.Condition;
-import org.interledger.cryptoconditions.ConditionType;
-import org.interledger.cryptoconditions.UnsignedBigInteger;
-import org.interledger.cryptoconditions.der.CryptoConditionReader;
-import org.interledger.cryptoconditions.test.TestCondition;
-import org.interledger.cryptoconditions.test.TestVectorJson;
-
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -20,40 +9,53 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
+import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
+import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
+import org.interledger.cryptoconditions.Condition;
+import org.interledger.cryptoconditions.ConditionType;
+import org.interledger.cryptoconditions.UnsignedBigInteger;
+import org.interledger.cryptoconditions.der.CryptoConditionReader;
+import org.interledger.cryptoconditions.test.TestCondition;
+import org.interledger.cryptoconditions.test.vectors.TestVectorJson;
 
 /**
- * Builds conditions for testing based on the test vectors loaded.
+ * Builds instances of {@link Condition} for testing based on the test vectors loaded.
  */
-public class TestConditionFactory {
+public class TestVectorConditionFactory {
 
   /**
    * Constructs a test condition based on test vector.
    */
-  public static TestCondition getTestConditionFromTestVectorJson(TestVectorJson condition) {
+  public static TestCondition getTestVectorCondition(final TestVectorJson condition) {
+    Objects.requireNonNull(condition);
 
-    ConditionType type = ConditionType.fromString(condition.getType());
+    final ConditionType type = ConditionType.fromString(condition.getType());
 
     switch (type) {
 
-      case PREIMAGE_SHA256:
+      case PREIMAGE_SHA256: {
         return new TestPreimageSha256Condition(
             Base64.getUrlDecoder().decode(condition.getPreimage()));
+      }
 
-      case PREFIX_SHA256:
+      case PREFIX_SHA256: {
         return new TestPrefixSha256Condition(Base64.getUrlDecoder().decode(condition.getPrefix()),
             condition.getMaxMessageLength(),
-            getTestConditionFromTestVectorJson(condition.getSubfulfillment()));
+            getTestVectorCondition(condition.getSubfulfillment()));
+      }
 
-      case THRESHOLD_SHA256:
+      case THRESHOLD_SHA256: {
         List<Condition> subconditions = new ArrayList<>();
         for (TestVectorJson vector : condition.getSubfulfillments()) {
-          subconditions.add(getTestConditionFromTestVectorJson(vector));
+          subconditions.add(getTestVectorCondition(vector));
         }
         return new TestThresholdSha256Condition(condition.getThreshold(),
             subconditions.toArray(new Condition[subconditions.size()]));
+      }
 
-      case RSA_SHA256:
-
+      case RSA_SHA256: {
         byte[] modulusBytes = Base64.getUrlDecoder().decode(condition.getModulus());
         BigInteger modulus = UnsignedBigInteger.fromUnsignedByteArray(modulusBytes);
         BigInteger exponent = BigInteger.valueOf(65537);
@@ -65,19 +67,20 @@ public class TestConditionFactory {
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
           throw new RuntimeException("Error creating RSA key.", e);
         }
+      }
 
-      case ED25519_SHA256:
-
+      case ED25519_SHA256: {
         byte[] publicKeyBytes = Base64.getUrlDecoder().decode(condition.getPublicKey());
 
-        EdDSAPublicKeySpec publicKeyspec = new EdDSAPublicKeySpec(
+        final EdDSAPublicKeySpec publicKeyspec = new EdDSAPublicKeySpec(
             publicKeyBytes, EdDSANamedCurveTable.getByName(CryptoConditionReader.ED_25519)
         );
-        EdDSAPublicKey publicKey = new EdDSAPublicKey(publicKeyspec);
+        final EdDSAPublicKey publicKey = new EdDSAPublicKey(publicKeyspec);
         return new TestEd25519Sha256Condition(publicKey);
+      }
 
       default:
-        throw new RuntimeException("Unknown type.");
+        throw new RuntimeException(String.format("Unknown Condition type: %s", type));
     }
 
   }

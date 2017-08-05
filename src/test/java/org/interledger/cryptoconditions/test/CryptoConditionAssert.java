@@ -2,10 +2,6 @@ package org.interledger.cryptoconditions.test;
 
 import static org.junit.Assert.assertEquals;
 
-import org.interledger.cryptoconditions.Condition;
-import org.interledger.cryptoconditions.ConditionType;
-import org.interledger.cryptoconditions.Fulfillment;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,15 +11,23 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.interledger.cryptoconditions.Condition;
+import org.interledger.cryptoconditions.ConditionType;
+import org.interledger.cryptoconditions.Fulfillment;
 
+/**
+ * @deprecated Determine if this class should be removed since issues #52 allows URIs to be compared
+ * for string equality.
+ */
+@Deprecated
 public class CryptoConditionAssert {
 
   /**
    * Tests that the given URIs are equal.
-   * 
-   * @param message A detail message to record if the assertion fails.
-   * @param expected    The expected URI
-   * @param actual  The URI to test against the one expected.
+   *
+   * @param message  A detail message to record if the assertion fails.
+   * @param expected The expected URI
+   * @param actual   The URI to test against the one expected.
    */
   public static void assertUriEqual(String message, URI expected, URI actual)
       throws UnsupportedEncodingException {
@@ -103,9 +107,10 @@ public class CryptoConditionAssert {
 
   /**
    * Asserts the the set of types given are equal.
-   * @param message A detail message to record if the assertion fails.
-   * @param expected    A list of expected condition types.
-   * @param actual  A set of condition types to compare against the ones expected.
+   *
+   * @param message  A detail message to record if the assertion fails.
+   * @param expected A list of expected condition types.
+   * @param actual   A set of condition types to compare against the ones expected.
    */
   public static void assertSetOfTypesIsEqual(String message, List<String> expected,
       EnumSet<ConditionType> actual) {
@@ -123,11 +128,11 @@ public class CryptoConditionAssert {
 
   /**
    * Asserts that the fulfillment is valid for the given condition.
-   * 
+   *
    * @param assertionMessage A detail message to record if the assertion fails.
-   * @param fulfillment The fulfillment to examine
-   * @param condition   The condition that the fufillment is expected to fulfill.
-   * @param message A message used to verify the fulfillment against the condition.
+   * @param fulfillment      The fulfillment to examine
+   * @param condition        The condition that the fufillment is expected to fulfill.
+   * @param message          A message used to verify the fulfillment against the condition.
    */
   public static void assertFulfillmentIsvalidForCondition(String assertionMessage,
       Fulfillment fulfillment, Condition condition, byte[] message) {

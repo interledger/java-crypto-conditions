@@ -1,4 +1,4 @@
-package org.interledger.cryptoconditions.test;
+package org.interledger.cryptoconditions.test.vectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -1,11 +1,5 @@
 package org.interledger.cryptoconditions.types;
 
-import org.interledger.cryptoconditions.Condition;
-import org.interledger.cryptoconditions.ConditionType;
-import org.interledger.cryptoconditions.Fulfillment;
-import org.interledger.cryptoconditions.UnsignedBigInteger;
-import org.interledger.cryptoconditions.der.DerOutputStream;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -15,6 +9,12 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
+import org.interledger.cryptoconditions.Condition;
+import org.interledger.cryptoconditions.ConditionType;
+import org.interledger.cryptoconditions.Fulfillment;
+import org.interledger.cryptoconditions.UnsignedBigInteger;
+import org.interledger.cryptoconditions.der.DerOutputStream;
 
 /**
  * Implementation of a fulfillment based on an RSA key and the SHA-256 function.
@@ -29,7 +29,7 @@ public class RsaSha256Fulfillment implements Fulfillment {
 
   /**
    * Constructs an instance of the fulfillment.
-   * 
+   *
    * @param publicKey The public key used with the fulfillment.
    * @param signature The signature used with the fulfillment.
    */
@@ -115,11 +115,46 @@ public class RsaSha256Fulfillment implements Fulfillment {
       rsaSigner.update(message);
       return rsaSigner.verify(signature);
     } catch (InvalidKeyException | NoSuchAlgorithmException | SignatureException e) {
-      // TODO Log error or throw?
-      e.printStackTrace();
-      return false;
+      throw new RuntimeException(e);
     }
 
   }
 
+  /**
+   * The {@link #condition} field in this class is not part of this equals method because it is a
+   * value derived from this fulfillment, and is lazily initialized (so it's occasionally null until
+   * {@link #getCondition()} is called.
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    RsaSha256Fulfillment that = (RsaSha256Fulfillment) o;
+
+    if (!publicKey.equals(that.publicKey)) {
+      return false;
+    }
+    return Arrays.equals(signature, that.signature);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = publicKey.hashCode();
+    result = 31 * result + Arrays.hashCode(signature);
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("RsaSha256Fulfillment{");
+    sb.append("publicKey=").append(publicKey);
+    sb.append(", type=").append(getType());
+    sb.append('}');
+    return sb.toString();
+  }
 }

@@ -1,12 +1,5 @@
 package org.interledger.cryptoconditions.types;
 
-import org.interledger.cryptoconditions.CompoundCondition;
-import org.interledger.cryptoconditions.CompoundSha256Condition;
-import org.interledger.cryptoconditions.Condition;
-import org.interledger.cryptoconditions.ConditionType;
-import org.interledger.cryptoconditions.der.DerOutputStream;
-import org.interledger.cryptoconditions.der.DerTag;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -14,6 +7,12 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
+import org.interledger.cryptoconditions.CompoundCondition;
+import org.interledger.cryptoconditions.CompoundSha256Condition;
+import org.interledger.cryptoconditions.Condition;
+import org.interledger.cryptoconditions.ConditionType;
+import org.interledger.cryptoconditions.der.DerOutputStream;
+import org.interledger.cryptoconditions.der.DerTag;
 
 /**
  * Implements a condition based on a number of subconditions and the SHA-256 function.
@@ -25,8 +24,8 @@ public class ThresholdSha256Condition extends CompoundSha256Condition implements
 
   /**
    * Constructs an instance of the condition.
-   * 
-   * @param threshold The number of subconditions that must be fulfilled.
+   *
+   * @param threshold     The number of subconditions that must be fulfilled.
    * @param subconditions A set of subconditions that this condition is dependent on.
    */
   public ThresholdSha256Condition(int threshold, Condition[] subconditions) {
@@ -39,10 +38,10 @@ public class ThresholdSha256Condition extends CompoundSha256Condition implements
 
   /**
    * Constructs an instance of the condition.
-   * 
+   *
    * @param fingerprint The calculcated fingerprint for the condition.
-   * @param cost The calculated cost of this condition.
-   * @param subtypes A set of condition types for the subconditions that this one depends on.
+   * @param cost        The calculated cost of this condition.
+   * @param subtypes    A set of condition types for the subconditions that this one depends on.
    */
   public ThresholdSha256Condition(byte[] fingerprint, long cost, EnumSet<ConditionType> subtypes) {
     super(fingerprint, cost, subtypes);
@@ -67,7 +66,7 @@ public class ThresholdSha256Condition extends CompoundSha256Condition implements
         out.write(subconditions[i].getEncoded());
       }
       out.close();
-      
+
       final byte[] subconditionBuffer = baos.toByteArray();
 
       // Build threshold and subconditions sequence
@@ -76,7 +75,7 @@ public class ThresholdSha256Condition extends CompoundSha256Condition implements
       out.writeTaggedObject(0, BigInteger.valueOf(threshold).toByteArray());
       out.writeTaggedConstructedObject(1, subconditionBuffer);
       out.close();
-      
+
       final byte[] thresholdBuffer = baos.toByteArray();
 
       // Wrap SEQUENCE
@@ -93,7 +92,7 @@ public class ThresholdSha256Condition extends CompoundSha256Condition implements
 
   /**
    * Sorts the given array of conditions into ascending lexicographic order.
-   * 
+   *
    * @param conditions The array of conditions to sort.
    */
   private static void sortConditions(Condition[] conditions) {
@@ -114,8 +113,8 @@ public class ThresholdSha256Condition extends CompoundSha256Condition implements
 
   /**
    * Calculates the cost of a threshold condition as sum(biggest(t, subcondition_costs)) + 1024 * n
-   * 
-   * @param threshold The number of subconditions that must be met.
+   *
+   * @param threshold     The number of subconditions that must be met.
    * @param subconditions The list of subconditions.
    * @return The calculated cost of a threshold condition.
    */
@@ -139,8 +138,8 @@ public class ThresholdSha256Condition extends CompoundSha256Condition implements
 
   /**
    * Determines the set of condition types that are ultimately held via the sub condition.
-   * 
-   * @param subcondition The sub condition that this condition depends on.
+   *
+   * @param subconditions The sub conditions that this condition depends on.
    * @return The set of condition types related to the sub condition.
    */
   private static EnumSet<ConditionType> calculateSubtypes(Condition[] subconditions) {

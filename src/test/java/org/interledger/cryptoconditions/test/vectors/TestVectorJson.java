@@ -1,10 +1,14 @@
-package org.interledger.cryptoconditions.test;
+package org.interledger.cryptoconditions.test.vectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * A class that models the "json" field in the testVectors file.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TestVectorJson {
+
   private int maxMessageLength;
   private String modulus;
   private String prefix;

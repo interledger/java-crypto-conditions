@@ -1,13 +1,13 @@
 package org.interledger.cryptoconditions.types;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Arrays;
 import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.Fulfillment;
 import org.interledger.cryptoconditions.der.DerOutputStream;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 
 /**
  * Implementation of a fulfillment based on a number of subconditions and subfulfillments.
@@ -20,8 +20,8 @@ public class ThresholdSha256Fulfillment implements Fulfillment {
 
   /**
    * Constructs an instance of the fulfillment.
-   * 
-   * @param subconditions A set of conditions that this fulfillment relates to.
+   *
+   * @param subconditions   A set of conditions that this fulfillment relates to.
    * @param subfulfillments A set of subfulfillments this fulfillment relates to.
    */
   public ThresholdSha256Fulfillment(Condition[] subconditions, Fulfillment[] subfulfillments) {
@@ -62,6 +62,11 @@ public class ThresholdSha256Fulfillment implements Fulfillment {
 
   @Override
   public byte[] getEncoded() {
+
+    // Preemptively load all condition/subconditions so that encoding works properly.
+    this.getCondition();
+    Arrays.stream(this.subfulfillments).forEach(Fulfillment::getCondition);
+
     try {
       // Build subfulfillment sequence
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -156,4 +161,32 @@ public class ThresholdSha256Fulfillment implements Fulfillment {
     return true;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    ThresholdSha256Fulfillment that = (ThresholdSha256Fulfillment) o;
+
+    // Probably incorrect - comparing Object[] arrays with Arrays.equals
+    return Arrays.equals(subfulfillments, that.subfulfillments);
+  }
+
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(subfulfillments);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("ThresholdSha256Fulfillment{");
+    sb.append("type=").append(getType());
+    sb.append(", threshold=").append(getThreshold());
+    sb.append('}');
+    return sb.toString();
+  }
 }

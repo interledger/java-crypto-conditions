@@ -22,7 +22,7 @@ public class CryptoConditionUriTest {
   @Test
   public void test_parse_preimage_sha_256() throws UriEncodingException {
     URI uri = URI.create(
-        "ni:///sha-256;47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU?fpt=preimage-sha-256&cost=0");
+        "ni:///sha-256;47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU?cost=0&fpt=preimage-sha-256");
 
     Condition condition = CryptoConditionUri.parse(uri);
 
@@ -35,7 +35,7 @@ public class CryptoConditionUriTest {
   @Test
   public void test_parse_prefix_sha_256() throws UriEncodingException {
     URI uri = URI.create(
-        "ni:///sha-256;47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU?fpt=prefix-sha-256&cost=0"
+        "ni:///sha-256;47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU?cost=0&fpt=prefix-sha-256"
         + "&subtypes=preimage-sha-256,prefix-sha-256");
 
     Condition condition = CryptoConditionUri.parse(uri);

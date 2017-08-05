@@ -16,8 +16,12 @@ package org.interledger.cryptoconditions;
 
 /**
  * Copied from Android Source.
+ *
+ * @deprecated Consider replacing with BaseEncoding.base16().encode()
  */
+@Deprecated
 public class HexDump {
+
   private final static char[] HEX_DIGITS =
       {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
@@ -127,12 +131,15 @@ public class HexDump {
   }
 
   private static int toByte(char c) {
-    if (c >= '0' && c <= '9')
+    if (c >= '0' && c <= '9') {
       return (c - '0');
-    if (c >= 'A' && c <= 'F')
+    }
+    if (c >= 'A' && c <= 'F') {
       return (c - 'A' + 10);
-    if (c >= 'a' && c <= 'f')
+    }
+    if (c >= 'a' && c <= 'f') {
       return (c - 'a' + 10);
+    }
     throw new RuntimeException("Invalid hex char '" + c + "'");
   }
 

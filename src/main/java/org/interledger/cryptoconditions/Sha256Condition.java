@@ -66,4 +66,11 @@ public abstract class Sha256Condition extends ConditionBase {
     return messageDigest.digest(input);
   }
 
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("Sha256Condition{");
+    sb.append("uri=").append(getUri());
+    sb.append('}');
+    return sb.toString();
+  }
 }

@@ -1,5 +1,6 @@
 package org.interledger.cryptoconditions.types;
 
+import java.util.Arrays;
 import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.Fulfillment;
@@ -23,8 +24,10 @@ public class PreimageSha256Fulfillment implements Fulfillment {
    * @param preimage The preimage associated with the fulfillment.
    */
   public PreimageSha256Fulfillment(byte[] preimage) {
-    this.preimage = new byte[preimage.length];
-    System.arraycopy(preimage, 0, this.preimage, 0, preimage.length);
+
+    this.preimage = Arrays.copyOf(preimage, preimage.length);
+//    this.preimage = new byte[preimage.length];
+//    System.arraycopy(preimage, 0, this.preimage, 0, preimage.length);
   }
 
   @Override
@@ -88,4 +91,35 @@ public class PreimageSha256Fulfillment implements Fulfillment {
     return getCondition().equals(condition);
   }
 
+  /**
+   * The {@link #condition} field in this class is not part of this equals method because it is a
+   * value derived from this fulfillment, and is lazily initialized (so it's occasionally null until
+   * {@link #getCondition()} is called.
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    PreimageSha256Fulfillment that = (PreimageSha256Fulfillment) o;
+
+    return Arrays.equals(preimage, that.preimage);
+  }
+
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(preimage);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("PreimageSha256Fulfillment{");
+    sb.append("type=").append(getType());
+    sb.append('}');
+    return sb.toString();
+  }
 }
