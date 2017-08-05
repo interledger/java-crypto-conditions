@@ -1,5 +1,6 @@
 package org.interledger.cryptoconditions;
 
+import javax.xml.bind.DatatypeConverter;
 import net.i2p.crypto.eddsa.EdDSAEngine;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 
@@ -36,8 +37,9 @@ import java.security.spec.RSAKeyGenParameterSpec;
 
 
 /**
- * Playground / test class. Will be removed at a future date.
+ * @deprecated Playground / test class. Will be removed at a future date.
  */
+@Deprecated
 public class Application {
 
   public static void main(String[] args) throws NoSuchAlgorithmException,
@@ -120,7 +122,7 @@ public class Application {
     byte[] encodedRsaFulfillment = rsaFulfillment.getEncoded();
     byte[] encodedPrefixFulfillmentOnEd25519Fulfillment = prefixFulfillmentOnEd25519Fulfillment.getEncoded();
     byte[] encodedThresholdFulfillment = thresholdFulfillment.getEncoded();
-    
+
     hexDump("preimage_fulfillment", encodedPreimageFulfillment);
     hexDump("ed25519_fulfillment", encodedEd25519Fulfillment);
     hexDump("rsa_fulfillment", encodedRsaFulfillment);
@@ -139,12 +141,12 @@ public class Application {
     System.out.println("threshold : "
         + (thresholdFulfillment.verify(thresholdCondition, message) ? "VERIFIED" : "FAILED"));
 
-    PreimageSha256Fulfillment preimageFulfillment2 = (PreimageSha256Fulfillment) CryptoConditionReader.readFulfillment(encodedPreimageFulfillment);    
-    PrefixSha256Fulfillment prefixFulfillment2 = (PrefixSha256Fulfillment) CryptoConditionReader.readFulfillment(encodedPrefixFulfillmentOnEd25519Fulfillment);    
-    ThresholdSha256Fulfillment thresholdFulfillment2 = (ThresholdSha256Fulfillment) CryptoConditionReader.readFulfillment(encodedThresholdFulfillment);    
-    RsaSha256Fulfillment rsaFulfillment2 = (RsaSha256Fulfillment) CryptoConditionReader.readFulfillment(encodedRsaFulfillment);    
-    Ed25519Sha256Fulfillment ed25519Fulfillment2 = (Ed25519Sha256Fulfillment) CryptoConditionReader.readFulfillment(encodedEd25519Fulfillment);    
-    
+    PreimageSha256Fulfillment preimageFulfillment2 = (PreimageSha256Fulfillment) CryptoConditionReader.readFulfillment(encodedPreimageFulfillment);
+    PrefixSha256Fulfillment prefixFulfillment2 = (PrefixSha256Fulfillment) CryptoConditionReader.readFulfillment(encodedPrefixFulfillmentOnEd25519Fulfillment);
+    ThresholdSha256Fulfillment thresholdFulfillment2 = (ThresholdSha256Fulfillment) CryptoConditionReader.readFulfillment(encodedThresholdFulfillment);
+    RsaSha256Fulfillment rsaFulfillment2 = (RsaSha256Fulfillment) CryptoConditionReader.readFulfillment(encodedRsaFulfillment);
+    Ed25519Sha256Fulfillment ed25519Fulfillment2 = (Ed25519Sha256Fulfillment) CryptoConditionReader.readFulfillment(encodedEd25519Fulfillment);
+
     System.out.println("decoded preimage: " + preimageFulfillment2.toString());
     System.out.println("decoded prefix: " + prefixFulfillment2.toString());
     System.out.println("decoded threshold: " + thresholdFulfillment2.toString());
@@ -155,7 +157,7 @@ public class Application {
 
   private static void hexDump(String label, byte[] bytes) {
     System.out.print("<" + label + ">");
-    System.out.println(HexDump.dumpHexString(bytes));
+    DatatypeConverter.printHexBinary(bytes);
     System.out.println("</" + label + ">");
   }
 
