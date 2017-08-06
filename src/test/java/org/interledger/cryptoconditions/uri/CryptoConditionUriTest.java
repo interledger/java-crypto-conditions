@@ -7,7 +7,7 @@ import org.interledger.cryptoconditions.CompoundCondition;
 import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.HexDump;
-import org.interledger.cryptoconditions.uri.CryptoConditionUri;
+import org.interledger.cryptoconditions.types.CryptoConditionUri;
 import org.junit.Test;
 
 import java.net.URI;

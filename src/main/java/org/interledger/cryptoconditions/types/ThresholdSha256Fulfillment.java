@@ -1,13 +1,9 @@
 package org.interledger.cryptoconditions.types;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Arrays;
 import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.Fulfillment;
-import org.interledger.cryptoconditions.der.DerOutputStream;
 
 /**
  * Implementation of a fulfillment based on a number of subconditions and subfulfillments.
@@ -58,62 +54,6 @@ public class ThresholdSha256Fulfillment implements Fulfillment {
     Fulfillment[] subfulfillments = new Fulfillment[this.subfulfillments.length];
     System.arraycopy(this.subfulfillments, 0, subfulfillments, 0, this.subfulfillments.length);
     return subfulfillments;
-  }
-
-  @Override
-  public byte[] getEncoded() {
-
-    // Preemptively load all condition/subconditions so that encoding works properly.
-    this.getCondition();
-    Arrays.stream(this.subfulfillments).forEach(Fulfillment::getCondition);
-
-    try {
-      // Build subfulfillment sequence
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      for (int i = 0; i < subfulfillments.length; i++) {
-        baos.write(subfulfillments[i].getEncoded());
-      }
-      baos.close();
-      byte[] fulfillmentsBuffer = baos.toByteArray();
-
-      // Wrap SET OF
-      baos = new ByteArrayOutputStream();
-      DerOutputStream out = new DerOutputStream(baos);
-      out.writeTaggedConstructedObject(0, fulfillmentsBuffer);
-      out.close();
-      fulfillmentsBuffer = baos.toByteArray();
-
-      // Build subcondition sequence
-      baos = new ByteArrayOutputStream();
-      for (int i = 0; i < subconditions.length; i++) {
-        baos.write(subconditions[i].getEncoded());
-      }
-      out.close();
-      byte[] conditionsBuffer = baos.toByteArray();
-
-      // Wrap SET OF
-      baos = new ByteArrayOutputStream();
-      out = new DerOutputStream(baos);
-      out.writeTaggedConstructedObject(1, conditionsBuffer);
-      out.close();
-      conditionsBuffer = baos.toByteArray();
-
-      byte[] buffer = new byte[fulfillmentsBuffer.length + conditionsBuffer.length];
-      System.arraycopy(fulfillmentsBuffer, 0, buffer, 0, fulfillmentsBuffer.length);
-      System.arraycopy(conditionsBuffer, 0, buffer, fulfillmentsBuffer.length,
-          conditionsBuffer.length);
-
-      // Wrap CHOICE
-      baos = new ByteArrayOutputStream();
-      out = new DerOutputStream(baos);
-      out.writeTaggedConstructedObject(getType().getTypeCode(), buffer);
-      out.close();
-
-      return baos.toByteArray();
-
-    } catch (IOException ioe) {
-      throw new UncheckedIOException("DER Encoding Error", ioe);
-    }
   }
 
   @Override

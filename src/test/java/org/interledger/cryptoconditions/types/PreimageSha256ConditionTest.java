@@ -4,11 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import com.google.common.io.BaseEncoding;
-
+import java.net.URI;
 import org.interledger.cryptoconditions.ConditionType;
 import org.junit.Test;
-
-import java.net.URI;
 
 /**
  * Unit tests for {@link PreimageSha256Condition}.
@@ -34,11 +32,13 @@ public class PreimageSha256ConditionTest extends AbstractCryptoConditionTest {
 
       assertThat(condition.getType(), is(ConditionType.PREIMAGE_SHA256));
       assertThat(condition.getCost(), is(3L));
-      assertThat(condition.getUri(), is(CONDITION_URI));
+      assertThat(CryptoConditionUri.toUri(condition), is(CONDITION_URI));
 
       assertThat(BaseEncoding.base64().encode(condition.getFingerprint()),
           is("mDSHbc+wXLFnpcJJU+uljErImxrfV/KPL50JrxB+6PA="));
-      assertThat(BaseEncoding.base64().encode(condition.getFingerprintContents()), is("YWFh"));
+      assertThat(
+          BaseEncoding.base64().encode(condition.constructFingerprintContents(PREIMAGE.getBytes())),
+          is("YWFh"));
     };
 
     this.runConcurrent(1, runnableTest);

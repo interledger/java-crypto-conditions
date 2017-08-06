@@ -1,8 +1,5 @@
 package org.interledger.cryptoconditions.types;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -13,8 +10,6 @@ import java.util.Arrays;
 import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.Fulfillment;
-import org.interledger.cryptoconditions.UnsignedBigInteger;
-import org.interledger.cryptoconditions.der.DerOutputStream;
 
 /**
  * Implementation of a fulfillment based on an RSA key and the SHA-256 function.
@@ -58,30 +53,6 @@ public class RsaSha256Fulfillment implements Fulfillment {
     byte[] signature = new byte[this.signature.length];
     System.arraycopy(this.signature, 0, signature, 0, this.signature.length);
     return signature;
-  }
-
-  @Override
-  public byte[] getEncoded() {
-    try {
-      // Build preimage sequence
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      DerOutputStream out = new DerOutputStream(baos);
-      out.writeTaggedObject(0, UnsignedBigInteger.toUnsignedByteArray(publicKey.getModulus()));
-      out.writeTaggedObject(1, signature);
-      out.close();
-      byte[] buffer = baos.toByteArray();
-
-      // Wrap CHOICE
-      baos = new ByteArrayOutputStream();
-      out = new DerOutputStream(baos);
-      out.writeTaggedConstructedObject(getType().getTypeCode(), buffer);
-      out.close();
-
-      return baos.toByteArray();
-
-    } catch (IOException e) {
-      throw new UncheckedIOException("DER Encoding Error", e);
-    }
   }
 
   @Override

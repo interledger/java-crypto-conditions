@@ -18,8 +18,9 @@ import java.security.spec.RSAKeyGenParameterSpec;
 import net.i2p.crypto.eddsa.EdDSAEngine;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.interledger.cryptoconditions.der.CryptoConditionReader;
 import org.interledger.cryptoconditions.der.DerEncodingException;
+import org.interledger.cryptoconditions.types.CryptoConditionReader;
+import org.interledger.cryptoconditions.types.CryptoConditionWriter;
 import org.interledger.cryptoconditions.types.Ed25519Sha256Condition;
 import org.interledger.cryptoconditions.types.Ed25519Sha256Fulfillment;
 import org.interledger.cryptoconditions.types.PrefixSha256Condition;
@@ -103,23 +104,27 @@ public class Application {
     hexDump("eddsa_publickey", edDsaKeyPair.getPublic().getEncoded());
     hexDump("eddsa_sig", edDsaSignature);
 
-    hexDump("preimage_condition", preimageCondition.getEncoded());
+    hexDump("preimage_condition", CryptoConditionWriter.writeCondition(preimageCondition));
     System.out.println("preimage_condition: " + preimageCondition.toString());
-    hexDump("ed25519_condition", ed25519Condition.getEncoded());
+    hexDump("ed25519_condition", CryptoConditionWriter.writeCondition(ed25519Condition));
     System.out.println("ed25519_condition: " + ed25519Condition.toString());
-    hexDump("rsa_condition", rsaCondition.getEncoded());
+    hexDump("rsa_condition", CryptoConditionWriter.writeCondition(rsaCondition));
     System.out.println("rsa_condition: " + rsaCondition.toString());
-    hexDump("prefix_condition", prefixConditionOnEd25519Condition.getEncoded());
+    hexDump("prefix_condition",
+        CryptoConditionWriter.writeCondition(prefixConditionOnEd25519Condition));
     System.out.println("prefix_condition: " + prefixConditionOnEd25519Condition.toString());
-    hexDump("threshold_condition", thresholdCondition.getEncoded());
+    hexDump("threshold_condition", CryptoConditionWriter.writeCondition(thresholdCondition));
     System.out.println("threshold_condition: " + thresholdCondition.toString());
 
-    byte[] encodedPreimageFulfillment = preimageFulfillment.getEncoded();
-    byte[] encodedEd25519Fulfillment = ed25519Fulfillment.getEncoded();
-    byte[] encodedRsaFulfillment = rsaFulfillment.getEncoded();
-    byte[] encodedPrefixFulfillmentOnEd25519Fulfillment = prefixFulfillmentOnEd25519Fulfillment
-        .getEncoded();
-    byte[] encodedThresholdFulfillment = thresholdFulfillment.getEncoded();
+    byte[] encodedPreimageFulfillment = CryptoConditionWriter.writeFulfillment(preimageFulfillment);
+    byte[] encodedEd25519Fulfillment = CryptoConditionWriter
+        .writeFulfillment(ed25519Fulfillment);
+    byte[] encodedRsaFulfillment = CryptoConditionWriter
+        .writeFulfillment(rsaFulfillment);
+    byte[] encodedPrefixFulfillmentOnEd25519Fulfillment = CryptoConditionWriter
+        .writeFulfillment(prefixFulfillmentOnEd25519Fulfillment);
+    byte[] encodedThresholdFulfillment = CryptoConditionWriter
+        .writeFulfillment(thresholdFulfillment);
 
     hexDump("preimage_fulfillment", encodedPreimageFulfillment);
     hexDump("ed25519_fulfillment", encodedEd25519Fulfillment);

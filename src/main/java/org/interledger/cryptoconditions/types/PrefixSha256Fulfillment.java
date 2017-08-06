@@ -1,15 +1,10 @@
 package org.interledger.cryptoconditions.types;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Objects;
 import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.Fulfillment;
-import org.interledger.cryptoconditions.der.DerOutputStream;
 
 /**
  * Implementation of a fulfillment based on a prefix, a sub fulfillment, and the SHA-256 function.
@@ -65,31 +60,6 @@ public class PrefixSha256Fulfillment implements Fulfillment {
    */
   public Fulfillment getSubfulfillment() {
     return subfulfillment;
-  }
-
-  @Override
-  public byte[] getEncoded() {
-    try {
-      // Build prefix sequence
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      DerOutputStream out = new DerOutputStream(baos);
-      out.writeTaggedObject(0, prefix);
-      out.writeTaggedObject(1, BigInteger.valueOf(maxMessageLength).toByteArray());
-      out.writeTaggedConstructedObject(2, subfulfillment.getEncoded());
-      out.close();
-      byte[] buffer = baos.toByteArray();
-
-      // Wrap CHOICE
-      baos = new ByteArrayOutputStream();
-      out = new DerOutputStream(baos);
-      out.writeTaggedConstructedObject(getType().getTypeCode(), buffer);
-      out.close();
-
-      return baos.toByteArray();
-
-    } catch (IOException ioe) {
-      throw new UncheckedIOException("DER Encoding Error", ioe);
-    }
   }
 
   @Override

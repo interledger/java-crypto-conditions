@@ -1,24 +1,25 @@
-package org.interledger.cryptoconditions.uri;
-
-import org.interledger.cryptoconditions.Condition;
-import org.interledger.cryptoconditions.ConditionType;
-import org.interledger.cryptoconditions.types.Ed25519Sha256Condition;
-import org.interledger.cryptoconditions.types.PrefixSha256Condition;
-import org.interledger.cryptoconditions.types.PreimageSha256Condition;
-import org.interledger.cryptoconditions.types.RsaSha256Condition;
-import org.interledger.cryptoconditions.types.ThresholdSha256Condition;
+package org.interledger.cryptoconditions.types;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.util.Base64;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.interledger.cryptoconditions.CompoundCondition;
+import org.interledger.cryptoconditions.Condition;
+import org.interledger.cryptoconditions.ConditionType;
+import org.interledger.cryptoconditions.SimpleCondition;
+import org.interledger.cryptoconditions.uri.NamedInformationUri;
+import org.interledger.cryptoconditions.uri.NamedInformationUri.HashFunction;
+import org.interledger.cryptoconditions.uri.UriEncodingException;
 
 /**
  * This class is responsible for parsing a uri-formatted crypto-condition.
@@ -34,6 +35,7 @@ public class CryptoConditionUri {
       + HASH_FUNCTION_NAME + ";([a-zA-Z0-9_-]{0,86})\\?(.+)$";
 
   public static class QueryParams {
+
     public static final String COST = "cost";
     public static final String TYPE = "fpt";
     public static final String SUBTYPES = "subtypes";
@@ -43,7 +45,6 @@ public class CryptoConditionUri {
    * Parses a URI formatted crypto-condition.
    *
    * @param uri The crypto-condition formatted as a URI.
-   * 
    * @return The equivalent crypto-condition.
    */
   public static Condition parse(URI uri) throws UriEncodingException {
@@ -111,9 +112,47 @@ public class CryptoConditionUri {
     }
   }
 
+  public static URI toUri(final Condition condition) {
+    if (condition instanceof SimpleCondition) {
+      return writeSingleCondition((SimpleCondition) condition);
+    } else if (condition instanceof CompoundCondition) {
+      return writeCompoundCondition((CompoundCondition) condition);
+    } else {
+      throw new IllegalArgumentException(
+          String.format("Unhandled Condition type: %s", condition.getClass().getName())
+      );
+    }
+  }
+
+  private static URI writeSingleCondition(final SimpleCondition condition) {
+    Objects.requireNonNull(condition);
+    final Map<String, String> params = new HashMap<>();
+    params.put(CryptoConditionUri.QueryParams.TYPE, condition.getType().toString().toLowerCase());
+    params.put(CryptoConditionUri.QueryParams.COST, Long.toString(condition.getCost()));
+
+    return NamedInformationUri.getUri(HashFunction.SHA_256, condition.getFingerprint(), params);
+  }
+
+
+  private static URI writeCompoundCondition(final CompoundCondition condition) {
+    Objects.requireNonNull(condition);
+
+    Map<String, String> params = new HashMap<>();
+    params.put(CryptoConditionUri.QueryParams.TYPE, condition.getType().toString().toLowerCase());
+    params.put(CryptoConditionUri.QueryParams.COST, Long.toString(condition.getCost()));
+
+    if (condition.getSubtypes() != null && !condition.getSubtypes().isEmpty()) {
+      params.put(CryptoConditionUri.QueryParams.SUBTYPES,
+          ConditionType.getEnumOfTypesAsString(condition.getSubtypes()));
+    }
+
+    return NamedInformationUri.getUri(HashFunction.SHA_256, condition.getFingerprint(), params);
+  }
+
+
   /**
    * Unpacks an URL encoded string of query parameters into a map of keys and values.
-   * 
+   *
    * @param queryParams The url-encoded query parameters.
    * @return A map containing keyed on the query parameter names containing the associated values.
    */

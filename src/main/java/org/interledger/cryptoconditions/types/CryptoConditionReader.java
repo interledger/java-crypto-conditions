@@ -1,4 +1,4 @@
-package org.interledger.cryptoconditions.der;
+package org.interledger.cryptoconditions.types;
 
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
@@ -8,6 +8,9 @@ import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.Fulfillment;
 import org.interledger.cryptoconditions.UnsignedBigInteger;
+import org.interledger.cryptoconditions.der.DerEncodingException;
+import org.interledger.cryptoconditions.der.DerInputStream;
+import org.interledger.cryptoconditions.der.DerTag;
 import org.interledger.cryptoconditions.types.Ed25519Sha256Condition;
 import org.interledger.cryptoconditions.types.Ed25519Sha256Fulfillment;
 import org.interledger.cryptoconditions.types.PrefixSha256Condition;

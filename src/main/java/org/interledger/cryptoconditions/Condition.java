@@ -1,7 +1,5 @@
 package org.interledger.cryptoconditions;
 
-import java.net.URI;
-
 /**
  * Java implementation of Crypto-Conditions Condition.
  *
@@ -29,8 +27,25 @@ public interface Condition {
    * key.
    *
    * @return the unique fingerprint of this condition
+   * @deprecated This method is deprecated, and will go away in a future release. Implementations
+   * should prefer {@link #getFingerprintBase64Url()} instead.
    */
+  @Deprecated
   byte[] getFingerprint();
+
+  /**
+   * A fingerprint is a binary (aka "octet") string uniquely representing the condition with
+   * respect to other conditions of the same type. This is possible because the fingerprint
+   * is a cryptographically secure hash of the data which defines the condition, such as a public
+   * key. The length and contents of the fingerprint are defined by the condition type.
+   *
+   * Implementations which index conditions MUST use
+   * the entire string or binary encoded condition as the key - not just the fingerprint - as
+   * different conditions of different types may have the same fingerprint.
+   *
+   * @return A {@link String} containing the Base64Url-encoded fingerprint of this condition
+   */
+  String getFingerprintBase64Url();
 
   /**
    * The estimated "cost" of processing a fulfillment of this condition. For details of how to
@@ -39,18 +54,4 @@ public interface Condition {
    * @return the cost of validating the fulfillment of this condition
    */
   long getCost();
-
-  /**
-   * Get the condition encoded in ASN.1 DER binary encoding.
-   *
-   * @return the DER encoded condition
-   */
-  byte[] getEncoded();
-
-  /**
-   * Get the Named Information URL that describes this condition.
-   *
-   * @return an ni:// URI that identifes this condition
-   */
-  URI getUri();
 }

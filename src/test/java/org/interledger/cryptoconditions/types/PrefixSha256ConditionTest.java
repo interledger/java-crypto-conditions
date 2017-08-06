@@ -4,11 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import com.google.common.io.BaseEncoding;
-
+import java.net.URI;
 import org.interledger.cryptoconditions.ConditionType;
 import org.junit.Test;
-
-import java.net.URI;
 
 /**
  * Unit tests for {@link PrefixSha256Condition}.
@@ -34,13 +32,14 @@ public class PrefixSha256ConditionTest extends AbstractCryptoConditionTest {
 
       assertThat(prefixSha256Condition.getType(), is(ConditionType.PREFIX_SHA256));
       assertThat(prefixSha256Condition.getCost(), is(17463L));
-      assertThat(prefixSha256Condition.getUri(), is(URI.create(
+      assertThat(CryptoConditionUri.toUri(prefixSha256Condition), is(URI.create(
           "ni:///sha-256;hfHFYbd93301v75b1967nmZ4uLx8Pf_UYqCYYTfT_MI?cost=17463&fpt=prefix-sha-"
               + "256&subtypes=preimage-sha-256")));
 
       assertThat(BaseEncoding.base64().encode(prefixSha256Condition.getFingerprint()),
           is("hfHFYbd93301v75b1967nmZ4uLx8Pf/UYqCYYTfT/MI="));
-      assertThat(BaseEncoding.base64().encode(prefixSha256Condition.getFingerprintContents()),
+      assertThat(BaseEncoding.base64().encode(prefixSha256Condition
+              .constructFingerprintContents(AUTHOR.getBytes(), 16384, preimageSha256Condition)),
           is("MDiACURvYyBCcm93boECQACiJ6AlgCD7bwRU2vus7BD9ey+slXEu+MFjfxk1mUdo8dimwhuYfoEBLg=="));
     };
 

@@ -45,29 +45,6 @@ public class PreimageSha256Fulfillment implements Fulfillment {
   }
 
   @Override
-  public byte[] getEncoded() {
-    try {
-      // Build preimage sequence
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      DerOutputStream out = new DerOutputStream(baos);
-      out.writeTaggedObject(0, preimage);
-      out.close();
-      byte[] buffer = baos.toByteArray();
-
-      // Wrap CHOICE
-      baos = new ByteArrayOutputStream();
-      out = new DerOutputStream(baos);
-      out.writeTaggedConstructedObject(getType().getTypeCode(), buffer);
-      out.close();
-
-      return baos.toByteArray();
-
-    } catch (IOException e) {
-      throw new UncheckedIOException("DER Encoding Error", e);
-    }
-  }
-
-  @Override
   public PreimageSha256Condition getCondition() {
     if (condition == null) {
       condition = new PreimageSha256Condition(preimage);

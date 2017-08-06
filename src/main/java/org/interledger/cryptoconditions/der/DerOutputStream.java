@@ -17,7 +17,7 @@ public class DerOutputStream extends FilterOutputStream {
   /**
    * Writes the DER tag to the stream.
    * 
-   * @param tag The tag to write.
+   * @param tag The tag to writeFulfillment.
    * @param index The index of the tag.
    */
   public void writeTag(DerTag tag, int index) throws IOException {
@@ -27,7 +27,7 @@ public class DerOutputStream extends FilterOutputStream {
   /**
    * Writes a DER encoded length indicator to the stream.
    * 
-   * @param length The length value to write to the stream.
+   * @param length The length value to writeFulfillment to the stream.
    */
   public void writeLength(int length) throws IOException {
     if (length > 127) {
@@ -52,7 +52,7 @@ public class DerOutputStream extends FilterOutputStream {
    * Writes an encoded DER value to the stream.
    * 
    * @param tag The DER tag that should accompany the value.
-   * @param bytes The value to write to the stream.
+   * @param bytes The value to writeFulfillment to the stream.
    */
   public void writeEncoded(int tag, byte[] bytes) throws IOException {
     write(tag);
@@ -63,7 +63,7 @@ public class DerOutputStream extends FilterOutputStream {
   /**
    * Writes the value as a DER integer to the steam.
    * 
-   * @param value The value to write to the stream.
+   * @param value The value to writeFulfillment to the stream.
    */
   public void writeInteger(BigInteger value) throws IOException {
     writeEncoded(DerTag.INTEGER.getTag(), value.toByteArray());
@@ -72,7 +72,7 @@ public class DerOutputStream extends FilterOutputStream {
   /**
    * Writes the value as a DER octet string to the stream.
    * 
-   * @param octets The octets to write to the stream.
+   * @param octets The octets to writeFulfillment to the stream.
    */
   public void writeOctetString(byte[] octets) throws IOException {
     writeEncoded(DerTag.OCTET_STRING.getTag(), octets);
@@ -82,7 +82,7 @@ public class DerOutputStream extends FilterOutputStream {
    * Writes the value as a DER tagged object.
    * 
    * @param tagNumber The tag number for the object.
-   * @param object The value to write to the stream.
+   * @param object The value to writeFulfillment to the stream.
    */
   public void writeTaggedObject(int tagNumber, byte[] object) throws IOException {
     writeEncoded(DerTag.TAGGED.getTag() + tagNumber, object);
@@ -92,7 +92,7 @@ public class DerOutputStream extends FilterOutputStream {
    * Writes the value as a DER tagged, constructed object.
    * 
    * @param tagNumber The tag number for the object.
-   * @param object The value to write to the stream.
+   * @param object The value to writeFulfillment to the stream.
    */
   public void writeTaggedConstructedObject(int tagNumber, byte[] object) throws IOException {
     writeEncoded(DerTag.TAGGED.getTag() + DerTag.CONSTRUCTED.getTag() + tagNumber, object);
@@ -101,7 +101,7 @@ public class DerOutputStream extends FilterOutputStream {
   /**
    * Writes the value as a DER bit string.
    * 
-   * @param bitStringData The bit string value to write to the stream.
+   * @param bitStringData The bit string value to writeFulfillment to the stream.
    */
   public void writeBitString(byte[] bitStringData) throws IOException {
     writeEncoded(DerTag.BIT_STRING.getTag(), bitStringData);
@@ -109,7 +109,7 @@ public class DerOutputStream extends FilterOutputStream {
 
   /**
    * TODO: confirm if this method should be implemented...
-   * @param bitString The bit string value to write to the stream.
+   * @param bitString The bit string value to writeFulfillment to the stream.
    * @param unusedBits  Indicates the number of unused bits in the bit string.
    */
   public void writeBitString(byte[] bitString, int unusedBits) {

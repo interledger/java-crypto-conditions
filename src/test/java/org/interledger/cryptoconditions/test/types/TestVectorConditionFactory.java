@@ -16,9 +16,13 @@ import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.UnsignedBigInteger;
-import org.interledger.cryptoconditions.der.CryptoConditionReader;
-import org.interledger.cryptoconditions.test.TestCondition;
 import org.interledger.cryptoconditions.test.vectors.TestVectorJson;
+import org.interledger.cryptoconditions.types.CryptoConditionReader;
+import org.interledger.cryptoconditions.types.Ed25519Sha256Condition;
+import org.interledger.cryptoconditions.types.PrefixSha256Condition;
+import org.interledger.cryptoconditions.types.PreimageSha256Condition;
+import org.interledger.cryptoconditions.types.RsaSha256Condition;
+import org.interledger.cryptoconditions.types.ThresholdSha256Condition;
 
 /**
  * Builds instances of {@link Condition} for testing based on the test vectors loaded.
@@ -26,9 +30,9 @@ import org.interledger.cryptoconditions.test.vectors.TestVectorJson;
 public class TestVectorConditionFactory {
 
   /**
-   * Constructs a test condition based on test vector.
+   * Constructs a condition based on the test vector JSON file.
    */
-  public static TestCondition getTestVectorCondition(final TestVectorJson condition) {
+  public static Condition getTestVectorCondition(final TestVectorJson condition) {
     Objects.requireNonNull(condition);
 
     final ConditionType type = ConditionType.fromString(condition.getType());
@@ -36,12 +40,12 @@ public class TestVectorConditionFactory {
     switch (type) {
 
       case PREIMAGE_SHA256: {
-        return new TestPreimageSha256Condition(
+        return new PreimageSha256Condition(
             Base64.getUrlDecoder().decode(condition.getPreimage()));
       }
 
       case PREFIX_SHA256: {
-        return new TestPrefixSha256Condition(Base64.getUrlDecoder().decode(condition.getPrefix()),
+        return new PrefixSha256Condition(Base64.getUrlDecoder().decode(condition.getPrefix()),
             condition.getMaxMessageLength(),
             getTestVectorCondition(condition.getSubfulfillment()));
       }
@@ -51,8 +55,10 @@ public class TestVectorConditionFactory {
         for (TestVectorJson vector : condition.getSubfulfillments()) {
           subconditions.add(getTestVectorCondition(vector));
         }
-        return new TestThresholdSha256Condition(condition.getThreshold(),
-            subconditions.toArray(new Condition[subconditions.size()]));
+        return new ThresholdSha256Condition(
+            condition.getThreshold(),
+            subconditions.toArray(new Condition[subconditions.size()])
+        );
       }
 
       case RSA_SHA256: {
@@ -63,7 +69,7 @@ public class TestVectorConditionFactory {
         try {
           KeyFactory keyFactory = KeyFactory.getInstance("RSA");
           RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(spec);
-          return new TestRsaSha256Condition(publicKey);
+          return new RsaSha256Condition(publicKey);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
           throw new RuntimeException("Error creating RSA key.", e);
         }
@@ -76,7 +82,7 @@ public class TestVectorConditionFactory {
             publicKeyBytes, EdDSANamedCurveTable.getByName(CryptoConditionReader.ED_25519)
         );
         final EdDSAPublicKey publicKey = new EdDSAPublicKey(publicKeyspec);
-        return new TestEd25519Sha256Condition(publicKey);
+        return new Ed25519Sha256Condition(publicKey);
       }
 
       default:

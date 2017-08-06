@@ -1,8 +1,5 @@
 package org.interledger.cryptoconditions.types;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -14,7 +11,6 @@ import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.Fulfillment;
-import org.interledger.cryptoconditions.der.DerOutputStream;
 
 
 /**
@@ -57,30 +53,6 @@ public class Ed25519Sha256Fulfillment implements Fulfillment {
     byte[] signature = new byte[this.signature.length];
     System.arraycopy(this.signature, 0, signature, 0, this.signature.length);
     return signature;
-  }
-
-  @Override
-  public byte[] getEncoded() {
-    try {
-      // Build preimage sequence
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      DerOutputStream out = new DerOutputStream(baos);
-      out.writeTaggedObject(0, publicKey.getA().toByteArray());
-      out.writeTaggedObject(1, signature);
-      out.close();
-      byte[] buffer = baos.toByteArray();
-
-      // Wrap CHOICE
-      baos = new ByteArrayOutputStream();
-      out = new DerOutputStream(baos);
-      out.writeTaggedConstructedObject(getType().getTypeCode(), buffer);
-      out.close();
-
-      return baos.toByteArray();
-
-    } catch (IOException e) {
-      throw new UncheckedIOException("DER Encoding Error", e);
-    }
   }
 
   @Override
@@ -166,14 +138,6 @@ public class Ed25519Sha256Fulfillment implements Fulfillment {
     result = 31 * result + Arrays.hashCode(signature);
     return result;
   }
-
-//  @Override
-//  public String toString() {
-//    final StringBuilder sb = new StringBuilder("Ed25519Sha256Fulfillment{");
-//    sb.append("type=").append(getType());
-//    sb.append('}');
-//    return sb.toString();
-//  }
 
   @Override
   public String toString() {

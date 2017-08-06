@@ -5,9 +5,9 @@ import static org.hamcrest.core.Is.is;
 import static org.interledger.cryptoconditions.ConditionType.THRESHOLD_SHA256;
 
 import com.google.common.io.BaseEncoding;
-
 import org.hamcrest.CoreMatchers;
 import org.interledger.cryptoconditions.Condition;
+import org.interledger.cryptoconditions.der.DerEncodingException;
 import org.junit.Test;
 
 /**
@@ -35,16 +35,23 @@ public class ThresholdSha256ConditionTest extends AbstractCryptoConditionTest {
 
       assertThat(thresholdSha256Condition.getType(), is(THRESHOLD_SHA256));
       assertThat(thresholdSha256Condition.getCost(), CoreMatchers.is(1033L));
-      assertThat(thresholdSha256Condition.getUri().toString(), is(
+      assertThat(CryptoConditionUri.toUri(thresholdSha256Condition).toString(), is(
           "ni:///sha-256;W-kFFQRd_dtz60dK3Jq0wr-DEDWHLFh8D1TQHCTi75I?cost=1033&"
               + "fpt=threshold-sha-256&subtypes=preimage-sha-256"));
 
       assertThat(BaseEncoding.base64().encode(thresholdSha256Condition.getFingerprint()),
           is("W+kFFQRd/dtz60dK3Jq0wr+DEDWHLFh8D1TQHCTi75I="));
-      assertThat(BaseEncoding.base64().encode(thresholdSha256Condition.getFingerprintContents()),
+      assertThat(BaseEncoding.base64().encode(thresholdSha256Condition
+              .constructFingerprintContents(1, new Condition[]{preimageCondition})),
           is("MCyAAQGhJ6AlgCBjEgvXn574GWJrrBNHDMuo/bgLkhTNwoj1GUDp77vDnYEBCQ=="));
-      assertThat(BaseEncoding.base64().encode(thresholdSha256Condition.getEncoded()),
-          is("oiqAIFvpBRUEXf3bc+tHStyatMK/gxA1hyxYfA9U0Bwk4u+SgQIECYICB4A="));
+
+      try {
+        assertThat(BaseEncoding.base64()
+                .encode(CryptoConditionWriter.writeCondition(thresholdSha256Condition)),
+            is("oiqAIFvpBRUEXf3bc+tHStyatMK/gxA1hyxYfA9U0Bwk4u+SgQIECYICB4A="));
+      } catch (DerEncodingException e) {
+        throw new RuntimeException(e);
+      }
     };
 
     this.runConcurrent(1, runnableTest);

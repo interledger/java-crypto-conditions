@@ -4,23 +4,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import com.google.common.io.BaseEncoding;
-
-import org.interledger.cryptoconditions.ConditionType;
-import org.interledger.cryptoconditions.UnsignedBigInteger;
-import org.junit.Test;
-
 import java.math.BigInteger;
-
 import java.net.URI;
-
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-
 import java.util.Base64;
+import org.interledger.cryptoconditions.ConditionType;
+import org.interledger.cryptoconditions.UnsignedBigInteger;
+import org.junit.Test;
 
 /**
  * Unit tests for {@link Ed25519Sha256Condition}.
@@ -48,12 +43,13 @@ public class RsaSha256ConditionTest extends AbstractCryptoConditionTest {
 
       assertThat(rsaSha256Condition.getType(), is(ConditionType.RSA_SHA256));
       assertThat(rsaSha256Condition.getCost(), is(65536L));
-      assertThat(rsaSha256Condition.getUri(), is(URI.create(
+      assertThat(CryptoConditionUri.toUri(rsaSha256Condition), is(URI.create(
           "ni:///sha-256;sx-oIG5Op-UVM3s7Mwgrh3ZRgBCF7YT7Ta6yR79pjX8?cost=65536&fpt=rsa-sha-256")));
 
       assertThat(BaseEncoding.base64().encode(rsaSha256Condition.getFingerprint()),
           is("sx+oIG5Op+UVM3s7Mwgrh3ZRgBCF7YT7Ta6yR79pjX8="));
-      assertThat(BaseEncoding.base64().encode(rsaSha256Condition.getFingerprintContents()),
+      assertThat(BaseEncoding.base64()
+              .encode(rsaSha256Condition.constructFingerprintContents(rsaPublicKey)),
           is("MIIBBICCAQDh74sk1vdrCcge13UqomLwRPBKh01DgJ0xzqYS+ZsMl6i0N0FT4+7z1mYWhD4OQcKTJkt"
               + "xthc9sc8NbNVYxYZXcG/PCX9wTEg+Wcv9/Vs+57yA10DF4PBH8+hfwNdYFXdqbz8jxdxeeXE5poguODNqS"
               + "l+zYTdiD/NmPbrjKEcoAYYvcvL4eyArnImt181bCgdvfFPjUDn2ftF+yBXltDBcxjGXBo1eblebpt5fTj5"

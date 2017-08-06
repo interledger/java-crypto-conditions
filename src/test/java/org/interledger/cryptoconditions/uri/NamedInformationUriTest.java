@@ -5,9 +5,8 @@ import static org.hamcrest.core.Is.is;
 
 import com.google.common.collect.ImmutableMap;
 
-import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.ConditionType;
-import org.interledger.cryptoconditions.uri.CryptoConditionUri.QueryParams;
+import org.interledger.cryptoconditions.types.CryptoConditionUri.QueryParams;
 import org.interledger.cryptoconditions.uri.NamedInformationUri.HashFunction;
 import org.junit.Test;
 

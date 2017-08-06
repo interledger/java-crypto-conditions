@@ -4,8 +4,6 @@ import org.interledger.cryptoconditions.ConditionType;
 import org.interledger.cryptoconditions.Sha256Condition;
 import org.interledger.cryptoconditions.SimpleCondition;
 
-import java.util.Arrays;
-
 /**
  * This type of condition is also called a "hashlock".  By creating a hash of a difficult-to-guess,
  * 256-bit, random or pseudo-random integer, it is possible to create a condition which the creator
@@ -14,9 +12,7 @@ import java.util.Arrays;
  * condition is cryptographically hard to fulfill because one would have to find a preimage for
  * the given condition hash.
  */
-public class PreimageSha256Condition extends Sha256Condition implements SimpleCondition {
-
-  private final byte[] preimage;
+public final class PreimageSha256Condition extends Sha256Condition implements SimpleCondition {
 
   /**
    * Required-args Constructor.  Constructs an instance of {@link PreimageSha256Condition} based
@@ -26,8 +22,12 @@ public class PreimageSha256Condition extends Sha256Condition implements SimpleCo
    * @param preimage An instance of {@link byte[]} containing preimage data.
    */
   public PreimageSha256Condition(final byte[] preimage) {
-    super(calculateCost(preimage));
-    this.preimage = Arrays.copyOf(preimage, preimage.length);
+    super(
+        hashFingerprintContents(
+            constructFingerprintContents(preimage)
+        ),
+        calculateCost(preimage)
+    );
   }
 
   /**
@@ -37,27 +37,25 @@ public class PreimageSha256Condition extends Sha256Condition implements SimpleCo
    * supplied by a remote system).
    *
    * @param fingerprint An instance of {@link byte[]} that contains the calculated fingerprint for
-   *     the condition.
-   * @param cost The cost associated with this condition.
+   *                    the condition.
+   * @param cost        The cost associated with this condition.
    */
-  public PreimageSha256Condition(byte[] fingerprint, long cost) {
+  PreimageSha256Condition(byte[] fingerprint, long cost) {
     super(fingerprint, cost);
-    this.preimage = null;
   }
 
   @Override
-  public ConditionType getType() {
+  public final ConditionType getType() {
     return ConditionType.PREIMAGE_SHA256;
   }
 
   /**
-   * For instances of {@link PreimageSha256Condition}, the fingerprint of a PREIMAGE-SHA-256
-   * condition is the SHA-256 hash of the *unencoded* preimage.  Thus, this method returns the
-   * preimage.
+   * Construct the fingerprint contents for this condition.
+   *
+   * @return
    */
-  @Override
-  protected byte[] getFingerprintContents() {
-    return preimage;
+  public static byte[] constructFingerprintContents(final byte[] prefix) {
+    return prefix;
   }
 
   /**

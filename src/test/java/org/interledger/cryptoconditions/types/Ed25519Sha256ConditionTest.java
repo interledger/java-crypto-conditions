@@ -4,24 +4,19 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import com.google.common.io.BaseEncoding;
-
+import java.net.URI;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveSpec;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
-
 import org.interledger.cryptoconditions.ConditionType;
-import org.interledger.cryptoconditions.der.CryptoConditionReader;
 import org.junit.Test;
-
-import java.net.URI;
-
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 
 /**
  * Unit tests for {@link Ed25519Sha256Condition}.
@@ -51,12 +46,13 @@ public class Ed25519Sha256ConditionTest extends AbstractCryptoConditionTest {
 
       assertThat(ed25519Sha256Condition.getType(), is(ConditionType.ED25519_SHA256));
       assertThat(ed25519Sha256Condition.getCost(), is(131072L));
-      assertThat(ed25519Sha256Condition.getUri(), is(URI.create(
+      assertThat(CryptoConditionUri.toUri(ed25519Sha256Condition), is(URI.create(
           "ni:///sha-256;aJ5kk1zn2qrQQO5QhYZXoGigv0Y5rSafiV3BUM1F9hM?cost=131072&"
               + "fpt=ed25519-sha-256")));
       assertThat(BaseEncoding.base64().encode(ed25519Sha256Condition.getFingerprint()),
           is("aJ5kk1zn2qrQQO5QhYZXoGigv0Y5rSafiV3BUM1F9hM="));
-      assertThat(BaseEncoding.base64().encode(ed25519Sha256Condition.getFingerprintContents()),
+      assertThat(BaseEncoding.base64().encode(ed25519Sha256Condition
+              .constructFingerprintContents((EdDSAPublicKey) keypair.getPublic())),
           is("MCKAIDauG5fFd65q+wKU6Rg5+nsfkzJ5G58sXVhoGQJfSi8d"));
     };
 
