@@ -21,7 +21,6 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.interledger.cryptoconditions.der.DerEncodingException;
@@ -30,7 +29,6 @@ import org.interledger.cryptoconditions.helpers.TestVector;
 import org.interledger.cryptoconditions.helpers.TestVectorFactory;
 import org.interledger.cryptoconditions.helpers.TestVectorJson;
 import org.interledger.cryptoconditions.utils.UnsignedBigInteger;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -198,11 +196,28 @@ public class ValidVectorTest {
   }
 
   /**
-   * This test parses a fulfillment from testVectors.fulfillment and validates that this value
-   * matches the fingerprint from an actual Condition generated from the testVector JSON.
+   * This test reads the binary condition and fulfillment data, and asserts that the condition
+   * verifies the fulfillment.
    */
   @Test
-  @Ignore
+  public void testParseBinaryConditionAgainstBinaryFulfillment() throws DerEncodingException {
+    final byte[] messageBinary = BaseEncoding.base16().decode(testVector.getMessage());
+    final Condition conditionFromBinary = CryptoConditionReader
+        .readCondition(BaseEncoding.base16().decode(testVector.getConditionBinary()));
+    final Fulfillment fulfillmentFromBinary = CryptoConditionReader
+        .readFulfillment(BaseEncoding.base16().decode(testVector.getFulfillment()));
+
+    assertTrue(fulfillmentFromBinary.verify(conditionFromBinary, messageBinary));
+  }
+
+  /**
+   * This test parses a fulfillment from testVectors.fulfillment binary, and then validates that
+   * this value matches the fingerprint from an actual Condition generated from the testVector
+   * JSON. This is a slightly different test from the one that parses the binary fulfillment and
+   * condition data and asserts that the fingerprints are the same
+   * (i.e., {@link #testParseBinaryConditionAgainstBinaryFulfillment}).
+   */
+  @Test
   public void testParseFulfillmentFromBinaryAndValidateFingerprintContents() {
     final byte[] testVectorFingerprintContents = BaseEncoding.base16()
         .decode(testVector.getFingerprintContents());
@@ -215,13 +230,15 @@ public class ValidVectorTest {
     switch (actualTestCondition.getType()) {
       case PREIMAGE_SHA256: {
         unhashedFingerprintContents = ((PreimageSha256Condition) actualTestCondition)
-            .constructFingerprintContents(testVector.getJson().getPreimage().getBytes());
+            .constructFingerprintContents(
+                BaseEncoding.base64Url().decode(testVector.getJson().getPreimage())
+            );
         break;
       }
       case PREFIX_SHA256: {
         unhashedFingerprintContents =
             ((PrefixSha256Condition) actualTestCondition).constructFingerprintContents(
-                testVector.getJson().getPrefix().getBytes(),
+                BaseEncoding.base64Url().decode(testVector.getJson().getPrefix()),
                 testVector.getJson().getMaxMessageLength(),
                 TestVectorFactory
                     .getFulfillmentFromTestVectorJson(testVector.getJson().getSubfulfillment())
@@ -238,26 +255,21 @@ public class ValidVectorTest {
       }
       case RSA_SHA256: {
         final RSAPublicKey publicKey = TestKeyFactory
-            .constructRsaPublicKey(testVector.getJson().getPublicKey());
+            .constructRsaPublicKey(testVector.getJson().getModulus());
         unhashedFingerprintContents
             = ((RsaSha256Condition) actualTestCondition).constructFingerprintContents(publicKey);
         break;
       }
       case THRESHOLD_SHA256: {
         final int threshold = testVector.getJson().getThreshold();
-
         final TestVectorJson[] jsonSubfulfillments = testVector.getJson().getSubfulfillments();
-        final List<Fulfillment> subfulfillments = new LinkedList<>();
+        final List<Condition> subconditions = new LinkedList<>();
         for (int i = 0; i < jsonSubfulfillments.length; i++) {
-          final TestVectorJson subfulfillmentJson = jsonSubfulfillments[i];
-          subfulfillments
-              .add(TestVectorFactory.getFulfillmentFromTestVectorJson(subfulfillmentJson));
+          subconditions
+              .add(TestVectorFactory.getConditionFromTestVectorJson(jsonSubfulfillments[i]));
         }
-        final Condition[] subconditions = subfulfillments.stream().map(Fulfillment::getCondition)
-            .collect(Collectors.toList()).toArray(new Condition[0]);
-
         unhashedFingerprintContents = ((ThresholdSha256Condition) actualTestCondition)
-            .constructFingerprintContents(threshold, subconditions);
+            .constructFingerprintContents(threshold, subconditions.toArray(new Condition[0]));
         break;
       }
       default: {

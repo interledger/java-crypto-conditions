@@ -48,7 +48,7 @@ public class TestVectorFactory {
         return new PrefixSha256Condition(
             Base64.getUrlDecoder().decode(testVectorJson.getPrefix()),
             testVectorJson.getMaxMessageLength(),
-            getFulfillmentFromTestVectorJson(testVectorJson.getSubfulfillment()).getCondition()
+            getConditionFromTestVectorJson(testVectorJson.getSubfulfillment())
         );
       }
 
@@ -67,13 +67,21 @@ public class TestVectorFactory {
       }
 
       case THRESHOLD_SHA256: {
-        final List<Fulfillment> subFulfillments = Arrays
-            .stream(testVectorJson.getSubfulfillments())
-            .map(TestVectorFactory::getFulfillmentFromTestVectorJson)
-            .collect(Collectors.toList());
+//        final List<Fulfillment> subFulfillments = Arrays
+//            .stream(testVectorJson.getSubfulfillments())
+//            .map(TestVectorFactory::getFulfillmentFromTestVectorJson)
+//            .collect(Collectors.toList());
 
-        final List<Condition> subConditions = subFulfillments.stream()
-            .map(Fulfillment::getCondition)
+        final List<Condition> subConditions = Arrays
+            // This is somewhat wrong - the test vectors occasionally treat the data in
+            // "testVectorJson.getSubfulfillments() as a fulfillment, and other times treat it as
+            // Condition data. thus, we get subfulfillment data but pass it into the condition test
+            // factory
+            .stream(testVectorJson.getSubfulfillments())
+            // For example, here, we want to create a condition with a threshold
+            // number that is potentially less than the number of fulfillments in the JSON, so we
+            // utilize testVectorJson.getThreshold to create the condition...
+            .map(TestVectorFactory::getConditionFromTestVectorJson)
             .collect(Collectors.toList());
 
         return new ThresholdSha256Condition(
