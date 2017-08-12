@@ -1,5 +1,7 @@
 package org.interledger.cryptoconditions;
 
+import static org.interledger.cryptoconditions.CryptoConditionType.THRESHOLD_SHA256;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -25,10 +27,11 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
    */
   public ThresholdSha256Condition(final int threshold, final List<Condition> subconditions) {
     super(
+        THRESHOLD_SHA256,
+        calculateCost(threshold, subconditions),
         hashFingerprintContents(
             constructFingerprintContents(threshold, subconditions)
         ),
-        calculateCost(threshold, subconditions),
         calculateSubtypes(subconditions)
     );
   }
@@ -38,17 +41,14 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
    *
    * Note this constructor is package-private because it is used primarily for testing purposes.
    *
-   * @param fingerprint The calculcated fingerprint for the condition.
    * @param cost        The calculated cost of this condition.
+   * @param fingerprint The calculcated fingerprint for the condition.
    * @param subtypes    A set of condition rsa for the subconditions that this one depends on.
    */
-  ThresholdSha256Condition(byte[] fingerprint, long cost, EnumSet<CryptoConditionType> subtypes) {
-    super(fingerprint, cost, subtypes);
-  }
-
-  @Override
-  public CryptoConditionType getType() {
-    return CryptoConditionType.THRESHOLD_SHA256;
+  ThresholdSha256Condition(
+      final long cost, final byte[] fingerprint, final EnumSet<CryptoConditionType> subtypes
+  ) {
+    super(THRESHOLD_SHA256, cost, fingerprint, subtypes);
   }
 
   /**
@@ -126,15 +126,20 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
   }
 
   /**
-   * Calculates the cost of a threshold condition as sum(biggest(t, subcondition_costs)) + 1024 * n
+   * Calculates the cost of a threshold condition as:
+   *
+   * <pre>
+   * sum(biggest(t, subcondition_costs)) + 1024 * n
+   * </pre>
    *
    * @param threshold     The number of subconditions that must be met.
    * @param subconditions The list of subconditions.
    * @return The calculated cost of a threshold condition.
    */
-  private static final long calculateCost(int threshold, List<Condition> subconditions) {
-
-    // sum(biggest(t, subcondition_costs)) + 1024 * n
+  private static final long calculateCost(
+      final int threshold, final List<Condition> subconditions
+  ) {
+    Objects.requireNonNull(subconditions);
 
     // Sort by cost
     subconditions.sort((Condition c1, Condition c2) -> (int) (c2.getCost() - c1.getCost()));
@@ -155,7 +160,9 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
    * @return The set of condition rsa related to the sub condition.
    */
   private static final EnumSet<CryptoConditionType> calculateSubtypes(
-      final List<Condition> subconditions) {
+      final List<Condition> subconditions
+  ) {
+    Objects.requireNonNull(subconditions);
 
     final EnumSet<CryptoConditionType> subtypes = EnumSet.noneOf(CryptoConditionType.class);
     for (int i = 0; i < subconditions.size(); i++) {
@@ -166,8 +173,8 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
     }
 
     // Remove our own type
-    if (subtypes.contains(CryptoConditionType.THRESHOLD_SHA256)) {
-      subtypes.remove(CryptoConditionType.THRESHOLD_SHA256);
+    if (subtypes.contains(THRESHOLD_SHA256)) {
+      subtypes.remove(THRESHOLD_SHA256);
     }
 
     return subtypes;

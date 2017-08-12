@@ -17,13 +17,16 @@ public abstract class Sha256Condition extends ConditionBase {
   /**
    * Constructor that accepts a fingerprint and a cost number.
    *
+   * @param type        A {@link CryptoConditionType} that represents the type of this condition.
    * @param cost        A {@link long} representing the anticipated cost of this condition,
    *                    calculated per
    *                    the rules of the crypto-conditions specification.
    * @param fingerprint The binary representation of the fingerprint for this condition.
    */
-  protected Sha256Condition(final byte[] fingerprint, final long cost) {
-    super(cost);
+  protected Sha256Condition(
+      final CryptoConditionType type, final long cost, final byte[] fingerprint
+  ) {
+    super(type, cost);
 
     Objects.requireNonNull(fingerprint);
     if (fingerprint.length != 32) {
@@ -35,6 +38,7 @@ public abstract class Sha256Condition extends ConditionBase {
     this.fingerprintBase64Url = Base64.getUrlEncoder().encodeToString(this.fingerprint);
   }
 
+  @Deprecated
   @Override
   public final byte[] getFingerprint() {
     return fingerprint;
@@ -43,6 +47,30 @@ public abstract class Sha256Condition extends ConditionBase {
   @Override
   public final String getFingerprintBase64Url() {
     return this.fingerprintBase64Url;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    Sha256Condition that = (Sha256Condition) o;
+
+    return fingerprintBase64Url.equals(that.fingerprintBase64Url);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + fingerprintBase64Url.hashCode();
+    return result;
   }
 
   /**

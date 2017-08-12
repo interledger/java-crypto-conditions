@@ -14,16 +14,22 @@ import org.interledger.cryptoconditions.der.DerTag;
 public final class Ed25519Sha256Condition extends Sha256Condition implements SimpleCondition {
 
   /**
+   * The public key and signature are a fixed size therefore the cost for an ED25519
+   * crypto-condition is fixed at 131072.
+   */
+  private static final long COST = 131072L;
+
+  /**
    * Constructs an instance of the condition.
    *
    * @param key A {@link EdDSAPublicKey} used to create the fingerprint.
    */
   public Ed25519Sha256Condition(final EdDSAPublicKey key) {
     super(
-        hashFingerprintContents(
-            constructFingerprintContents(key)
-        ),
-        calculateCost(key));
+        CryptoConditionType.ED25519_SHA256,
+        COST,
+        hashFingerprintContents(constructFingerprintContents(key))
+    );
   }
 
   /**
@@ -31,16 +37,13 @@ public final class Ed25519Sha256Condition extends Sha256Condition implements Sim
    *
    * Note this constructor is package-private because it is used primarily for testing purposes.
    *
-   * @param fingerprint The fingerprint associated with the condition.
-   * @param cost        The cost associated with the condition.
+   * @param cost        A {@link long} representing the anticipated cost of this condition,
+   *                    calculated per
+   *                    the rules of the crypto-conditions specification.
+   * @param fingerprint The binary representation of the fingerprint for this condition.
    */
-  Ed25519Sha256Condition(byte[] fingerprint, long cost) {
-    super(fingerprint, cost);
-  }
-
-  @Override
-  public CryptoConditionType getType() {
-    return CryptoConditionType.ED25519_SHA256;
+  Ed25519Sha256Condition(final long cost, final byte[] fingerprint) {
+    super(CryptoConditionType.ED25519_SHA256, cost, fingerprint);
   }
 
   /**
@@ -49,9 +52,7 @@ public final class Ed25519Sha256Condition extends Sha256Condition implements Sim
    * Note: This method is package-private as (opposed to private) for testing purposes.
    */
   final static byte[] constructFingerprintContents(final EdDSAPublicKey publicKey) {
-
     Objects.requireNonNull(publicKey);
-    validatePublicKey(publicKey);
 
     try {
       // Write public publicKey
@@ -72,19 +73,5 @@ public final class Ed25519Sha256Condition extends Sha256Condition implements Sim
     } catch (IOException ioe) {
       throw new UncheckedIOException("DER Encoding Error", ioe);
     }
-  }
-
-  /**
-   * Returns the cost of the condition (131072).
-   *
-   * @param key the key used in the condition.
-   * @return the cost of the condition
-   */
-  private static long calculateCost(final EdDSAPublicKey key) {
-    return 131072; //TODO: is this a placehoder, or should it be a constant?
-  }
-
-  private static final void validatePublicKey(final EdDSAPublicKey publicKey) {
-    // TODO: Validate key?
   }
 }

@@ -1,5 +1,7 @@
 package org.interledger.cryptoconditions;
 
+import static org.interledger.cryptoconditions.CryptoConditionType.PREIMAGE_SHA256;
+
 import java.util.Objects;
 
 /**
@@ -21,10 +23,11 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
    */
   public PreimageSha256Condition(final byte[] preimage) {
     super(
+        CryptoConditionType.PREIMAGE_SHA256,
+        calculateCost(preimage),
         hashFingerprintContents(
             constructFingerprintContents(preimage)
-        ),
-        calculateCost(preimage)
+        )
     );
   }
 
@@ -35,18 +38,11 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
    * supplied by a remote system).
    *
    * Note this constructor is package-private because it is used primarily for testing purposes.
-   *
+   *  @param cost        The cost associated with this condition.
    * @param fingerprint An instance of {@link byte[]} that contains the calculated fingerprint for
-   *                    the condition.
-   * @param cost        The cost associated with this condition.
    */
-  PreimageSha256Condition(final byte[] fingerprint, final long cost) {
-    super(fingerprint, cost);
-  }
-
-  @Override
-  public final CryptoConditionType getType() {
-    return CryptoConditionType.PREIMAGE_SHA256;
+  PreimageSha256Condition(final long cost, final byte[] fingerprint) {
+    super(PREIMAGE_SHA256, cost, fingerprint);
   }
 
   /**
@@ -54,7 +50,7 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
    *
    * Note: This method is package-private as (opposed to private) for testing purposes.
    */
-  public static byte[] constructFingerprintContents(final byte[] prefix) {
+  static final byte[] constructFingerprintContents(final byte[] prefix) {
     return Objects.requireNonNull(prefix);
   }
 
@@ -64,7 +60,8 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
    * @param preimage The preimage associated with this condition.
    * @return The cost of a condition based on the preimage.
    */
-  private static long calculateCost(byte[] preimage) {
+  private final static long calculateCost(byte[] preimage) {
     return preimage.length;
   }
+
 }

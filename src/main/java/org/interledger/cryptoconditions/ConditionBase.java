@@ -1,5 +1,6 @@
 package org.interledger.cryptoconditions;
 
+import java.util.Objects;
 import org.interledger.cryptoconditions.der.DerEncodingException;
 
 /**
@@ -7,20 +8,28 @@ import org.interledger.cryptoconditions.der.DerEncodingException;
  */
 public abstract class ConditionBase implements Condition {
 
+  private final CryptoConditionType type;
   private final long cost;
 
   /**
    * Default internal constructor for all conditions. Sub-classes must statically calculate the cost
    * of a condition and call this constructor with the correct cost value.
    *
+   * @param type The type of this condition.
    * @param cost the cost value for this condition.
    */
-  protected ConditionBase(final long cost) {
+  protected ConditionBase(final CryptoConditionType type, final long cost) {
+    this.type = Objects.requireNonNull(type);
+
     if (cost < 0) {
       throw new IllegalArgumentException("Cost must be positive!");
     }
-
     this.cost = cost;
+  }
+
+  @Override
+  public final CryptoConditionType getType() {
+    return this.type;
   }
 
   @Override
@@ -39,12 +48,17 @@ public abstract class ConditionBase implements Condition {
 
     ConditionBase that = (ConditionBase) o;
 
-    return cost == that.cost;
+    if (cost != that.cost) {
+      return false;
+    }
+    return type == that.type;
   }
 
   @Override
   public int hashCode() {
-    return (int) (cost ^ (cost >>> 32));
+    int result = type.hashCode();
+    result = 31 * result + (int) (cost ^ (cost >>> 32));
+    return result;
   }
 
   /**
@@ -68,7 +82,7 @@ public abstract class ConditionBase implements Condition {
    * or greater than the specified object.
    */
   @Override
-  public int compareTo(Condition that) {
+  public final int compareTo(Condition that) {
     try {
       byte[] c1encoded = CryptoConditionWriter.writeCondition(this);
       byte[] c2encoded = CryptoConditionWriter.writeCondition(that);

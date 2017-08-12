@@ -106,15 +106,15 @@ public class CryptoConditionReader {
 
     switch (type) {
       case PREIMAGE_SHA256:
-        return new PreimageSha256Condition(fingerprint, cost);
+        return new PreimageSha256Condition(cost, fingerprint);
       case PREFIX_SHA256:
-        return new PrefixSha256Condition(fingerprint, cost, subtypes);
+        return new PrefixSha256Condition(cost, fingerprint, subtypes);
       case THRESHOLD_SHA256:
-        return new ThresholdSha256Condition(fingerprint, cost, subtypes);
+        return new ThresholdSha256Condition(cost, fingerprint, subtypes);
       case RSA_SHA256:
-        return new RsaSha256Condition(fingerprint, cost);
+        return new RsaSha256Condition(cost, fingerprint);
       case ED25519_SHA256:
-        return new Ed25519Sha256Condition(fingerprint, cost);
+        return new Ed25519Sha256Condition(cost, fingerprint);
       default:
         throw new DerEncodingException("Unknown condition type: " + type);
     }
@@ -177,7 +177,6 @@ public class CryptoConditionReader {
    */
   public static Fulfillment readFulfillment(DerInputStream in, AtomicInteger bytesRead)
       throws DerEncodingException, IOException {
-    // TODO No length checks
 
     int tag = in.readTag(bytesRead, DerTag.CONSTRUCTED, DerTag.TAGGED);
     CryptoConditionType type = CryptoConditionType.valueOf(tag);
@@ -206,8 +205,8 @@ public class CryptoConditionReader {
             in.readTaggedObject(1, length - innerBytesRead.get(), innerBytesRead).getValue())
             .longValue();
 
-        tag = in.readTag(2, innerBytesRead, DerTag.CONSTRUCTED, DerTag.TAGGED);
-        length = in.readLength(innerBytesRead);
+        in.readTag(2, innerBytesRead, DerTag.CONSTRUCTED, DerTag.TAGGED);
+        in.readLength(innerBytesRead);
 
         Fulfillment subfulfillment = readFulfillment(in, innerBytesRead);
 
@@ -233,7 +232,7 @@ public class CryptoConditionReader {
           }
           innerBytesRead.addAndGet(subfulfillmentsBytesRead.get());
 
-          tag = in.readTag(1, innerBytesRead, DerTag.CONSTRUCTED, DerTag.TAGGED);
+          in.readTag(1, innerBytesRead, DerTag.CONSTRUCTED, DerTag.TAGGED);
           length = in.readLength(innerBytesRead);
 
         } else if (tag != 1) {

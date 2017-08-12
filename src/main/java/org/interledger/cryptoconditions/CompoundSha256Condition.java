@@ -14,16 +14,18 @@ public abstract class CompoundSha256Condition extends Sha256Condition implements
   /**
    * Constructor that accepts a fingerprint and a cost number.
    *
+   * @param type        A {@link CryptoConditionType} that represents the type of this condition.
    * @param cost        A {@link long} representing the anticipated cost of this condition,
    *                    calculated per
    *                    the rules of the crypto-conditions specification.
    * @param fingerprint The binary representation of the fingerprint for this condition.
-   * @param subtypes    A {@link EnumSet} of the sub-rsa of this compound condition.
+   * @param subtypes    An {@link EnumSet} of types that this condition will hold as subconditions.
    */
   protected CompoundSha256Condition(
-      final byte[] fingerprint, final long cost, final EnumSet<CryptoConditionType> subtypes
+      final CryptoConditionType type, final long cost, final byte[] fingerprint,
+      final EnumSet<CryptoConditionType> subtypes
   ) {
-    super(fingerprint, cost);
+    super(type, cost, fingerprint);
     this.subtypes = EnumSet.copyOf(Objects.requireNonNull(subtypes));
   }
 
@@ -32,4 +34,27 @@ public abstract class CompoundSha256Condition extends Sha256Condition implements
     return EnumSet.copyOf(subtypes);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    CompoundSha256Condition that = (CompoundSha256Condition) o;
+
+    return subtypes.equals(that.subtypes);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + subtypes.hashCode();
+    return result;
+  }
 }

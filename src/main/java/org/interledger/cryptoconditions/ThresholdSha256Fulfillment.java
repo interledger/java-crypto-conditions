@@ -3,6 +3,7 @@ package org.interledger.cryptoconditions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -82,12 +83,9 @@ public class ThresholdSha256Fulfillment implements Fulfillment {
   }
 
   @Override
-  public boolean verify(Condition condition, byte[] message) {
-
-    if (condition == null) {
-      throw new IllegalArgumentException(
-          "Can't verify a ThresholdSha256Fulfillment against an null condition.");
-    }
+  public boolean verify(final Condition condition, final byte[] message) {
+    Objects.requireNonNull(condition,
+        "Can't verify a ThresholdSha256Fulfillment against an null condition.");
 
     if (!(condition instanceof ThresholdSha256Condition)) {
       throw new IllegalArgumentException(

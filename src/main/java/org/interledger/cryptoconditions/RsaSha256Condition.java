@@ -1,5 +1,7 @@
 package org.interledger.cryptoconditions;
 
+import static org.interledger.cryptoconditions.CryptoConditionType.RSA_SHA256;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -21,10 +23,11 @@ public final class RsaSha256Condition extends Sha256Condition implements SimpleC
    */
   public RsaSha256Condition(final RSAPublicKey key) {
     super(
+        RSA_SHA256,
+        calculateCost(key),
         hashFingerprintContents(
             constructFingerprintContents(key)
-        ),
-        calculateCost(key)
+        )
     );
   }
 
@@ -33,16 +36,11 @@ public final class RsaSha256Condition extends Sha256Condition implements SimpleC
    *
    * Note this constructor is package-private because it is used primarily for testing purposes.
    *
-   * @param fingerprint The calculated fingerprint for the condition.
    * @param cost        The calculated cost of the condition.
+   * @param fingerprint The calculated fingerprint for the condition.
    */
-  RsaSha256Condition(final byte[] fingerprint, final long cost) {
-    super(fingerprint, cost);
-  }
-
-  @Override
-  public final CryptoConditionType getType() {
-    return CryptoConditionType.RSA_SHA256;
+  RsaSha256Condition(final long cost, final byte[] fingerprint) {
+    super(RSA_SHA256, cost, fingerprint);
   }
 
   /**

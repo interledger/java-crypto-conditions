@@ -97,15 +97,15 @@ public class CryptoConditionUri {
 
     switch (type) {
       case PREIMAGE_SHA256:
-        return new PreimageSha256Condition(fingerprint, cost);
+        return new PreimageSha256Condition(cost, fingerprint);
       case PREFIX_SHA256:
-        return new PrefixSha256Condition(fingerprint, cost, subtypes);
+        return new PrefixSha256Condition(cost, fingerprint, subtypes);
       case THRESHOLD_SHA256:
-        return new ThresholdSha256Condition(fingerprint, cost, subtypes);
+        return new ThresholdSha256Condition(cost, fingerprint, subtypes);
       case RSA_SHA256:
-        return new RsaSha256Condition(fingerprint, cost);
+        return new RsaSha256Condition(cost, fingerprint);
       case ED25519_SHA256:
-        return new Ed25519Sha256Condition(fingerprint, cost);
+        return new Ed25519Sha256Condition(cost, fingerprint);
       default:
         throw new URISyntaxException(uri.toString(), "No or invalid type provided");
     }

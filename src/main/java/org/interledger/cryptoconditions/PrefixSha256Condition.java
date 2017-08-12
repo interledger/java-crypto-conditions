@@ -1,5 +1,7 @@
 package org.interledger.cryptoconditions;
 
+import static org.interledger.cryptoconditions.CryptoConditionType.PREFIX_SHA256;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -27,10 +29,11 @@ public final class PrefixSha256Condition extends CompoundSha256Condition
       final byte[] prefix, final long maxMessageLength, final Condition subcondition
   ) {
     super(
+        PREFIX_SHA256,
+        calculateCost(prefix, maxMessageLength, subcondition.getCost()),
         hashFingerprintContents(
             constructFingerprintContents(prefix, maxMessageLength, subcondition)
         ),
-        calculateCost(prefix, maxMessageLength, subcondition.getCost()),
         calculateSubtypes(subcondition)
     );
   }
@@ -40,17 +43,14 @@ public final class PrefixSha256Condition extends CompoundSha256Condition
    *
    * Note this constructor is package-private because it is used primarily for testing purposes.
    *
-   * @param fingerprint The calculated fingerprint.
    * @param cost        The cost of this condition.
+   * @param fingerprint The calculated fingerprint.
    * @param subtypes    A set of condition rsa for the conditions that this one depends on.
    */
-  PrefixSha256Condition(byte[] fingerprint, long cost, EnumSet<CryptoConditionType> subtypes) {
-    super(fingerprint, cost, subtypes);
-  }
-
-  @Override
-  public CryptoConditionType getType() {
-    return CryptoConditionType.PREFIX_SHA256;
+  PrefixSha256Condition(
+      final long cost, final byte[] fingerprint, final EnumSet<CryptoConditionType> subtypes
+  ) {
+    super(PREFIX_SHA256, cost, fingerprint, subtypes);
   }
 
   /**
@@ -117,8 +117,8 @@ public final class PrefixSha256Condition extends CompoundSha256Condition
     }
 
     // Remove our own type
-    if (subtypes.contains(CryptoConditionType.PREFIX_SHA256)) {
-      subtypes.remove(CryptoConditionType.PREFIX_SHA256);
+    if (subtypes.contains(PREFIX_SHA256)) {
+      subtypes.remove(PREFIX_SHA256);
     }
 
     return subtypes;
