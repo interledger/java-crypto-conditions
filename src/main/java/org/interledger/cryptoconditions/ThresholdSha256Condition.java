@@ -40,7 +40,7 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
    *
    * @param fingerprint The calculcated fingerprint for the condition.
    * @param cost        The calculated cost of this condition.
-   * @param subtypes    A set of condition types for the subconditions that this one depends on.
+   * @param subtypes    A set of condition rsa for the subconditions that this one depends on.
    */
   ThresholdSha256Condition(byte[] fingerprint, long cost, EnumSet<CryptoConditionType> subtypes) {
     super(fingerprint, cost, subtypes);
@@ -149,10 +149,10 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
   }
 
   /**
-   * Determines the set of condition types that are ultimately held via the sub condition.
+   * Determines the set of condition rsa that are ultimately held via the sub condition.
    *
    * @param subconditions The sub conditions that this condition depends on.
-   * @return The set of condition types related to the sub condition.
+   * @return The set of condition rsa related to the sub condition.
    */
   private static final EnumSet<CryptoConditionType> calculateSubtypes(
       final List<Condition> subconditions) {

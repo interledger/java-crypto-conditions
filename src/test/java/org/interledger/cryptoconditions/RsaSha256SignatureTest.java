@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.io.BaseEncoding;
 import java.io.File;
 import java.math.BigInteger;
-import java.net.URL;
+import java.net.URI;
 import java.security.KeyFactory;
 import java.security.Provider;
 import java.security.SecureRandom;
@@ -57,16 +57,16 @@ public class RsaSha256SignatureTest extends AbstractCryptoConditionTest {
    */
   @Parameters(name = "Modulus {index}: {0}")
   public static Collection<RsaTestVectorPair> testVectors() throws Exception {
-
-    final URL classUri = RsaSha256SignatureTest.class
-        .getResource(RsaSha256SignatureTest.class.getSimpleName() + ".class");
-    final File dir = new File(classUri.toURI()).getParentFile();
+    final URI baseUri = RsaSha256SignatureTest.class
+        .getResource(RsaSha256SignatureTest.class.getSimpleName() + ".class").toURI();
+    final File baseDirectoryFile = new File(baseUri).getParentFile();
+    final File validTestVectorDir = new File(baseDirectoryFile, "/rsa");
 
     final Builder<RsaTestVectorPair> vectors = ImmutableList.builder();
     final ObjectMapper mapper = new ObjectMapper();
 
     final Signature rsaSha256Signer = Signature.getInstance("SHA256withRSA/PSS", "BC");
-    Arrays.stream(dir.listFiles()).forEach(file -> {
+    Arrays.stream(validTestVectorDir.listFiles()).forEach(file -> {
       try {
         if (file.getName().endsWith("sha256.json")) {
           final List<RsaTestVectorJson> testVectors = mapper
@@ -84,7 +84,7 @@ public class RsaSha256SignatureTest extends AbstractCryptoConditionTest {
     });
 
     final Signature rsaSha1Signer = Signature.getInstance("SHA1withRSA/PSS", "BC");
-    Arrays.stream(dir.listFiles()).forEach(file -> {
+    Arrays.stream(validTestVectorDir.listFiles()).forEach(file -> {
       try {
 
         if (file.getName().endsWith("sha1.json")) {

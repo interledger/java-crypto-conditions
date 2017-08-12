@@ -13,11 +13,11 @@ import java.util.List;
 public class CryptoConditionAssert {
 
   /**
-   * Asserts the the set of types given are equal.
+   * Asserts the the set of rsa given are equal.
    *
    * @param message  A detail message to record if the assertion fails.
-   * @param expected A list of expected condition types.
-   * @param actual   A set of condition types to compare against the ones expected.
+   * @param expected A list of expected condition rsa.
+   * @param actual   A set of condition rsa to compare against the ones expected.
    */
   public static void assertSetOfTypesIsEqual(String message, List<String> expected,
       EnumSet<CryptoConditionType> actual) {

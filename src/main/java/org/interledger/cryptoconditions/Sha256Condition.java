@@ -7,7 +7,7 @@ import java.util.Base64;
 import java.util.Objects;
 
 /**
- * Abstract base class for the *-SHA-256 condition types.
+ * Abstract base class for the *-SHA-256 condition rsa.
  */
 public abstract class Sha256Condition extends ConditionBase {
 

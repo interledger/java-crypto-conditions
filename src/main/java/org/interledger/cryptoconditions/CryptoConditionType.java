@@ -5,7 +5,7 @@ import java.util.EnumSet;
 import java.util.Objects;
 
 /**
- * Enumeration of crypto-condition types. These types apply to both conditions and fulfillments.
+ * Enumeration of crypto-condition rsa. These rsa apply to both conditions and fulfillments.
  */
 public enum CryptoConditionType {
 
@@ -70,10 +70,10 @@ public enum CryptoConditionType {
   }
 
   /**
-   * TODO This will break if the possible types exceeds 8. Only works for our current known set.
-   * Convert a set of types into a byte that can be used to encode a BIT STRING.
+   * TODO This will break if the possible rsa exceeds 8. Only works for our current known set.
+   * Convert a set of rsa into a byte that can be used to encode a BIT STRING.
    *
-   * @param types set of types to encode as a BIT STRING.
+   * @param types set of rsa to encode as a BIT STRING.
    * @return byte array where first byte indicates the number of unused bits in last byte and
    * remaining bytes encode the bit string
    */
@@ -82,7 +82,7 @@ public enum CryptoConditionType {
     byte[] data = new byte[2];
     int lastUsedBit = -1;
 
-    // No guarantee that iterating through the types will be done in order so just test for each
+    // No guarantee that iterating through the rsa will be done in order so just test for each
     if (types.contains(PREIMAGE_SHA256)) {
       data[1] += CryptoConditionType.PREIMAGE_SHA256.getMask();
       lastUsedBit = PREIMAGE_SHA256.getTypeCode();
@@ -117,9 +117,9 @@ public enum CryptoConditionType {
   }
 
   /**
-   * Convert a set of types into a comma separated list.
+   * Convert a set of rsa into a comma separated list.
    *
-   * @param types set of types to encode
+   * @param types set of rsa to encode
    */
   public static String getEnumOfTypesAsString(EnumSet<CryptoConditionType> types) {
 
@@ -151,10 +151,10 @@ public enum CryptoConditionType {
   }
 
   /**
-   * Convert a comma separated list of types into a set of types.
+   * Convert a comma separated list of rsa into a set of rsa.
    *
    * @param subtypes a comma separated list of type names.
-   * @return A set of condition types based on the list.
+   * @return A set of condition rsa based on the list.
    */
   public static EnumSet<CryptoConditionType> getEnumOfTypesFromString(String subtypes) {
     EnumSet<CryptoConditionType> types = EnumSet.noneOf(CryptoConditionType.class);
@@ -172,16 +172,16 @@ public enum CryptoConditionType {
   }
 
   /**
-   * Get the set of types represented by a raw bit string.
+   * Get the set of rsa represented by a raw bit string.
    *
    * @param bitStringData a raw BIT STRING including the padding bit count in the first byte
-   * @return A set of condition types based on the bit string.
+   * @return A set of condition rsa based on the bit string.
    */
   public static EnumSet<CryptoConditionType> getEnumOfTypesFromBitString(byte[] bitStringData) {
 
-    // We only have 5 known types so shouldn't be more than a padding byte and the bitmap
+    // We only have 5 known rsa so shouldn't be more than a padding byte and the bitmap
     if (bitStringData.length > 2) {
-      throw new IllegalArgumentException("Unknown types in bit string.");
+      throw new IllegalArgumentException("Unknown rsa in bit string.");
     }
 
     if (bitStringData.length == 1) {
@@ -195,9 +195,9 @@ public enum CryptoConditionType {
 
     int padBits = bitStringData[0];
 
-    // We only have 5 known types so should have at least 3 padding bits
+    // We only have 5 known rsa so should have at least 3 padding bits
     if (padBits < 3) {
-      throw new IllegalArgumentException("Unknown types in bit string.");
+      throw new IllegalArgumentException("Unknown rsa in bit string.");
     }
 
     // We only expect 1 byte of data so let's keep it simple

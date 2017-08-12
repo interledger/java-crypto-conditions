@@ -18,7 +18,7 @@ public abstract class CompoundSha256Condition extends Sha256Condition implements
    *                    calculated per
    *                    the rules of the crypto-conditions specification.
    * @param fingerprint The binary representation of the fingerprint for this condition.
-   * @param subtypes    A {@link EnumSet} of the sub-types of this compound condition.
+   * @param subtypes    A {@link EnumSet} of the sub-rsa of this compound condition.
    */
   protected CompoundSha256Condition(
       final byte[] fingerprint, final long cost, final EnumSet<CryptoConditionType> subtypes
