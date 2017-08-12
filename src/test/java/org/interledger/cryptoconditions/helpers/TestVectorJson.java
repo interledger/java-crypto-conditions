@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * A class that models the "json" field in the testVectors file.
+ * A class that models the "json" field in the testVectorData file.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TestVectorJson {
