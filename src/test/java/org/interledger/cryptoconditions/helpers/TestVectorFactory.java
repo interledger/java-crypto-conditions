@@ -130,13 +130,10 @@ public class TestVectorFactory {
       }
 
       case THRESHOLD_SHA256: {
-
         final List<Fulfillment> subfulfillments = Arrays
             .stream(testVectorJson.getSubfulfillments())
             .map(TestVectorFactory::getFulfillmentFromTestVectorJson)
             .collect(Collectors.toList());
-
-        // TODO: Should the threshold fulfillment be able to specify conditions?
         return new ThresholdSha256Fulfillment(new LinkedList<>(), subfulfillments);
       }
 
