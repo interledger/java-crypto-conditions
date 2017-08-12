@@ -6,34 +6,45 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.util.Arrays;
+import java.util.Objects;
 import net.i2p.crypto.eddsa.EdDSAEngine;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 
 
 /**
- * Implements a fulfullment using the ED-25519 and SHA-256 functions.
+ * An implementation of {@link Fulfillment} for a crypto-condition fulfillment of type
+ * "ED25519-SHA256" using the ED-25519 and SHA-256 functions.
+ *
+ * @see "https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/"
  */
 public class Ed25519Sha256Fulfillment implements Fulfillment {
 
-  private Ed25519Sha256Condition condition;
-  private EdDSAPublicKey publicKey;
-  private byte[] signature;
+  // Final attributes...
+  private final CryptoConditionType type;
+  private final EdDSAPublicKey publicKey;
+  private final byte[] signature;
+  private final Ed25519Sha256Condition condition;
 
   /**
    * Constructs an instance of the fulfillment.
    *
-   * @param publicKey The public key associated with the condition and fulfillment.
-   * @param signature The signature associated with the fulfillment.
+   * @param publicKey An {@link EdDSAPublicKey} associated with this fulfillment and its
+   *                  corresponding condition.
+   * @param signature A {@link byte[]} containing the signature associated with this fulfillment.
    */
-  public Ed25519Sha256Fulfillment(EdDSAPublicKey publicKey, byte[] signature) {
-    this.signature = new byte[signature.length];
-    System.arraycopy(signature, 0, this.signature, 0, signature.length);
+  public Ed25519Sha256Fulfillment(final EdDSAPublicKey publicKey, final byte[] signature) {
+    Objects.requireNonNull(publicKey, "EdDSAPublicKey must not be null!");
+    Objects.requireNonNull(signature, "Signature must not be null!");
+
+    this.type = CryptoConditionType.ED25519_SHA256;
     this.publicKey = publicKey;
+    this.signature = Arrays.copyOf(signature, signature.length);
+    this.condition = new Ed25519Sha256Condition(publicKey);
   }
 
   @Override
   public CryptoConditionType getType() {
-    return CryptoConditionType.ED25519_SHA256;
+    return this.type;
   }
 
   /**
@@ -54,10 +65,7 @@ public class Ed25519Sha256Fulfillment implements Fulfillment {
 
   @Override
   public Ed25519Sha256Condition getCondition() {
-    if (condition == null) {
-      condition = new Ed25519Sha256Condition(publicKey);
-    }
-    return condition;
+    return this.condition;
   }
 
   @Override
@@ -78,40 +86,18 @@ public class Ed25519Sha256Fulfillment implements Fulfillment {
     }
 
     try {
-      Signature edDsaSigner = new EdDSAEngine(getSha512Digest());
+      // MessageDigest isn't particularly expensive to construct (see MessageDigest source).
+      final MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
+      final Signature edDsaSigner = new EdDSAEngine(messageDigest);
       edDsaSigner.initVerify(publicKey);
       edDsaSigner.update(message);
       return edDsaSigner.verify(signature);
-    } catch (InvalidKeyException | SignatureException e) {
-      // TODO Log error or throw?
-      e.printStackTrace();
-      return false;
+    } catch (InvalidKeyException | NoSuchAlgorithmException |
+        SignatureException e) {
+      throw new RuntimeException(e);
     }
-
   }
 
-  private static MessageDigest _DIGEST;
-
-  private static MessageDigest getSha512Digest() {
-    if (_DIGEST == null) {
-      try {
-        // TODO: i havent read up on fulfillments, but this seems counter-intuitive - why is this
-        // class called ...Sha256, but we use a 512 digest? If this is right, we should definitely
-        // include some comments here to explain.
-        _DIGEST = MessageDigest.getInstance("SHA-512");
-      } catch (NoSuchAlgorithmException e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    return _DIGEST;
-  }
-
-  /**
-   * The {@link #condition} field in this class is not part of this equals method because it is a
-   * value derived from this fulfillment, and is lazily initialized (so it's occasionally null until
-   * {@link #getCondition()} is called.
-   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -123,25 +109,34 @@ public class Ed25519Sha256Fulfillment implements Fulfillment {
 
     Ed25519Sha256Fulfillment that = (Ed25519Sha256Fulfillment) o;
 
+    if (type != that.type) {
+      return false;
+    }
     if (!publicKey.equals(that.publicKey)) {
       return false;
     }
-    return Arrays.equals(signature, that.signature);
+    if (!Arrays.equals(signature, that.signature)) {
+      return false;
+    }
+    return condition.equals(that.condition);
   }
 
   @Override
   public int hashCode() {
-    int result = publicKey.hashCode();
+    int result = type.hashCode();
+    result = 31 * result + publicKey.hashCode();
     result = 31 * result + Arrays.hashCode(signature);
+    result = 31 * result + condition.hashCode();
     return result;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("Ed25519Sha256Fulfillment{");
-    sb.append("publicKey=").append(publicKey);
+    sb.append("type=").append(type);
+    sb.append(", publicKey=").append(publicKey);
     sb.append(", signature=").append(Arrays.toString(signature));
-    sb.append(", type=").append(getType());
+    sb.append(", condition=").append(condition);
     sb.append('}');
     return sb.toString();
   }

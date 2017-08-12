@@ -3,9 +3,7 @@ package org.interledger.cryptoconditions;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.interledger.cryptoconditions.CryptoConditionType;
-import org.interledger.cryptoconditions.Fulfillment;
-import org.interledger.cryptoconditions.PreimageSha256Fulfillment;
+import java.util.Base64;
 import org.junit.Test;
 
 /**
@@ -25,7 +23,8 @@ public class PreimageSha256FulfillmentTest {
 
     //assertThat(actual.getCondition(), is(expectedCondition));
     //assertThat(actual.getEncoded(), is(expectedCondition));
-    assertThat(actual.getPreimage(), is("Hello World".getBytes()));
+    assertThat(Base64.getUrlDecoder().decode(actual.getBase64UrlEncodedPreimage()),
+        is("Hello World".getBytes()));
     assertThat(actual.getType(), is(CryptoConditionType.PREIMAGE_SHA256));
   }
 

@@ -8,64 +8,55 @@ import java.util.Objects;
  */
 public class PrefixSha256Fulfillment implements Fulfillment {
 
-  private PrefixSha256Condition condition;
-  private Fulfillment subfulfillment;
-
-  private long maxMessageLength;
-  private byte[] prefix;
+  private final CryptoConditionType type;
+  private final byte[] prefix;
+  private final long maxMessageLength;
+  private final Fulfillment subfulfillment;
+  private final PrefixSha256Condition condition;
 
   /**
    * Constructs an instance of the fulfillment.
    *
    * @param prefix           The prefix associated with the condition and fulfillment
    * @param maxMessageLength The maximum length of a message.
-   * @param subfulfillment   The sub fulfillments that this fulfillment depends on.
+   * @param subfulfillment   The subfulfillments that this fulfillment depends on.
    */
-  public PrefixSha256Fulfillment(byte[] prefix, long maxMessageLength, Fulfillment subfulfillment) {
-    this.prefix = new byte[prefix.length];
-    System.arraycopy(prefix, 0, this.prefix, 0, prefix.length);
+  public PrefixSha256Fulfillment(
+      final byte[] prefix, final long maxMessageLength, final Fulfillment subfulfillment
+  ) {
+    Objects.requireNonNull(prefix, "Prefix must not be null!");
+    Objects.requireNonNull(subfulfillment, "Subfulfillment must not be null!");
 
+    this.type = CryptoConditionType.PREFIX_SHA256;
+    this.prefix = Arrays.copyOf(prefix, prefix.length);
     this.maxMessageLength = maxMessageLength;
-
-    // FIXME Safe copy?
+    // Fulfillments are immutable, so no need to perform any type of deep-copy here.
     this.subfulfillment = subfulfillment;
+
+    this.condition = new PrefixSha256Condition(prefix, maxMessageLength,
+        subfulfillment.getCondition());
   }
 
   @Override
   public CryptoConditionType getType() {
-    return CryptoConditionType.PREFIX_SHA256;
+    return type;
   }
 
-  /**
-   * Returns a copy of the prefix used in this fulfillment.
-   */
+  @Override
+  public final PrefixSha256Condition getCondition() {
+    return this.condition;
+  }
+
   public byte[] getPrefix() {
-    byte[] prefix = new byte[this.prefix.length];
-    System.arraycopy(this.prefix, 0, prefix, 0, this.prefix.length);
     return prefix;
   }
 
-  /**
-   * Returns the maximum allowable message length.
-   */
   public long getMaxMessageLength() {
     return maxMessageLength;
   }
 
-  /**
-   * Returns the sub fulfillment that this fulfillment depends on.
-   */
   public Fulfillment getSubfulfillment() {
     return subfulfillment;
-  }
-
-  @Override
-  public PrefixSha256Condition getCondition() {
-    if (condition == null) {
-      condition =
-          new PrefixSha256Condition(prefix, maxMessageLength, subfulfillment.getCondition());
-    }
-    return condition;
   }
 
   @Override
@@ -89,18 +80,13 @@ public class PrefixSha256Fulfillment implements Fulfillment {
       return false;
     }
 
-    Condition subcondition = subfulfillment.getCondition();
-    byte[] prefixedMessage = Arrays.copyOf(prefix, prefix.length + message.length);
+    final Condition subcondition = subfulfillment.getCondition();
+    final byte[] prefixedMessage = Arrays.copyOf(prefix, prefix.length + message.length);
     System.arraycopy(message, 0, prefixedMessage, prefix.length, message.length);
 
     return subfulfillment.verify(subcondition, prefixedMessage);
   }
 
-  /**
-   * The {@link #condition} field in this class is not part of this equals method because it is a
-   * value derived from this fulfillment, and is lazily initialized (so it's occasionally null until
-   * {@link #getCondition()} is called.
-   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -115,28 +101,38 @@ public class PrefixSha256Fulfillment implements Fulfillment {
     if (maxMessageLength != that.maxMessageLength) {
       return false;
     }
-    if (subfulfillment != null ? !subfulfillment.equals(that.subfulfillment)
-        : that.subfulfillment != null) {
+    if (type != that.type) {
       return false;
     }
-    return Arrays.equals(prefix, that.prefix);
+    if (!Arrays.equals(prefix, that.prefix)) {
+      return false;
+    }
+    if (!subfulfillment.equals(that.subfulfillment)) {
+      return false;
+    }
+    return condition.equals(that.condition);
   }
 
   @Override
   public int hashCode() {
-    int result = subfulfillment != null ? subfulfillment.hashCode() : 0;
-    result = 31 * result + (int) (maxMessageLength ^ (maxMessageLength >>> 32));
+    int result = type.hashCode();
     result = 31 * result + Arrays.hashCode(prefix);
+    result = 31 * result + (int) (maxMessageLength ^ (maxMessageLength >>> 32));
+    result = 31 * result + subfulfillment.hashCode();
+    result = 31 * result + condition.hashCode();
     return result;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("PrefixSha256Fulfillment{");
-    sb.append("maxMessageLength=").append(maxMessageLength);
+    sb.append("type=").append(type);
     sb.append(", prefix=").append(Arrays.toString(prefix));
-    sb.append(", type=").append(getType());
+    sb.append(", maxMessageLength=").append(maxMessageLength);
+//    sb.append(", subfulfillment=").append(subfulfillment);
+    sb.append(", condition=").append(condition);
     sb.append('}');
     return sb.toString();
   }
+
 }

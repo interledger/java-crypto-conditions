@@ -7,33 +7,45 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
- * Implementation of a fulfillment based on an RSA key and the SHA-256 function.
+ * An implementation of {@link Fulfillment} for a crypto-condition fulfillment of type
+ * "RSA-SHA-256" based upon an RSA key and the SHA-256 function.
+ *
+ * @see "https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/"
  */
-public class RsaSha256Fulfillment implements Fulfillment {
+public class RsaSha256Fulfillment implements Fulfillment<RsaSha256Condition> {
 
   public static final BigInteger PUBLIC_EXPONENT = BigInteger.valueOf(65537);
+  public static final String SHA_256_WITH_RSA_PSS = "SHA256withRSA/PSS";
 
-  private RsaSha256Condition condition;
-  private RSAPublicKey publicKey;
-  private byte[] signature;
+  // Final attributes...
+  private final CryptoConditionType type;
+  private final RSAPublicKey publicKey;
+  private final byte[] signature;
+  private final RsaSha256Condition condition;
 
   /**
    * Constructs an instance of the fulfillment.
    *
-   * @param publicKey The public key used with the fulfillment.
-   * @param signature The signature used with the fulfillment.
+   * @param publicKey An {@link RSAPublicKey} to be used with this fulfillment.
+   * @param signature A {@link byte[]} that contains a binary representation of the signature
+   *                  associated with this fulfillment.
    */
-  public RsaSha256Fulfillment(RSAPublicKey publicKey, byte[] signature) {
-    this.signature = new byte[signature.length];
-    System.arraycopy(signature, 0, this.signature, 0, signature.length);
+  public RsaSha256Fulfillment(final RSAPublicKey publicKey, final byte[] signature) {
+    Objects.requireNonNull(publicKey, "PublicKey must not be null!");
+    Objects.requireNonNull(signature, "Signature must not be null!");
+
+    this.type = CryptoConditionType.RSA_SHA256;
     this.publicKey = publicKey;
+    this.signature = Arrays.copyOf(signature, signature.length);
+    this.condition = new RsaSha256Condition(publicKey);
   }
 
   @Override
   public CryptoConditionType getType() {
-    return CryptoConditionType.RSA_SHA256;
+    return this.type;
   }
 
   /**
@@ -54,19 +66,14 @@ public class RsaSha256Fulfillment implements Fulfillment {
 
   @Override
   public RsaSha256Condition getCondition() {
-    if (condition == null) {
-      condition = new RsaSha256Condition(publicKey);
-    }
-    return condition;
+    return this.condition;
   }
 
   @Override
-  public boolean verify(Condition condition, byte[] message) {
+  public boolean verify(final RsaSha256Condition condition, final byte[] message) {
 
-    if (condition == null) {
-      throw new IllegalArgumentException(
-          "Can't verify a RsaSha256Fulfillment against an null condition.");
-    }
+    Objects.requireNonNull(condition,
+        "Can't verify a RsaSha256Fulfillment against an null condition.");
 
     if (!(condition instanceof RsaSha256Condition)) {
       throw new IllegalArgumentException(
@@ -78,21 +85,15 @@ public class RsaSha256Fulfillment implements Fulfillment {
     }
 
     try {
-      Signature rsaSigner = Signature.getInstance("SHA256withRSA/PSS");
+      Signature rsaSigner = Signature.getInstance(SHA_256_WITH_RSA_PSS);
       rsaSigner.initVerify(publicKey);
       rsaSigner.update(message);
       return rsaSigner.verify(signature);
     } catch (InvalidKeyException | NoSuchAlgorithmException | SignatureException e) {
       throw new RuntimeException(e);
     }
-
   }
 
-  /**
-   * The {@link #condition} field in this class is not part of this equals method because it is a
-   * value derived from this fulfillment, and is lazily initialized (so it's occasionally null until
-   * {@link #getCondition()} is called.
-   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -104,24 +105,34 @@ public class RsaSha256Fulfillment implements Fulfillment {
 
     RsaSha256Fulfillment that = (RsaSha256Fulfillment) o;
 
+    if (type != that.type) {
+      return false;
+    }
     if (!publicKey.equals(that.publicKey)) {
       return false;
     }
-    return Arrays.equals(signature, that.signature);
+    if (!Arrays.equals(signature, that.signature)) {
+      return false;
+    }
+    return condition.equals(that.condition);
   }
 
   @Override
   public int hashCode() {
-    int result = publicKey.hashCode();
+    int result = type.hashCode();
+    result = 31 * result + publicKey.hashCode();
     result = 31 * result + Arrays.hashCode(signature);
+    result = 31 * result + condition.hashCode();
     return result;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("RsaSha256Fulfillment{");
-    sb.append("publicKey=").append(publicKey);
-    sb.append(", type=").append(getType());
+    sb.append("type=").append(type);
+    sb.append(", publicKey=").append(publicKey);
+    sb.append(", signature=").append(Arrays.toString(signature));
+    sb.append(", condition=").append(condition);
     sb.append('}');
     return sb.toString();
   }

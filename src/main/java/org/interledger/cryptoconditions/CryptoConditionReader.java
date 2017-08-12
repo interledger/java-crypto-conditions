@@ -1,13 +1,5 @@
 package org.interledger.cryptoconditions;
 
-import net.i2p.crypto.eddsa.EdDSAPublicKey;
-import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
-import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
-
-import org.interledger.cryptoconditions.der.DerEncodingException;
-import org.interledger.cryptoconditions.der.DerInputStream;
-import org.interledger.cryptoconditions.der.DerTag;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -22,6 +14,12 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
+import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
+import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
+import org.interledger.cryptoconditions.der.DerEncodingException;
+import org.interledger.cryptoconditions.der.DerInputStream;
+import org.interledger.cryptoconditions.der.DerTag;
 import org.interledger.cryptoconditions.utils.UnsignedBigInteger;
 
 /**
@@ -81,8 +79,8 @@ public class CryptoConditionReader {
 
   /**
    * Reads a DER encoded condition from the input stream.
-   * 
-   * @param in The input stream containing the DER encoded condition.
+   *
+   * @param in        The input stream containing the DER encoded condition.
    * @param bytesRead will be updated with the number of bytes read from the stream.
    * @return The condition read from the stream.
    */
@@ -124,7 +122,7 @@ public class CryptoConditionReader {
 
   /**
    * Reads a DER encoded fulfillment from the buffer.
-   * 
+   *
    * @param buffer The buffer holding the DER encoded fulfillment
    * @return The fulfillment read from the buffer.
    */
@@ -134,7 +132,7 @@ public class CryptoConditionReader {
 
   /**
    * Reads a DER encoded fulfillment from the buffer.
-   * 
+   *
    * @param buffer The buffer holding the DER encoded fulfillment
    * @param offset the position within the buffer to begin reading the fulfilment.
    * @param length the number of bytes to read.
@@ -161,7 +159,7 @@ public class CryptoConditionReader {
 
   /**
    * Reads a DER encoded fulfillment from the input stream.
-   * 
+   *
    * @param in The input stream containing the DER encoded fulfillment.
    * @return The fulfillment read from the stream.
    */
@@ -172,8 +170,8 @@ public class CryptoConditionReader {
 
   /**
    * Reads a DER encoded fulfillment from the input stream.
-   * 
-   * @param in The input stream containing the DER encoded fulfillment.
+   *
+   * @param in        The input stream containing the DER encoded fulfillment.
    * @param bytesRead will be updated with the number of bytes read from the stream.
    * @return The fulfillment read from the stream.
    */
@@ -206,7 +204,7 @@ public class CryptoConditionReader {
             in.readTaggedObject(0, length - innerBytesRead.get(), innerBytesRead).getValue();
         final long maxMessageLength = new BigInteger(
             in.readTaggedObject(1, length - innerBytesRead.get(), innerBytesRead).getValue())
-                .longValue();
+            .longValue();
 
         tag = in.readTag(2, innerBytesRead, DerTag.CONSTRUCTED, DerTag.TAGGED);
         length = in.readLength(innerBytesRead);
@@ -252,9 +250,7 @@ public class CryptoConditionReader {
 
         bytesRead.addAndGet(innerBytesRead.get());
 
-        return new ThresholdSha256Fulfillment(
-            subconditions.toArray(new Condition[subconditions.size()]),
-            subfulfillments.toArray(new Fulfillment[subfulfillments.size()]));
+        return new ThresholdSha256Fulfillment(subconditions, subfulfillments);
 
       case RSA_SHA256:
 

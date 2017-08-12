@@ -3,6 +3,7 @@ package org.interledger.cryptoconditions.helpers;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -84,10 +85,7 @@ public class TestVectorFactory {
             .map(TestVectorFactory::getConditionFromTestVectorJson)
             .collect(Collectors.toList());
 
-        return new ThresholdSha256Condition(
-            testVectorJson.getThreshold(),
-            subConditions.toArray(new Condition[0])
-        );
+        return new ThresholdSha256Condition(testVectorJson.getThreshold(), subConditions);
       }
 
       default:
@@ -139,10 +137,7 @@ public class TestVectorFactory {
             .collect(Collectors.toList());
 
         // TODO: Should the threshold fulfillment be able to specify conditions?
-        return new ThresholdSha256Fulfillment(
-            new Condition[0],
-            subfulfillments.toArray(new Fulfillment[0])
-        );
+        return new ThresholdSha256Fulfillment(new LinkedList<>(), subfulfillments);
       }
 
       default:

@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.interledger.cryptoconditions.CryptoConditionType.THRESHOLD_SHA256;
 
+import com.google.common.collect.Lists;
 import com.google.common.io.BaseEncoding;
 import org.hamcrest.CoreMatchers;
 import org.interledger.cryptoconditions.der.DerEncodingException;
@@ -29,7 +30,7 @@ public class ThresholdSha256ConditionTest extends AbstractCryptoConditionTest {
           AUTHOR.getBytes());
 
       final ThresholdSha256Condition thresholdSha256Condition = new ThresholdSha256Condition(
-          1, new Condition[]{preimageCondition}
+          1, Lists.newArrayList(preimageCondition)
       );
 
       assertThat(thresholdSha256Condition.getType(), is(THRESHOLD_SHA256));
@@ -41,7 +42,7 @@ public class ThresholdSha256ConditionTest extends AbstractCryptoConditionTest {
       assertThat(BaseEncoding.base64().encode(thresholdSha256Condition.getFingerprint()),
           is("W+kFFQRd/dtz60dK3Jq0wr+DEDWHLFh8D1TQHCTi75I="));
       assertThat(BaseEncoding.base64().encode(thresholdSha256Condition
-              .constructFingerprintContents(1, new Condition[]{preimageCondition})),
+              .constructFingerprintContents(1, Lists.newArrayList(preimageCondition))),
           is("MCyAAQGhJ6AlgCBjEgvXn574GWJrrBNHDMuo/bgLkhTNwoj1GUDp77vDnYEBCQ=="));
 
       try {

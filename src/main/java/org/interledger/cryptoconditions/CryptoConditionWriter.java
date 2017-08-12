@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigInteger;
+import java.util.Base64;
 import java.util.Objects;
 import org.interledger.cryptoconditions.der.DerEncodingException;
 import org.interledger.cryptoconditions.der.DerOutputStream;
@@ -147,7 +148,8 @@ public class CryptoConditionWriter {
       // Build preimage sequence
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       DerOutputStream out = new DerOutputStream(baos);
-      out.writeTaggedObject(0, fulfillment.getPreimage());
+      out.writeTaggedObject(0,
+          Base64.getUrlDecoder().decode(fulfillment.getBase64UrlEncodedPreimage()));
       out.close();
       byte[] buffer = baos.toByteArray();
 
@@ -274,8 +276,8 @@ public class CryptoConditionWriter {
     try {
       // Build subfulfillment sequence
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      for (int i = 0; i < fulfillment.getSubfulfillments().length; i++) {
-        baos.write(writeFulfillment(fulfillment.getSubfulfillments()[i]));
+      for (int i = 0; i < fulfillment.getSubfulfillments().size(); i++) {
+        baos.write(writeFulfillment(fulfillment.getSubfulfillments().get(i)));
       }
       baos.close();
       byte[] fulfillmentsBuffer = baos.toByteArray();
@@ -289,8 +291,8 @@ public class CryptoConditionWriter {
 
       // Build subcondition sequence
       baos = new ByteArrayOutputStream();
-      for (int i = 0; i < fulfillment.getSubconditions().length; i++) {
-        baos.write(writeCondition(fulfillment.getSubconditions()[i]));
+      for (int i = 0; i < fulfillment.getSubconditions().size(); i++) {
+        baos.write(writeCondition(fulfillment.getSubconditions().get(i)));
       }
       out.close();
       byte[] conditionsBuffer = baos.toByteArray();

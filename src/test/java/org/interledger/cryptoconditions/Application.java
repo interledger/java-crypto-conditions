@@ -1,5 +1,6 @@
 package org.interledger.cryptoconditions;
 
+import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -67,8 +68,10 @@ public class Application {
         new Ed25519Sha256Condition((EdDSAPublicKey) edDsaKeyPair.getPublic());
     PrefixSha256Condition prefixConditionOnEd25519Condition =
         new PrefixSha256Condition(prefix, 1000, ed25519Condition);
-    ThresholdSha256Condition thresholdCondition = new ThresholdSha256Condition(2,
-        new Condition[]{preimageCondition, rsaCondition, prefixConditionOnEd25519Condition});
+    ThresholdSha256Condition thresholdCondition = new ThresholdSha256Condition(
+        2,
+        Lists.newArrayList(preimageCondition, rsaCondition, prefixConditionOnEd25519Condition)
+    );
 
     PreimageSha256Fulfillment preimageFulfillment = new PreimageSha256Fulfillment(preimage);
     RsaSha256Fulfillment rsaFulfillment =
@@ -78,8 +81,10 @@ public class Application {
     PrefixSha256Fulfillment prefixFulfillmentOnEd25519Fulfillment =
         new PrefixSha256Fulfillment(prefix, 1000, ed25519Fulfillment);
     ThresholdSha256Fulfillment thresholdFulfillment =
-        new ThresholdSha256Fulfillment(new Condition[]{rsaCondition},
-            new Fulfillment[]{preimageFulfillment, prefixFulfillmentOnEd25519Fulfillment});
+        new ThresholdSha256Fulfillment(
+            Lists.newArrayList(rsaCondition),
+            Lists.newArrayList(preimageFulfillment, prefixFulfillmentOnEd25519Fulfillment)
+        );
 
     hexDump("preimage", preimage);
     hexDump("prefix", prefix);

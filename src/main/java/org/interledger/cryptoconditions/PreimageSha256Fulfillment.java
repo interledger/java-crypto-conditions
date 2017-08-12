@@ -1,51 +1,46 @@
 package org.interledger.cryptoconditions;
 
-import java.util.Arrays;
+import java.util.Base64;
 
 /**
- * Implementation of a fulfillment based on a preimage and the SHA-256 function.
+ * An implementation of {@link Fulfillment} for a crypto-condition fulfillment of type
+ * "PREIMAGE-SHA-256" based upon a preimage and the SHA-256 hash function.
+ *
+ * @see "https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/"
  */
-public class PreimageSha256Fulfillment implements Fulfillment {
+public class PreimageSha256Fulfillment implements Fulfillment<PreimageSha256Condition> {
 
-  private PreimageSha256Condition condition;
-  private byte[] preimage;
+  private final CryptoConditionType type;
+  private final PreimageSha256Condition condition;
+  private final String base64UrlEncodedPreimage;
 
   /**
    * Constructs an instance of the fulfillment.
-   * 
+   *
    * @param preimage The preimage associated with the fulfillment.
    */
   public PreimageSha256Fulfillment(byte[] preimage) {
-
-    this.preimage = Arrays.copyOf(preimage, preimage.length);
-//    this.preimage = new byte[preimage.length];
-//    System.arraycopy(preimage, 0, this.preimage, 0, preimage.length);
+    this.type = CryptoConditionType.PREIMAGE_SHA256;
+    this.condition = new PreimageSha256Condition(preimage);
+    this.base64UrlEncodedPreimage = Base64.getUrlEncoder().encodeToString(preimage);
   }
 
   @Override
   public CryptoConditionType getType() {
-    return CryptoConditionType.PREIMAGE_SHA256;
-  }
-
-  /**
-   * Returns a copy of the preimage associated with the fulfillment.
-   */
-  public byte[] getPreimage() {
-    byte[] preimage = new byte[this.preimage.length];
-    System.arraycopy(this.preimage, 0, preimage, 0, this.preimage.length);
-    return preimage;
+    return type;
   }
 
   @Override
   public PreimageSha256Condition getCondition() {
-    if (condition == null) {
-      condition = new PreimageSha256Condition(preimage);
-    }
-    return condition;
+    return this.condition;
+  }
+
+  public String getBase64UrlEncodedPreimage() {
+    return this.base64UrlEncodedPreimage;
   }
 
   @Override
-  public boolean verify(Condition condition, byte[] message) {
+  public boolean verify(final PreimageSha256Condition condition, final byte[] message) {
 
     if (condition == null) {
       throw new IllegalArgumentException(
@@ -60,11 +55,6 @@ public class PreimageSha256Fulfillment implements Fulfillment {
     return getCondition().equals(condition);
   }
 
-  /**
-   * The {@link #condition} field in this class is not part of this equals method because it is a
-   * value derived from this fulfillment, and is lazily initialized (so it's occasionally null until
-   * {@link #getCondition()} is called.
-   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -76,18 +66,29 @@ public class PreimageSha256Fulfillment implements Fulfillment {
 
     PreimageSha256Fulfillment that = (PreimageSha256Fulfillment) o;
 
-    return Arrays.equals(preimage, that.preimage);
+    if (type != that.type) {
+      return false;
+    }
+    if (!condition.equals(that.condition)) {
+      return false;
+    }
+    return base64UrlEncodedPreimage.equals(that.base64UrlEncodedPreimage);
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(preimage);
+    int result = type.hashCode();
+    result = 31 * result + condition.hashCode();
+    result = 31 * result + base64UrlEncodedPreimage.hashCode();
+    return result;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("PreimageSha256Fulfillment{");
-    sb.append("type=").append(getType());
+    sb.append("type=").append(type);
+    sb.append(", condition=").append(condition);
+    sb.append(", base64UrlEncodedPreimage='").append(base64UrlEncodedPreimage).append('\'');
     sb.append('}');
     return sb.toString();
   }

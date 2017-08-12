@@ -4,9 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.Objects;
 import org.interledger.cryptoconditions.der.DerEncodingException;
 import org.interledger.cryptoconditions.der.DerOutputStream;
 import org.interledger.cryptoconditions.der.DerTag;
@@ -23,7 +23,7 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
    * @param threshold     The number of subconditions that must be fulfilled.
    * @param subconditions A set of subconditions that this condition is dependent on.
    */
-  public ThresholdSha256Condition(final int threshold, final Condition[] subconditions) {
+  public ThresholdSha256Condition(final int threshold, final List<Condition> subconditions) {
     super(
         hashFingerprintContents(
             constructFingerprintContents(threshold, subconditions)
@@ -57,7 +57,7 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
    * Note: This method is package-private as (opposed to private) for testing purposes.
    */
   static final byte[] constructFingerprintContents(
-      final int threshold, final Condition[] subconditions
+      final int threshold, final List<Condition> subconditions
   ) {
     try {
 
@@ -67,8 +67,8 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
       // Build subcondition sequence
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       DerOutputStream out = new DerOutputStream(baos);
-      for (int i = 0; i < subconditions.length; i++) {
-        out.write(CryptoConditionWriter.writeCondition(subconditions[i]));
+      for (int i = 0; i < subconditions.size(); i++) {
+        out.write(CryptoConditionWriter.writeCondition(subconditions.get(i)));
       }
       out.close();
 
@@ -102,9 +102,10 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
    *
    * @param conditions The array of conditions to sort.
    */
-  private static final void sortConditions(Condition[] conditions) {
+  private static final void sortConditions(final List<Condition> conditions) {
+    Objects.requireNonNull(conditions);
 
-    Arrays.sort(conditions, (Comparator<? super Condition>) (Condition c1, Condition c2) -> {
+    conditions.sort((Condition c1, Condition c2) -> {
       try {
         byte[] c1encoded = CryptoConditionWriter.writeCondition(c1);
         byte[] c2encoded = CryptoConditionWriter.writeCondition(c2);
@@ -131,22 +132,20 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
    * @param subconditions The list of subconditions.
    * @return The calculated cost of a threshold condition.
    */
-  private static final long calculateCost(int threshold, Condition[] subconditions) {
+  private static final long calculateCost(int threshold, List<Condition> subconditions) {
 
     // sum(biggest(t, subcondition_costs)) + 1024 * n
 
     // Sort by cost
-    Condition[] sortedConditions = Arrays.copyOf(subconditions, subconditions.length);
-    Arrays.sort(sortedConditions, (Comparator<? super Condition>) (Condition c1, Condition c2) -> {
-      return (int) (c2.getCost() - c1.getCost());
-    });
+    subconditions.sort((Condition c1, Condition c2) -> (int) (c2.getCost() - c1.getCost()));
 
+    // Count only up to the threshold...
     long largestCosts = 0;
     for (int i = 0; i < threshold; i++) {
-      largestCosts += sortedConditions[i].getCost();
+      largestCosts += subconditions.get(i).getCost();
     }
 
-    return largestCosts + (subconditions.length * 1024);
+    return largestCosts + (subconditions.size() * 1024);
   }
 
   /**
@@ -156,14 +155,13 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
    * @return The set of condition types related to the sub condition.
    */
   private static final EnumSet<CryptoConditionType> calculateSubtypes(
-      final Condition[] subconditions) {
-    // TODO: looks suspiciously similar to the Prefix implementiaton - lets refactor into a common
-    // place?
-    EnumSet<CryptoConditionType> subtypes = EnumSet.noneOf(CryptoConditionType.class);
-    for (int i = 0; i < subconditions.length; i++) {
-      subtypes.add(subconditions[i].getType());
-      if (subconditions[i] instanceof CompoundCondition) {
-        subtypes.addAll(((CompoundCondition) subconditions[i]).getSubtypes());
+      final List<Condition> subconditions) {
+
+    final EnumSet<CryptoConditionType> subtypes = EnumSet.noneOf(CryptoConditionType.class);
+    for (int i = 0; i < subconditions.size(); i++) {
+      subtypes.add(subconditions.get(i).getType());
+      if (subconditions.get(i) instanceof CompoundCondition) {
+        subtypes.addAll(((CompoundCondition) subconditions.get(i)).getSubtypes());
       }
     }
 

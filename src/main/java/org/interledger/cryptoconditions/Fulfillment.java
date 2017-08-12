@@ -5,7 +5,7 @@ package org.interledger.cryptoconditions;
  *
  * @see "https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/"
  */
-public interface Fulfillment<C extends Condition> extends Comparable<Fulfillment<C>> {
+public interface Fulfillment<C extends Condition> {
 
   /**
    * Accessor for the type of this fulfillment.
@@ -13,22 +13,6 @@ public interface Fulfillment<C extends Condition> extends Comparable<Fulfillment
    * @return A {@link CryptoConditionType} for this fulfillment.
    */
   CryptoConditionType getType();
-
-  /**
-   * Accessor for a copy of the bytes that encode this {@link Fulfillment}.
-   *
-   * @return A {@link byte[]} that provides access to the binary encoding of this {@link Fulfillment}.
-   */
-  byte[] getEncoded();
-
-  /**
-   * Accessor for an immutable, read-only view of the bytes that encode this {@link Fulfillment}, as
-   * a Base64 encoded {@link String}.
-   *
-   * @return A read-only {@link byte[]} that provides access to the binary encoding of this
-   * {@link Fulfillment}.
-   */
-  String getEncodedBase64();
 
   /**
    * Accessor for the condition that corresponds to this fulfillment.
