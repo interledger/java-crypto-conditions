@@ -19,18 +19,6 @@ import net.i2p.crypto.eddsa.EdDSAEngine;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.interledger.cryptoconditions.der.DerEncodingException;
-import org.interledger.cryptoconditions.types.CryptoConditionReader;
-import org.interledger.cryptoconditions.types.CryptoConditionWriter;
-import org.interledger.cryptoconditions.types.Ed25519Sha256Condition;
-import org.interledger.cryptoconditions.types.Ed25519Sha256Fulfillment;
-import org.interledger.cryptoconditions.types.PrefixSha256Condition;
-import org.interledger.cryptoconditions.types.PrefixSha256Fulfillment;
-import org.interledger.cryptoconditions.types.PreimageSha256Condition;
-import org.interledger.cryptoconditions.types.PreimageSha256Fulfillment;
-import org.interledger.cryptoconditions.types.RsaSha256Condition;
-import org.interledger.cryptoconditions.types.RsaSha256Fulfillment;
-import org.interledger.cryptoconditions.types.ThresholdSha256Condition;
-import org.interledger.cryptoconditions.types.ThresholdSha256Fulfillment;
 
 
 /**

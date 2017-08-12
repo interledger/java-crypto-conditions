@@ -2,7 +2,7 @@ package org.interledger.cryptoconditions;
 
 public interface Fulfillment {
 
-  ConditionType getType();
+  CryptoConditionType getType();
 
   Condition getCondition();
 

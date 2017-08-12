@@ -9,7 +9,7 @@ import java.util.Objects;
  */
 public abstract class CompoundSha256Condition extends Sha256Condition implements CompoundCondition {
 
-  private final EnumSet<ConditionType> subtypes;
+  private final EnumSet<CryptoConditionType> subtypes;
 
   /**
    * Constructor that accepts a fingerprint and a cost number.
@@ -21,14 +21,14 @@ public abstract class CompoundSha256Condition extends Sha256Condition implements
    * @param subtypes    A {@link EnumSet} of the sub-types of this compound condition.
    */
   protected CompoundSha256Condition(
-      final byte[] fingerprint, final long cost, final EnumSet<ConditionType> subtypes
+      final byte[] fingerprint, final long cost, final EnumSet<CryptoConditionType> subtypes
   ) {
     super(fingerprint, cost);
     this.subtypes = EnumSet.copyOf(Objects.requireNonNull(subtypes));
   }
 
   @Override
-  public final EnumSet<ConditionType> getSubtypes() {
+  public final EnumSet<CryptoConditionType> getSubtypes() {
     return EnumSet.copyOf(subtypes);
   }
 

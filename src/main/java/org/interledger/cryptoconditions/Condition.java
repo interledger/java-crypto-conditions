@@ -14,7 +14,7 @@ public interface Condition {
    *
    * @return the type of this condition
    */
-  ConditionType getType();
+  CryptoConditionType getType();
 
   /**
    * A fingerprint is a binary (aka "octet") string uniquely representing the condition with respect

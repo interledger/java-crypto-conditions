@@ -1,7 +1,5 @@
 package org.interledger.cryptoconditions;
 
-import org.interledger.cryptoconditions.types.CryptoConditionUri;
-
 /**
  * This class provides shared, concrete logic for all conditions.
  */
