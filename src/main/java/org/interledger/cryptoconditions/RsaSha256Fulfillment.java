@@ -1,5 +1,7 @@
 package org.interledger.cryptoconditions;
 
+import static org.interledger.cryptoconditions.CryptoConditionType.RSA_SHA256;
+
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -15,13 +17,12 @@ import java.util.Objects;
  *
  * @see "https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/"
  */
-public class RsaSha256Fulfillment implements Fulfillment<RsaSha256Condition> {
+public class RsaSha256Fulfillment extends FulfillmentBase<RsaSha256Condition>
+    implements Fulfillment<RsaSha256Condition> {
 
   public static final BigInteger PUBLIC_EXPONENT = BigInteger.valueOf(65537);
   public static final String SHA_256_WITH_RSA_PSS = "SHA256withRSA/PSS";
 
-  // Final attributes...
-  private final CryptoConditionType type;
   private final RSAPublicKey publicKey;
   private final byte[] signature;
   private final RsaSha256Condition condition;
@@ -34,18 +35,13 @@ public class RsaSha256Fulfillment implements Fulfillment<RsaSha256Condition> {
    *                  associated with this fulfillment.
    */
   public RsaSha256Fulfillment(final RSAPublicKey publicKey, final byte[] signature) {
+    super(RSA_SHA256);
     Objects.requireNonNull(publicKey, "PublicKey must not be null!");
     Objects.requireNonNull(signature, "Signature must not be null!");
 
-    this.type = CryptoConditionType.RSA_SHA256;
     this.publicKey = publicKey;
     this.signature = Arrays.copyOf(signature, signature.length);
     this.condition = new RsaSha256Condition(publicKey);
-  }
-
-  @Override
-  public CryptoConditionType getType() {
-    return this.type;
   }
 
   /**
@@ -71,14 +67,9 @@ public class RsaSha256Fulfillment implements Fulfillment<RsaSha256Condition> {
 
   @Override
   public boolean verify(final RsaSha256Condition condition, final byte[] message) {
-
     Objects.requireNonNull(condition,
         "Can't verify a RsaSha256Fulfillment against an null condition.");
-
-    if (!(condition instanceof RsaSha256Condition)) {
-      throw new IllegalArgumentException(
-          "Must verify a RsaSha256Fulfillment against RsaSha256Condition.");
-    }
+    Objects.requireNonNull(message, "Message must not be null!");
 
     if (!getCondition().equals(condition)) {
       return false;
@@ -102,12 +93,12 @@ public class RsaSha256Fulfillment implements Fulfillment<RsaSha256Condition> {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+    if (!super.equals(o)) {
+      return false;
+    }
 
     RsaSha256Fulfillment that = (RsaSha256Fulfillment) o;
 
-    if (type != that.type) {
-      return false;
-    }
     if (!publicKey.equals(that.publicKey)) {
       return false;
     }
@@ -119,7 +110,7 @@ public class RsaSha256Fulfillment implements Fulfillment<RsaSha256Condition> {
 
   @Override
   public int hashCode() {
-    int result = type.hashCode();
+    int result = super.hashCode();
     result = 31 * result + publicKey.hashCode();
     result = 31 * result + Arrays.hashCode(signature);
     result = 31 * result + condition.hashCode();
@@ -129,10 +120,10 @@ public class RsaSha256Fulfillment implements Fulfillment<RsaSha256Condition> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("RsaSha256Fulfillment{");
-    sb.append("type=").append(type);
-    sb.append(", publicKey=").append(publicKey);
+    sb.append("publicKey=").append(publicKey);
     sb.append(", signature=").append(Arrays.toString(signature));
     sb.append(", condition=").append(condition);
+    sb.append(", type=").append(getType());
     sb.append('}');
     return sb.toString();
   }

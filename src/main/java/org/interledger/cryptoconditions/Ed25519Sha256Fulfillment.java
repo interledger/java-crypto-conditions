@@ -1,5 +1,7 @@
 package org.interledger.cryptoconditions;
 
+import static org.interledger.cryptoconditions.CryptoConditionType.ED25519_SHA256;
+
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -17,10 +19,9 @@ import net.i2p.crypto.eddsa.EdDSAPublicKey;
  *
  * @see "https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/"
  */
-public class Ed25519Sha256Fulfillment implements Fulfillment {
+public class Ed25519Sha256Fulfillment extends FulfillmentBase<Ed25519Sha256Condition>
+    implements Fulfillment<Ed25519Sha256Condition> {
 
-  // Final attributes...
-  private final CryptoConditionType type;
   private final EdDSAPublicKey publicKey;
   private final byte[] signature;
   private final Ed25519Sha256Condition condition;
@@ -33,18 +34,14 @@ public class Ed25519Sha256Fulfillment implements Fulfillment {
    * @param signature A {@link byte[]} containing the signature associated with this fulfillment.
    */
   public Ed25519Sha256Fulfillment(final EdDSAPublicKey publicKey, final byte[] signature) {
+    super(ED25519_SHA256);
+
     Objects.requireNonNull(publicKey, "EdDSAPublicKey must not be null!");
     Objects.requireNonNull(signature, "Signature must not be null!");
 
-    this.type = CryptoConditionType.ED25519_SHA256;
     this.publicKey = publicKey;
     this.signature = Arrays.copyOf(signature, signature.length);
     this.condition = new Ed25519Sha256Condition(publicKey);
-  }
-
-  @Override
-  public CryptoConditionType getType() {
-    return this.type;
   }
 
   /**
@@ -69,17 +66,10 @@ public class Ed25519Sha256Fulfillment implements Fulfillment {
   }
 
   @Override
-  public boolean verify(Condition condition, byte[] message) {
-
-    if (condition == null) {
-      throw new IllegalArgumentException(
-          "Can't verify a Ed25519Sha256Fulfillment against an null condition.");
-    }
-
-    if (!(condition instanceof Ed25519Sha256Condition)) {
-      throw new IllegalArgumentException(
-          "Must verify a Ed25519Sha256Fulfillment against Ed25519Sha256Condition.");
-    }
+  public boolean verify(final Ed25519Sha256Condition condition, final byte[] message) {
+    Objects.requireNonNull(condition,
+        "Can't verify a Ed25519Sha256Fulfillment against an null condition.");
+    Objects.requireNonNull(message, "Message must not be null!");
 
     if (!getCondition().equals(condition)) {
       return false;
@@ -106,12 +96,12 @@ public class Ed25519Sha256Fulfillment implements Fulfillment {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+    if (!super.equals(o)) {
+      return false;
+    }
 
     Ed25519Sha256Fulfillment that = (Ed25519Sha256Fulfillment) o;
 
-    if (type != that.type) {
-      return false;
-    }
     if (!publicKey.equals(that.publicKey)) {
       return false;
     }
@@ -123,7 +113,7 @@ public class Ed25519Sha256Fulfillment implements Fulfillment {
 
   @Override
   public int hashCode() {
-    int result = type.hashCode();
+    int result = super.hashCode();
     result = 31 * result + publicKey.hashCode();
     result = 31 * result + Arrays.hashCode(signature);
     result = 31 * result + condition.hashCode();
@@ -133,10 +123,10 @@ public class Ed25519Sha256Fulfillment implements Fulfillment {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("Ed25519Sha256Fulfillment{");
-    sb.append("type=").append(type);
-    sb.append(", publicKey=").append(publicKey);
+    sb.append("publicKey=").append(publicKey);
     sb.append(", signature=").append(Arrays.toString(signature));
     sb.append(", condition=").append(condition);
+    sb.append(", type=").append(getType());
     sb.append('}');
     return sb.toString();
   }

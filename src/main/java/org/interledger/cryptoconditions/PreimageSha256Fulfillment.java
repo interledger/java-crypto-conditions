@@ -1,6 +1,7 @@
 package org.interledger.cryptoconditions;
 
 import java.util.Base64;
+import java.util.Objects;
 
 /**
  * An implementation of {@link Fulfillment} for a crypto-condition fulfillment of type
@@ -8,9 +9,9 @@ import java.util.Base64;
  *
  * @see "https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/"
  */
-public class PreimageSha256Fulfillment implements Fulfillment<PreimageSha256Condition> {
+public class PreimageSha256Fulfillment extends FulfillmentBase<PreimageSha256Condition>
+    implements Fulfillment<PreimageSha256Condition> {
 
-  private final CryptoConditionType type;
   private final PreimageSha256Condition condition;
   private final String base64UrlEncodedPreimage;
 
@@ -19,38 +20,28 @@ public class PreimageSha256Fulfillment implements Fulfillment<PreimageSha256Cond
    *
    * @param preimage The preimage associated with the fulfillment.
    */
-  public PreimageSha256Fulfillment(byte[] preimage) {
-    this.type = CryptoConditionType.PREIMAGE_SHA256;
+  public PreimageSha256Fulfillment(final byte[] preimage) {
+    super(CryptoConditionType.PREIMAGE_SHA256);
+
+    Objects.requireNonNull(preimage);
     this.condition = new PreimageSha256Condition(preimage);
     this.base64UrlEncodedPreimage = Base64.getUrlEncoder().encodeToString(preimage);
   }
 
   @Override
-  public CryptoConditionType getType() {
-    return type;
-  }
-
-  @Override
-  public PreimageSha256Condition getCondition() {
+  public final PreimageSha256Condition getCondition() {
     return this.condition;
   }
 
-  public String getBase64UrlEncodedPreimage() {
+  public final String getBase64UrlEncodedPreimage() {
     return this.base64UrlEncodedPreimage;
   }
 
   @Override
-  public boolean verify(final PreimageSha256Condition condition, final byte[] message) {
-
-    if (condition == null) {
-      throw new IllegalArgumentException(
-          "Can't verify a PreimageSha256Fulfillment against an null condition.");
-    }
-
-    if (!(condition instanceof PreimageSha256Condition)) {
-      throw new IllegalArgumentException(
-          "Must verify a PreimageSha256Fulfillment against PreimageSha256Condition.");
-    }
+  public final boolean verify(final PreimageSha256Condition condition, final byte[] message) {
+    Objects.requireNonNull(condition,
+        "Can't verify a PreimageSha256Fulfillment against an null condition.");
+    Objects.requireNonNull(message, "Message must not be null!");
 
     return getCondition().equals(condition);
   }
@@ -63,12 +54,12 @@ public class PreimageSha256Fulfillment implements Fulfillment<PreimageSha256Cond
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+    if (!super.equals(o)) {
+      return false;
+    }
 
     PreimageSha256Fulfillment that = (PreimageSha256Fulfillment) o;
 
-    if (type != that.type) {
-      return false;
-    }
     if (!condition.equals(that.condition)) {
       return false;
     }
@@ -77,7 +68,7 @@ public class PreimageSha256Fulfillment implements Fulfillment<PreimageSha256Cond
 
   @Override
   public int hashCode() {
-    int result = type.hashCode();
+    int result = super.hashCode();
     result = 31 * result + condition.hashCode();
     result = 31 * result + base64UrlEncodedPreimage.hashCode();
     return result;
@@ -86,9 +77,9 @@ public class PreimageSha256Fulfillment implements Fulfillment<PreimageSha256Cond
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("PreimageSha256Fulfillment{");
-    sb.append("type=").append(type);
-    sb.append(", condition=").append(condition);
+    sb.append("condition=").append(condition);
     sb.append(", base64UrlEncodedPreimage='").append(base64UrlEncodedPreimage).append('\'');
+    sb.append(", type=").append(getType());
     sb.append('}');
     return sb.toString();
   }

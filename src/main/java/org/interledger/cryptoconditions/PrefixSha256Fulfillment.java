@@ -1,14 +1,16 @@
 package org.interledger.cryptoconditions;
 
+import static org.interledger.cryptoconditions.CryptoConditionType.PREFIX_SHA256;
+
 import java.util.Arrays;
 import java.util.Objects;
 
 /**
  * Implementation of a fulfillment based on a prefix, a sub fulfillment, and the SHA-256 function.
  */
-public class PrefixSha256Fulfillment implements Fulfillment {
+public class PrefixSha256Fulfillment extends FulfillmentBase<PrefixSha256Condition>
+    implements Fulfillment<PrefixSha256Condition> {
 
-  private final CryptoConditionType type;
   private final byte[] prefix;
   private final long maxMessageLength;
   private final Fulfillment subfulfillment;
@@ -24,10 +26,10 @@ public class PrefixSha256Fulfillment implements Fulfillment {
   public PrefixSha256Fulfillment(
       final byte[] prefix, final long maxMessageLength, final Fulfillment subfulfillment
   ) {
+    super(PREFIX_SHA256);
     Objects.requireNonNull(prefix, "Prefix must not be null!");
     Objects.requireNonNull(subfulfillment, "Subfulfillment must not be null!");
 
-    this.type = CryptoConditionType.PREFIX_SHA256;
     this.prefix = Arrays.copyOf(prefix, prefix.length);
     this.maxMessageLength = maxMessageLength;
     // Fulfillments are immutable, so no need to perform any type of deep-copy here.
@@ -35,11 +37,6 @@ public class PrefixSha256Fulfillment implements Fulfillment {
 
     this.condition = new PrefixSha256Condition(prefix, maxMessageLength,
         subfulfillment.getCondition());
-  }
-
-  @Override
-  public CryptoConditionType getType() {
-    return type;
   }
 
   @Override
@@ -60,14 +57,10 @@ public class PrefixSha256Fulfillment implements Fulfillment {
   }
 
   @Override
-  public boolean verify(final Condition condition, final byte[] message) {
+  public boolean verify(final PrefixSha256Condition condition, final byte[] message) {
     Objects.requireNonNull(condition,
         "Can't verify a PrefixSha256Fulfillment against a null condition!");
-
-    if (!(condition instanceof PrefixSha256Condition)) {
-      throw new IllegalArgumentException(
-          "Must verify a PrefixSha256Fulfillment against PrefixSha256Condition.");
-    }
+    Objects.requireNonNull(message, "Message must not be null!");
 
     if (message.length > maxMessageLength) {
       throw new IllegalArgumentException(
@@ -95,13 +88,13 @@ public class PrefixSha256Fulfillment implements Fulfillment {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+    if (!super.equals(o)) {
+      return false;
+    }
 
     PrefixSha256Fulfillment that = (PrefixSha256Fulfillment) o;
 
     if (maxMessageLength != that.maxMessageLength) {
-      return false;
-    }
-    if (type != that.type) {
       return false;
     }
     if (!Arrays.equals(prefix, that.prefix)) {
@@ -115,7 +108,7 @@ public class PrefixSha256Fulfillment implements Fulfillment {
 
   @Override
   public int hashCode() {
-    int result = type.hashCode();
+    int result = super.hashCode();
     result = 31 * result + Arrays.hashCode(prefix);
     result = 31 * result + (int) (maxMessageLength ^ (maxMessageLength >>> 32));
     result = 31 * result + subfulfillment.hashCode();
@@ -126,13 +119,12 @@ public class PrefixSha256Fulfillment implements Fulfillment {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("PrefixSha256Fulfillment{");
-    sb.append("type=").append(type);
-    sb.append(", prefix=").append(Arrays.toString(prefix));
+    sb.append("prefix=").append(Arrays.toString(prefix));
     sb.append(", maxMessageLength=").append(maxMessageLength);
-//    sb.append(", subfulfillment=").append(subfulfillment);
+    sb.append(", subfulfillment=").append(subfulfillment);
     sb.append(", condition=").append(condition);
+    sb.append(", type=").append(getType());
     sb.append('}');
     return sb.toString();
   }
-
 }

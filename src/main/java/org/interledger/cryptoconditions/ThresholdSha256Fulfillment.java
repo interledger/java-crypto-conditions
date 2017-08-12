@@ -1,5 +1,7 @@
 package org.interledger.cryptoconditions;
 
+import static org.interledger.cryptoconditions.CryptoConditionType.THRESHOLD_SHA256;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,9 +14,9 @@ import java.util.stream.Collectors;
  *
  * @see "https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/"
  */
-public class ThresholdSha256Fulfillment implements Fulfillment {
+public class ThresholdSha256Fulfillment extends FulfillmentBase<ThresholdSha256Condition>
+    implements Fulfillment<ThresholdSha256Condition> {
 
-  private final CryptoConditionType type;
   // TODO: Remove subconditions as a property...?
   private final List<Condition> subconditions;
   private final List<Fulfillment> subfulfillments;
@@ -31,7 +33,7 @@ public class ThresholdSha256Fulfillment implements Fulfillment {
   public ThresholdSha256Fulfillment(
       final List<Condition> subconditions, final List<Fulfillment> subfulfillments
   ) {
-    this.type = CryptoConditionType.THRESHOLD_SHA256;
+    super(THRESHOLD_SHA256);
     // Create a new Collections that are unmodifiable so that neither the backing collections
     // nor the actual Collections can be mutated. This works so long as fulfillments are immutable,
     // which they are.
@@ -52,11 +54,6 @@ public class ThresholdSha256Fulfillment implements Fulfillment {
     );
 
     return new ThresholdSha256Condition(this.subfulfillments.size(), allConditions);
-  }
-
-  @Override
-  public CryptoConditionType getType() {
-    return this.type;
   }
 
   /**
@@ -83,14 +80,10 @@ public class ThresholdSha256Fulfillment implements Fulfillment {
   }
 
   @Override
-  public boolean verify(final Condition condition, final byte[] message) {
+  public boolean verify(final ThresholdSha256Condition condition, final byte[] message) {
     Objects.requireNonNull(condition,
         "Can't verify a ThresholdSha256Fulfillment against an null condition.");
-
-    if (!(condition instanceof ThresholdSha256Condition)) {
-      throw new IllegalArgumentException(
-          "Must verify a ThresholdSha256Fulfillment against ThresholdSha256Condition.");
-    }
+    Objects.requireNonNull(message, "Message must not be null!");
 
     if (!getCondition().equals(condition)) {
       return false;
@@ -114,12 +107,12 @@ public class ThresholdSha256Fulfillment implements Fulfillment {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+    if (!super.equals(o)) {
+      return false;
+    }
 
     ThresholdSha256Fulfillment that = (ThresholdSha256Fulfillment) o;
 
-    if (type != that.type) {
-      return false;
-    }
     if (!subconditions.equals(that.subconditions)) {
       return false;
     }
@@ -131,7 +124,7 @@ public class ThresholdSha256Fulfillment implements Fulfillment {
 
   @Override
   public int hashCode() {
-    int result = type.hashCode();
+    int result = super.hashCode();
     result = 31 * result + subconditions.hashCode();
     result = 31 * result + subfulfillments.hashCode();
     result = 31 * result + condition.hashCode();
@@ -141,10 +134,10 @@ public class ThresholdSha256Fulfillment implements Fulfillment {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("ThresholdSha256Fulfillment{");
-    sb.append("type=").append(type);
-    sb.append(", subconditions=").append(subconditions);
+    sb.append("subconditions=").append(subconditions);
     sb.append(", subfulfillments=").append(subfulfillments);
     sb.append(", condition=").append(condition);
+    sb.append(", type=").append(getType());
     sb.append('}');
     return sb.toString();
   }
