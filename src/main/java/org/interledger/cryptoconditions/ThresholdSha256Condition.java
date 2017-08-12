@@ -51,6 +51,11 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
     return CryptoConditionType.THRESHOLD_SHA256;
   }
 
+  /**
+   * Constructs the fingerprint for this condition.
+   *
+   * Note: This method is package-private as (opposed to private) for testing purposes.
+   */
   static final byte[] constructFingerprintContents(
       final int threshold, final Condition[] subconditions
   ) {

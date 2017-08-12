@@ -46,10 +46,9 @@ public final class RsaSha256Condition extends Sha256Condition implements SimpleC
   }
 
   /**
-   * Construct the fingerprint contents for this condition.
+   * Constructs the fingerprint for this condition.
    *
-   * @param publicKey
-   * @return
+   * Note: This method is package-private as (opposed to private) for testing purposes.
    */
   static final byte[] constructFingerprintContents(final RSAPublicKey publicKey) {
     Objects.requireNonNull(publicKey);

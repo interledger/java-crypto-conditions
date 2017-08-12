@@ -44,10 +44,9 @@ public final class Ed25519Sha256Condition extends Sha256Condition implements Sim
   }
 
   /**
-   * Construct the fingerprint contents for this condition.
+   * Constructs the fingerprint for this condition.
    *
-   * @param publicKey
-   * @return
+   * Note: This method is package-private as (opposed to private) for testing purposes.
    */
   final static byte[] constructFingerprintContents(final EdDSAPublicKey publicKey) {
 

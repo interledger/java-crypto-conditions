@@ -53,9 +53,16 @@ public final class PrefixSha256Condition extends CompoundSha256Condition
     return CryptoConditionType.PREFIX_SHA256;
   }
 
+  /**
+   * Constructs the fingerprint for this condition.
+   *
+   * Note: This method is package-private as (opposed to private) for testing purposes.
+   */
   static final byte[] constructFingerprintContents(
       final byte[] prefix, final long maxMessageLength, final Condition subcondition
   ) {
+    Objects.requireNonNull(prefix);
+    Objects.requireNonNull(subcondition);
 
     try {
       // Build prefix and subcondition

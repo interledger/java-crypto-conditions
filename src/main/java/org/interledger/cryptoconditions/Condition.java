@@ -1,13 +1,11 @@
 package org.interledger.cryptoconditions;
 
 /**
- * Java implementation of Crypto-Conditions Condition.
+ * An implementation of a crypto-conditions Condition.
  *
- * @author adrianhopebailie
- * @see<a href="https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/">
- * https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/</a>
+ * @see "https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/"
  */
-public interface Condition {
+public interface Condition extends Comparable<Condition> {
 
   /**
    * The type identifier representing the condition type.
@@ -26,24 +24,26 @@ public interface Condition {
    * is a cryptographically secure hash of the data which defines the condition, such as a public
    * key.
    *
-   * @return the unique fingerprint of this condition
-   * @deprecated This method is deprecated, and will go away in a future release. Implementations
-   * should prefer {@link #getFingerprintBase64Url()} instead.
+   * @return A read-only {@link byte[]} that contains the unique fingerprint of this condition.
+   * @deprecated This method may be removed in future versions, so callers should use {@link
+   * #getFingerprintBase64Url()} instead. Java 8 does not currently have the concept of an
+   * immutable byte array, which means outside callers could manipulate the bytes returned from this
+   * method and unintentionally (or purposefully) mutate the internal state of this Condition.
    */
   @Deprecated
   byte[] getFingerprint();
 
   /**
-   * A fingerprint is a binary (aka "octet") string uniquely representing the condition with
-   * respect to other conditions of the same type. This is possible because the fingerprint
+   * A fingerprint is a binary (aka "octet") string uniquely representing the condition with respect
+   * to other conditions of the same type. Implementations which index conditions MUST use the
+   * entire string or binary encoded condition as the key - not just the fingerprint - as different
+   * conditions of different types may have the same fingerprint.
+   *
+   * The length and contents of the fingerprint are defined by the condition type. The fingerprint
    * is a cryptographically secure hash of the data which defines the condition, such as a public
-   * key. The length and contents of the fingerprint are defined by the condition type.
+   * key.
    *
-   * Implementations which index conditions MUST use
-   * the entire string or binary encoded condition as the key - not just the fingerprint - as
-   * different conditions of different types may have the same fingerprint.
-   *
-   * @return A {@link String} containing the Base64Url-encoded fingerprint of this condition
+   * @return A Base64Url-encoded {@link String} that contains the unique fingerprint of this condition.
    */
   String getFingerprintBase64Url();
 
@@ -54,4 +54,5 @@ public interface Condition {
    * @return the cost of validating the fulfillment of this condition
    */
   long getCost();
+
 }

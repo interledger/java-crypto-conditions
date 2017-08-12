@@ -1,5 +1,7 @@
 package org.interledger.cryptoconditions;
 
+import java.util.Objects;
+
 /**
  * This type of condition is also called a "hashlock".  By creating a hash of a difficult-to-guess,
  * 256-bit, random or pseudo-random integer, it is possible to create a condition which the creator
@@ -48,12 +50,12 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
   }
 
   /**
-   * Construct the fingerprint contents for this condition.
+   * Constructs the fingerprint for this condition.
    *
-   * @return
+   * Note: This method is package-private as (opposed to private) for testing purposes.
    */
   public static byte[] constructFingerprintContents(final byte[] prefix) {
-    return prefix;
+    return Objects.requireNonNull(prefix);
   }
 
   /**
