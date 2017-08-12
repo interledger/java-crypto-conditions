@@ -1,7 +1,5 @@
 package org.interledger.cryptoconditions;
 
-import com.google.common.annotations.VisibleForTesting;
-
 /**
  * This type of condition is also called a "hashlock".  By creating a hash of a difficult-to-guess,
  * 256-bit, random or pseudo-random integer, it is possible to create a condition which the creator

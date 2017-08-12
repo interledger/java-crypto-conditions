@@ -1,6 +1,5 @@
 package org.interledger.cryptoconditions;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
