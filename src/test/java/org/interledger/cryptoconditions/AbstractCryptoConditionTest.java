@@ -23,9 +23,8 @@ import java.util.stream.Collectors;
 public abstract class AbstractCryptoConditionTest {
 
   protected final Logger logger = Logger.getLogger(this.getClass().getName());
-
-  private static final String ED_25519 = "Ed25519";
-  private static final int DEFAULT_NUM_THREADS = 100;
+  
+  private static final int DEFAULT_NUM_THREADS = 20;
 
   protected static final String AUTHOR = "Doc Brown";
   protected static final String MESSAGE_PREIMAGE = "Roads? Where we're going, we don't need roads.";
