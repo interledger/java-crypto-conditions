@@ -19,7 +19,7 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
    * on a supplied preimage. This constructor variant is intended to be used by developers
    * wishing to construct a Preimage condition from a secret preimage.
    *
-   * @param preimage An instance of {@link byte[]} containing preimage data.
+   * @param preimage An instance of byte array containing preimage data.
    */
   public PreimageSha256Condition(final byte[] preimage) {
     super(
@@ -36,10 +36,11 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
    * that this constructor variant does not include a preimage, and is thus intended to be used
    * to construct a condition that does not include a preimage (for example, if a condition is
    * supplied by a remote system).
-   *
+   * <p/>
    * Note this constructor is package-private because it is used primarily for testing purposes.
-   *  @param cost        The cost associated with this condition.
-   * @param fingerprint An instance of {@link byte[]} that contains the calculated fingerprint for
+   *
+   * @param cost        The cost associated with this condition.
+   * @param fingerprint An instance of byte array that contains the calculated fingerprint for
    */
   PreimageSha256Condition(final long cost, final byte[] fingerprint) {
     super(PREIMAGE_SHA256, cost, fingerprint);
@@ -47,7 +48,7 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
 
   /**
    * Constructs the fingerprint for this condition.
-   *
+   * <p/>
    * Note: This method is package-private as (opposed to private) for testing purposes.
    */
   static final byte[] constructFingerprintContents(final byte[] prefix) {
@@ -60,7 +61,7 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
    * @param preimage The preimage associated with this condition.
    * @return The cost of a condition based on the preimage.
    */
-  private final static long calculateCost(byte[] preimage) {
+  private static final long calculateCost(byte[] preimage) {
     return preimage.length;
   }
 

@@ -50,10 +50,11 @@ public class PrefixSha256Fulfillment extends FulfillmentBase<PrefixSha256Conditi
   /**
    * Accessor for the prefix as an array of bytes.
    *
-   * @return A {@link byte[]} containing the prefix for this fulfillment.
+   * @return A byte array containing the prefix for this fulfillment.
+   *
    * @deprecated Java 8 does not have the concept of an immutable byte array, so this method allows
-   * external callers to accidentally or intentionally mute the prefix. As such, this method may be
-   * removed in a future version. Prefer {@link #getPrefixBase64Url()} instead.
+   *     external callers to accidentally or intentionally mute the prefix. As such, this method may
+   *     be removed in a future version. Prefer {@link #getPrefixBase64Url()} instead.
    */
   @Deprecated
   public byte[] getPrefix() {
@@ -102,18 +103,18 @@ public class PrefixSha256Fulfillment extends FulfillmentBase<PrefixSha256Conditi
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object object) {
+    if (this == object) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (object == null || getClass() != object.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if (!super.equals(object)) {
       return false;
     }
 
-    PrefixSha256Fulfillment that = (PrefixSha256Fulfillment) o;
+    PrefixSha256Fulfillment that = (PrefixSha256Fulfillment) object;
 
     if (maxMessageLength != that.maxMessageLength) {
       return false;

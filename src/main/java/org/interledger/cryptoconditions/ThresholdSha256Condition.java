@@ -2,6 +2,10 @@ package org.interledger.cryptoconditions;
 
 import static org.interledger.cryptoconditions.CryptoConditionType.THRESHOLD_SHA256;
 
+import org.interledger.cryptoconditions.der.DerEncodingException;
+import org.interledger.cryptoconditions.der.DerOutputStream;
+import org.interledger.cryptoconditions.der.DerTag;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -9,9 +13,6 @@ import java.math.BigInteger;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
-import org.interledger.cryptoconditions.der.DerEncodingException;
-import org.interledger.cryptoconditions.der.DerOutputStream;
-import org.interledger.cryptoconditions.der.DerTag;
 
 /**
  * Implements a condition based on a number of subconditions and the SHA-256 function.
@@ -38,7 +39,7 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
 
   /**
    * Constructs an instance of the condition.
-   *
+   * <p/>
    * Note this constructor is package-private because it is used primarily for testing purposes.
    *
    * @param cost        The calculated cost of this condition.
@@ -53,7 +54,7 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
 
   /**
    * Constructs the fingerprint for this condition.
-   *
+   * <p/>
    * Note: This method is package-private as (opposed to private) for testing purposes.
    */
   static final byte[] constructFingerprintContents(
@@ -126,7 +127,7 @@ public final class ThresholdSha256Condition extends CompoundSha256Condition
   }
 
   /**
-   * Calculates the cost of a threshold condition as:
+   * Calculates the cost of a threshold condition. The calculation is as follows:
    *
    * <pre>
    * sum(biggest(t, subcondition_costs)) + 1024 * n

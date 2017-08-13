@@ -50,18 +50,18 @@ public abstract class Sha256Condition extends ConditionBase {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object object) {
+    if (this == object) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (object == null || getClass() != object.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if (!super.equals(object)) {
       return false;
     }
 
-    Sha256Condition that = (Sha256Condition) o;
+    Sha256Condition that = (Sha256Condition) object;
 
     return fingerprintBase64Url.equals(that.fingerprintBase64Url);
   }
@@ -77,8 +77,9 @@ public abstract class Sha256Condition extends ConditionBase {
    * Constructs the fingerprint of this condition by taking the SHA-256 digest of the contents of
    * this condition, per the crypto-conditions RFC.
    *
-   * @link fingerprintContents A {@link byte[]} containing the unhashed contents of this condition
-   * as assembled per the rules of the RFC.
+   * @param fingerprintContents A byte array containing the unhashed contents of this condition
+   *                            as assembled per the rules of the RFC.
+   * @return A byte array containing the hashed fingerprint.
    */
   protected static final byte[] hashFingerprintContents(final byte[] fingerprintContents) {
     Objects.requireNonNull(fingerprintContents);

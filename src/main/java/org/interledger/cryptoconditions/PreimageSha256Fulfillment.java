@@ -47,18 +47,18 @@ public class PreimageSha256Fulfillment extends FulfillmentBase<PreimageSha256Con
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object object) {
+    if (this == object) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (object == null || getClass() != object.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if (!super.equals(object)) {
       return false;
     }
 
-    PreimageSha256Fulfillment that = (PreimageSha256Fulfillment) o;
+    PreimageSha256Fulfillment that = (PreimageSha256Fulfillment) object;
 
     if (!condition.equals(that.condition)) {
       return false;

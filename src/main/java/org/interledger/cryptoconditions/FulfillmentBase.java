@@ -24,15 +24,15 @@ public abstract class FulfillmentBase<C extends Condition> implements Fulfillmen
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object object) {
+    if (this == object) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (object == null || getClass() != object.getClass()) {
       return false;
     }
 
-    FulfillmentBase<?> that = (FulfillmentBase<?>) o;
+    FulfillmentBase<?> that = (FulfillmentBase<?>) object;
 
     return type == that.type;
   }

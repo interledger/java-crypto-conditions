@@ -2,6 +2,9 @@ package org.interledger.cryptoconditions;
 
 import static org.interledger.cryptoconditions.CryptoConditionType.ED25519_SHA256;
 
+import net.i2p.crypto.eddsa.EdDSAEngine;
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
+
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -10,8 +13,6 @@ import java.security.SignatureException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
-import net.i2p.crypto.eddsa.EdDSAEngine;
-import net.i2p.crypto.eddsa.EdDSAPublicKey;
 
 
 /**
@@ -33,7 +34,7 @@ public class Ed25519Sha256Fulfillment extends FulfillmentBase<Ed25519Sha256Condi
    *
    * @param publicKey An {@link EdDSAPublicKey} associated with this fulfillment and its
    *                  corresponding condition.
-   * @param signature A {@link byte[]} containing the signature associated with this fulfillment.
+   * @param signature A byte array containing the signature associated with this fulfillment.
    */
   public Ed25519Sha256Fulfillment(final EdDSAPublicKey publicKey, final byte[] signature) {
     super(ED25519_SHA256);
@@ -58,8 +59,8 @@ public class Ed25519Sha256Fulfillment extends FulfillmentBase<Ed25519Sha256Condi
    * Returns a copy of the signature linked to this fulfillment.
    *
    * @deprecated Java 8 does not have the concept of an immutable byte array, so this method allows
-   * external callers to accidentally or intentionally mute the prefix. As such, this method may be
-   * removed in a future version. Prefer {@link #getSignatureBase64Url()} instead.
+   *     external callers to accidentally or intentionally mute the prefix. As such, this method may
+   *     be removed in a future version. Prefer {@link #getSignatureBase64Url()} instead.
    */
   @Deprecated
   public byte[] getSignature() {
@@ -95,25 +96,24 @@ public class Ed25519Sha256Fulfillment extends FulfillmentBase<Ed25519Sha256Condi
       edDsaSigner.initVerify(publicKey);
       edDsaSigner.update(message);
       return edDsaSigner.verify(signature);
-    } catch (InvalidKeyException | NoSuchAlgorithmException |
-        SignatureException e) {
+    } catch (InvalidKeyException | NoSuchAlgorithmException | SignatureException e) {
       throw new RuntimeException(e);
     }
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object object) {
+    if (this == object) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (object == null || getClass() != object.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if (!super.equals(object)) {
       return false;
     }
 
-    Ed25519Sha256Fulfillment that = (Ed25519Sha256Fulfillment) o;
+    Ed25519Sha256Fulfillment that = (Ed25519Sha256Fulfillment) object;
 
     if (!publicKey.equals(that.publicKey)) {
       return false;

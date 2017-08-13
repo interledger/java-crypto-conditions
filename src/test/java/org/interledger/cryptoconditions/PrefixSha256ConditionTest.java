@@ -4,8 +4,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import com.google.common.io.BaseEncoding;
-import java.net.URI;
+
 import org.junit.Test;
+
+import java.net.URI;
 
 /**
  * Unit tests for {@link PrefixSha256Condition}.

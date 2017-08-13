@@ -1,5 +1,12 @@
 package org.interledger.cryptoconditions.helpers;
 
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
+import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
+import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
+
+import org.interledger.cryptoconditions.CryptoConditionReader;
+import org.interledger.cryptoconditions.utils.UnsignedBigInteger;
+
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -7,11 +14,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
-import net.i2p.crypto.eddsa.EdDSAPublicKey;
-import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
-import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
-import org.interledger.cryptoconditions.utils.UnsignedBigInteger;
-import org.interledger.cryptoconditions.CryptoConditionReader;
 
 /**
  * A helper class to create RSA and Ed25519 keys.

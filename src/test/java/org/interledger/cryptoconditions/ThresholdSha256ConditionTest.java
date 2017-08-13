@@ -6,8 +6,11 @@ import static org.interledger.cryptoconditions.CryptoConditionType.THRESHOLD_SHA
 
 import com.google.common.collect.Lists;
 import com.google.common.io.BaseEncoding;
+
 import org.hamcrest.CoreMatchers;
+
 import org.interledger.cryptoconditions.der.DerEncodingException;
+
 import org.junit.Test;
 
 /**

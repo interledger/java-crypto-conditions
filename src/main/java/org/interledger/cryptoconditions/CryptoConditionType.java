@@ -75,7 +75,7 @@ public enum CryptoConditionType {
    *
    * @param types set of rsa to encode as a BIT STRING.
    * @return byte array where first byte indicates the number of unused bits in last byte and
-   * remaining bytes encode the bit string
+   *     remaining bytes encode the bit string
    */
   public static byte[] getEnumOfTypesAsBitString(EnumSet<CryptoConditionType> types) {
 
@@ -112,7 +112,7 @@ public enum CryptoConditionType {
       data[0] = (byte) (7 - lastUsedBit);
       return data;
     } else {
-      return new byte[]{(byte) 0x00};
+      return new byte[] {(byte) 0x00};
     }
   }
 

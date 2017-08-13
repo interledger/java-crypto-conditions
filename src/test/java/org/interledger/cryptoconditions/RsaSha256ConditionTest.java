@@ -4,10 +4,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import com.google.common.io.BaseEncoding;
+
+import org.interledger.cryptoconditions.helpers.TestKeyFactory;
+
+import org.junit.Test;
+
 import java.net.URI;
 import java.security.interfaces.RSAPublicKey;
-import org.interledger.cryptoconditions.helpers.TestKeyFactory;
-import org.junit.Test;
 
 /**
  * Unit tests for {@link Ed25519Sha256Condition}.

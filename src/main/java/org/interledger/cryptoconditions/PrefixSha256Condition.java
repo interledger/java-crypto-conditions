@@ -2,15 +2,16 @@ package org.interledger.cryptoconditions;
 
 import static org.interledger.cryptoconditions.CryptoConditionType.PREFIX_SHA256;
 
+import org.interledger.cryptoconditions.der.DerEncodingException;
+import org.interledger.cryptoconditions.der.DerOutputStream;
+import org.interledger.cryptoconditions.der.DerTag;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigInteger;
 import java.util.EnumSet;
 import java.util.Objects;
-import org.interledger.cryptoconditions.der.DerEncodingException;
-import org.interledger.cryptoconditions.der.DerOutputStream;
-import org.interledger.cryptoconditions.der.DerTag;
 
 /**
  * Implementation of a crypto condition based on a prefix, a sub-condition and the SHA-256 function.
@@ -40,7 +41,7 @@ public final class PrefixSha256Condition extends CompoundSha256Condition
 
   /**
    * Constructs an instance of the condition.
-   *
+   * <p/>
    * Note this constructor is package-private because it is used primarily for testing purposes.
    *
    * @param cost        The cost of this condition.
@@ -55,7 +56,7 @@ public final class PrefixSha256Condition extends CompoundSha256Condition
 
   /**
    * Constructs the fingerprint for this condition.
-   *
+   * <p/>
    * Note: This method is package-private as (opposed to private) for testing purposes.
    */
   static final byte[] constructFingerprintContents(

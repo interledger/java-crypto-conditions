@@ -2,14 +2,15 @@ package org.interledger.cryptoconditions;
 
 import static org.interledger.cryptoconditions.CryptoConditionType.RSA_SHA256;
 
+import org.interledger.cryptoconditions.der.DerOutputStream;
+import org.interledger.cryptoconditions.der.DerTag;
+import org.interledger.cryptoconditions.utils.UnsignedBigInteger;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Objects;
-import org.interledger.cryptoconditions.der.DerOutputStream;
-import org.interledger.cryptoconditions.der.DerTag;
-import org.interledger.cryptoconditions.utils.UnsignedBigInteger;
 
 /**
  * Implementation of a condition based on RSA PKI and the SHA-256 function.
@@ -33,7 +34,7 @@ public final class RsaSha256Condition extends Sha256Condition implements SimpleC
 
   /**
    * Constructs an instance of the condition.
-   *
+   * <p/>
    * Note this constructor is package-private because it is used primarily for testing purposes.
    *
    * @param cost        The calculated cost of the condition.
@@ -45,7 +46,7 @@ public final class RsaSha256Condition extends Sha256Condition implements SimpleC
 
   /**
    * Constructs the fingerprint for this condition.
-   *
+   * <p/>
    * Note: This method is package-private as (opposed to private) for testing purposes.
    */
   static final byte[] constructFingerprintContents(final RSAPublicKey publicKey) {
@@ -73,7 +74,7 @@ public final class RsaSha256Condition extends Sha256Condition implements SimpleC
   }
 
   /**
-   * Calculates the cost of a condition based on an RSA key as (modulus size in bytes) ^ 2
+   * Calculates the cost of a condition based on an RSA key as ((modulus size in bytes)^2).
    *
    * @param key The key used in the condition.
    * @return the cost of a condition using this key.

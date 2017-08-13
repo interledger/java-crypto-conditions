@@ -13,8 +13,8 @@ import java.util.Base64;
 import java.util.Objects;
 
 /**
- * An implementation of {@link Fulfillment} for a crypto-condition fulfillment of type
- * "RSA-SHA-256" based upon an RSA key and the SHA-256 function.
+ * An implementation of {@link Fulfillment} for a crypto-condition fulfillment of type "RSA-SHA-256"
+ * based upon an RSA key and the SHA-256 function.
  *
  * @see "https://datatracker.ietf.org/doc/draft-thomas-crypto-conditions/"
  */
@@ -33,8 +33,8 @@ public class RsaSha256Fulfillment extends FulfillmentBase<RsaSha256Condition>
    * Constructs an instance of the fulfillment.
    *
    * @param publicKey An {@link RSAPublicKey} to be used with this fulfillment.
-   * @param signature A {@link byte[]} that contains a binary representation of the signature
-   *                  associated with this fulfillment.
+   * @param signature A byte array that contains a binary representation of the signature associated
+   *                  with this fulfillment.
    */
   public RsaSha256Fulfillment(final RSAPublicKey publicKey, final byte[] signature) {
     super(RSA_SHA256);
@@ -58,14 +58,12 @@ public class RsaSha256Fulfillment extends FulfillmentBase<RsaSha256Condition>
    * Returns a copy of the signature used in this fulfillment.
    *
    * @deprecated Java 8 does not have the concept of an immutable byte array, so this method allows
-   * external callers to accidentally or intentionally mute the prefix. As such, this method may be
-   * removed in a future version. Prefer {@link #getSignatureBase64Url()} instead.
+   *     external callers to accidentally or intentionally mute the prefix. As such, this method may
+   *     be removed in a future version. Prefer {@link #getSignatureBase64Url()} instead.
    */
   @Deprecated
   public byte[] getSignature() {
-    byte[] signature = new byte[this.signature.length];
-    System.arraycopy(this.signature, 0, signature, 0, this.signature.length);
-    return signature;
+    return this.signature;
   }
 
   /**
@@ -101,18 +99,18 @@ public class RsaSha256Fulfillment extends FulfillmentBase<RsaSha256Condition>
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object object) {
+    if (this == object) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (object == null || getClass() != object.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if (!super.equals(object)) {
       return false;
     }
 
-    RsaSha256Fulfillment that = (RsaSha256Fulfillment) o;
+    RsaSha256Fulfillment that = (RsaSha256Fulfillment) object;
 
     if (!publicKey.equals(that.publicKey)) {
       return false;

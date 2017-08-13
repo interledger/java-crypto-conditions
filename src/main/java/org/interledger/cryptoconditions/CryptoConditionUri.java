@@ -1,5 +1,7 @@
 package org.interledger.cryptoconditions;
 
+import org.interledger.cryptoconditions.NamedInformationUri.HashFunction;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,7 +16,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.interledger.cryptoconditions.NamedInformationUri.HashFunction;
 
 /**
  * This class is responsible for parsing a uri-formatted crypto-condition.
@@ -111,6 +112,12 @@ public class CryptoConditionUri {
     }
   }
 
+  /**
+   * Convert a crypto condition to its ni-schemed URI representation.
+   *
+   * @param condition A {@link Condition} to convert.
+   * @return A {@link URI} representing the ni-schemed version of the supplied {@code condition}.
+   */
   public static URI toUri(final Condition condition) {
     if (condition instanceof SimpleCondition) {
       return writeSingleCondition((SimpleCondition) condition);

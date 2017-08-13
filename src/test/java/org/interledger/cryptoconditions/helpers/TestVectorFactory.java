@@ -1,13 +1,7 @@
 package org.interledger.cryptoconditions.helpers;
 
-import java.security.interfaces.RSAPublicKey;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
+
 import org.interledger.cryptoconditions.Condition;
 import org.interledger.cryptoconditions.CryptoConditionType;
 import org.interledger.cryptoconditions.Ed25519Sha256Condition;
@@ -22,6 +16,14 @@ import org.interledger.cryptoconditions.RsaSha256Fulfillment;
 import org.interledger.cryptoconditions.ThresholdSha256Condition;
 import org.interledger.cryptoconditions.ThresholdSha256Fulfillment;
 
+import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 /**
  * Builds instances of {@link Condition} for testing based on the test vectors loaded.
  */
@@ -29,8 +31,11 @@ public class TestVectorFactory {
 
   /**
    * Assembles an instance of {@link Condition} from the information provided in {@code
-   * testVectorJson, which is generally assembled from a JSON file in this project's test
+   * testVectorJson}, which is generally assembled from a JSON file in this project's test
    * harness.
+   *
+   * @param testVectorJson A {@link TestVectorJson} to retrieve a condition from.
+   * @return A {@link Condition} assembled from the supplied test vector data.
    */
   public static Condition getConditionFromTestVectorJson(final TestVectorJson testVectorJson) {
     Objects.requireNonNull(testVectorJson);
@@ -68,10 +73,10 @@ public class TestVectorFactory {
       }
 
       case THRESHOLD_SHA256: {
-//        final List<Fulfillment> subFulfillments = Arrays
-//            .stream(testVectorJson.getSubfulfillments())
-//            .map(TestVectorFactory::getFulfillmentFromTestVectorJson)
-//            .collect(Collectors.toList());
+        //final List<Fulfillment> subFulfillments = Arrays
+        //    .stream(testVectorJson.getSubfulfillments())
+        //    .map(TestVectorFactory::getFulfillmentFromTestVectorJson)
+        //    .collect(Collectors.toList());
 
         final List<Condition> subConditions = Arrays
             // This is somewhat wrong - the test vectors occasionally treat the data in
@@ -94,6 +99,14 @@ public class TestVectorFactory {
 
   }
 
+  /**
+   * Assembles an instance of {@link Fulfillment} from the information provided in {@code
+   * testVectorJson}, which is generally assembled from a JSON file in this project's test
+   * harness.
+   *
+   * @param testVectorJson A {@link TestVectorJson} to retrieve a condition from.
+   * @return A {@link Fulfillment} assembled from the supplied test vector data.
+   */
   public static Fulfillment getFulfillmentFromTestVectorJson(final TestVectorJson testVectorJson) {
     Objects.requireNonNull(testVectorJson);
 

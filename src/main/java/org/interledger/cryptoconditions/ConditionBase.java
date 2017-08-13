@@ -1,7 +1,8 @@
 package org.interledger.cryptoconditions;
 
-import java.util.Objects;
 import org.interledger.cryptoconditions.der.DerEncodingException;
+
+import java.util.Objects;
 
 /**
  * This class provides shared, concrete logic for all conditions.
@@ -38,15 +39,15 @@ public abstract class ConditionBase implements Condition {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object object) {
+    if (this == object) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (object == null || getClass() != object.getClass()) {
       return false;
     }
 
-    ConditionBase that = (ConditionBase) o;
+    ConditionBase that = (ConditionBase) object;
 
     if (cost != that.cost) {
       return false;
@@ -62,8 +63,8 @@ public abstract class ConditionBase implements Condition {
   }
 
   /**
-   * Overrides the default {@link java.lang.Object#toString()} and returns the result of
-   * {@link CryptoConditionUri#toUri(Condition)} as a string.
+   * Overrides the default {@link java.lang.Object#toString()} and returns the result of {@link
+   * CryptoConditionUri#toUri(Condition)} as a string.
    */
   @Override
   public final String toString() {
@@ -71,15 +72,15 @@ public abstract class ConditionBase implements Condition {
   }
 
   /**
-   * An implementation of {@link Comparable#compareTo(Object)} to conform to the {@link Comparable}
-   * interface.
+   * <p>An implementation of {@link Comparable#compareTo(Object)} to conform to the {@link
+   * Comparable} interface.</p>
    *
-   * This implementation merely loops through the bytes of each encoded condition and returns the
-   * result of that comparison.
+   * <p>This implementation merely loops through the bytes of each encoded condition and returns the
+   * result of that comparison.</p>
    *
    * @param that A {@link Condition} to compare against this condition.
    * @return a negative integer, zero, or a positive integer as this object is less than, equal to,
-   * or greater than the specified object.
+   *     or greater than the specified object.
    */
   @Override
   public final int compareTo(Condition that) {

@@ -141,11 +141,9 @@
           </execution>
         </executions>
         <configuration>
-          <!--<excludes>-->
-          <!--&lt;!&ndash;Do not bother checking the test Application or HexDump classes &ndash;&gt;-->
-          <!--<excludes>org/interledger/cryptoconditions/Application*</excludes>-->
-          <!--</excludes>-->
-          <!--<failsOnError>false</failsOnError>-->
+          <configLocation>google_checks.xml</configLocation>
+          <!--Do not bother checking the test Application or HexDump classes -->
+          <excludes>org/interledger/cryptoconditions/Application*</excludes>
         </configuration>
       </plugin>
 
@@ -235,10 +233,9 @@
           </reportSet>
         </reportSets>
         <configuration>
-          <excludes>
-            <!--Do not bother checking the test Application or HexDump classes -->
-            <excludes>org/interledger/cryptoconditions/Application*</excludes>
-          </excludes>
+          <configLocation>google_checks.xml</configLocation>
+          <!--Do not bother checking the test Application or HexDump classes -->
+          <excludes>org/interledger/cryptoconditions/Application*</excludes>
         </configuration>
       </plugin>
 

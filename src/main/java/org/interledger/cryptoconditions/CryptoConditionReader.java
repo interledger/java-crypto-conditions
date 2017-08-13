@@ -1,5 +1,14 @@
 package org.interledger.cryptoconditions;
 
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
+import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
+import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
+
+import org.interledger.cryptoconditions.der.DerEncodingException;
+import org.interledger.cryptoconditions.der.DerInputStream;
+import org.interledger.cryptoconditions.der.DerTag;
+import org.interledger.cryptoconditions.utils.UnsignedBigInteger;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -14,13 +23,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import net.i2p.crypto.eddsa.EdDSAPublicKey;
-import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
-import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
-import org.interledger.cryptoconditions.der.DerEncodingException;
-import org.interledger.cryptoconditions.der.DerInputStream;
-import org.interledger.cryptoconditions.der.DerTag;
-import org.interledger.cryptoconditions.utils.UnsignedBigInteger;
 
 /**
  * Provides utility methods to read a crypto-condition from DER encoding.
@@ -34,6 +36,7 @@ public class CryptoConditionReader {
    *
    * @param buffer contains the raw DER encoded condition.
    * @return The condition read from the buffer.
+   * @throws DerEncodingException when DER encoding fails for any reason.
    */
   public static Condition readCondition(byte[] buffer) throws DerEncodingException {
     return readCondition(buffer, 0, buffer.length);
@@ -46,6 +49,7 @@ public class CryptoConditionReader {
    * @param offset the position within the buffer to begin reading the condition.
    * @param length the number of bytes to read.
    * @return The condition read from the buffer.
+   * @throws DerEncodingException when DER encoding fails for any reason.
    */
   public static Condition readCondition(byte[] buffer, int offset, int length)
       throws DerEncodingException {
@@ -71,6 +75,8 @@ public class CryptoConditionReader {
    *
    * @param in The input stream containing the DER encoded condition.
    * @return The condition read from the stream.
+   * @throws DerEncodingException when DER encoding fails for any reason.
+   * @throws IOException if any I/O operation fails for any reason.
    */
   public static Condition readCondition(DerInputStream in)
       throws DerEncodingException, IOException {
@@ -83,6 +89,8 @@ public class CryptoConditionReader {
    * @param in        The input stream containing the DER encoded condition.
    * @param bytesRead will be updated with the number of bytes read from the stream.
    * @return The condition read from the stream.
+   * @throws DerEncodingException when DER encoding fails for any reason.
+   * @throws IOException if any I/O operation fails for any reason.
    */
   public static Condition readCondition(DerInputStream in, AtomicInteger bytesRead)
       throws DerEncodingException, IOException {
@@ -125,6 +133,7 @@ public class CryptoConditionReader {
    *
    * @param buffer The buffer holding the DER encoded fulfillment
    * @return The fulfillment read from the buffer.
+   * @throws DerEncodingException when DER encoding fails for any reason.
    */
   public static Fulfillment readFulfillment(byte[] buffer) throws DerEncodingException {
     return readFulfillment(buffer, 0, buffer.length);
@@ -137,6 +146,7 @@ public class CryptoConditionReader {
    * @param offset the position within the buffer to begin reading the fulfilment.
    * @param length the number of bytes to read.
    * @return The fulfillment read from the buffer.
+   * @throws DerEncodingException when DER encoding fails for any reason.
    */
   public static Fulfillment readFulfillment(byte[] buffer, int offset, int length)
       throws DerEncodingException {
@@ -162,6 +172,8 @@ public class CryptoConditionReader {
    *
    * @param in The input stream containing the DER encoded fulfillment.
    * @return The fulfillment read from the stream.
+   * @throws DerEncodingException when DER encoding fails for any reason.
+   * @throws IOException if any I/O operation fails for any reason.
    */
   public static Fulfillment readFulfillment(DerInputStream in)
       throws DerEncodingException, IOException {
@@ -174,6 +186,8 @@ public class CryptoConditionReader {
    * @param in        The input stream containing the DER encoded fulfillment.
    * @param bytesRead will be updated with the number of bytes read from the stream.
    * @return The fulfillment read from the stream.
+   * @throws DerEncodingException when DER encoding fails for any reason.
+   * @throws IOException if any I/O operation fails for any reason.
    */
   public static Fulfillment readFulfillment(DerInputStream in, AtomicInteger bytesRead)
       throws DerEncodingException, IOException {

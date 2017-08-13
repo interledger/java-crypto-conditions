@@ -24,10 +24,10 @@ public interface Fulfillment<C extends Condition> {
   /**
    * Verify that this fulfillment validates the supplied {@code condition}. A fulfillment is
    * validated by evaluating that the circuit output is {@code true} but also that the provided
-   * fulfillment matches the circuit fingerprint, which is the  {@code condition.
+   * fulfillment matches the circuit fingerprint, which is the  {@code condition}.
    *
    * @param condition A {@link Condition} that this fulfillment should validate.
-   * @param message   A {@link byte[]} that is part of verifying the supplied condition.
+   * @param message   A byte array that is part of verifying the supplied condition.
    * @return {@code true} if this fulfillment validates the supplied condition and message; {@code
    * false} otherwise.
    */

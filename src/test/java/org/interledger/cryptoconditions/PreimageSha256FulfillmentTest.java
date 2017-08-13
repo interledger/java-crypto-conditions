@@ -3,8 +3,9 @@ package org.interledger.cryptoconditions;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.util.Base64;
 import org.junit.Test;
+
+import java.util.Base64;
 
 /**
  * Unit tests {@link PreimageSha256Fulfillment}.

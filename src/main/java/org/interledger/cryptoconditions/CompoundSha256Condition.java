@@ -35,18 +35,18 @@ public abstract class CompoundSha256Condition extends Sha256Condition implements
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object object) {
+    if (this == object) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (object == null || getClass() != object.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if (!super.equals(object)) {
       return false;
     }
 
-    CompoundSha256Condition that = (CompoundSha256Condition) o;
+    CompoundSha256Condition that = (CompoundSha256Condition) object;
 
     return subtypes.equals(that.subtypes);
   }

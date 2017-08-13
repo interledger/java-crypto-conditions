@@ -4,10 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.io.BaseEncoding;
+
+import org.junit.Test;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.EnumSet;
-import org.junit.Test;
 
 /**
  * JUnit tests to exercise the {@link CryptoConditionUri} class. Directly translated from

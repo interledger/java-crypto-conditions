@@ -1,15 +1,16 @@
 package org.interledger.cryptoconditions;
 
+import org.interledger.cryptoconditions.der.DerEncodingException;
+import org.interledger.cryptoconditions.der.DerOutputStream;
+import org.interledger.cryptoconditions.der.DerTag;
+import org.interledger.cryptoconditions.utils.UnsignedBigInteger;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigInteger;
 import java.util.Base64;
 import java.util.Objects;
-import org.interledger.cryptoconditions.der.DerEncodingException;
-import org.interledger.cryptoconditions.der.DerOutputStream;
-import org.interledger.cryptoconditions.der.DerTag;
-import org.interledger.cryptoconditions.utils.UnsignedBigInteger;
 
 /**
  * Provides utility methods to read a crypto-condition from DER encoding.
@@ -20,7 +21,7 @@ public class CryptoConditionWriter {
    * Encodes a Condition using ASN.1 DER encoding.
    *
    * @param condition A {@link Condition} to encode.
-   * @return A {@link byte[]} containing the ASN.1 DER encoding of the supplied {@code condition}.
+   * @return A byte array containing the ASN.1 DER encoding of the supplied {@code condition}.
    */
   public static byte[] writeCondition(final Condition condition) throws DerEncodingException {
     Objects.requireNonNull(condition);
@@ -46,7 +47,7 @@ public class CryptoConditionWriter {
    * Encodes a Fulfillment using ASN.1 DER encoding.
    *
    * @param fulfillment A {@link Fulfillment} to encode.
-   * @return A {@link byte[]} containing the ASN.1 DER encoding of the supplied {@code fulfillment}.
+   * @return A byte array containing the ASN.1 DER encoding of the supplied {@code fulfillment}.
    */
   public static byte[] writeFulfillment(final Fulfillment fulfillment) throws DerEncodingException {
     Objects.requireNonNull(fulfillment);
@@ -73,7 +74,7 @@ public class CryptoConditionWriter {
    * Encodes a PreimageSha256Condition using ASN.1 DER encoding.
    *
    * @param condition A {@link PreimageSha256Condition} to encode.
-   * @return A {@link byte[]} containing the ASN.1 DER encoding of the supplied {@code condition}.
+   * @return A byte array containing the ASN.1 DER encoding of the supplied {@code condition}.
    */
   private static byte[] writeSingleCondition(final SimpleCondition condition)
       throws DerEncodingException {
@@ -103,7 +104,7 @@ public class CryptoConditionWriter {
    * Encodes a PreimageSha256Condition using ASN.1 DER encoding.
    *
    * @param condition A {@link PreimageSha256Condition} to encode.
-   * @return A {@link byte[]} containing the ASN.1 DER encoding of the supplied {@code condition}.
+   * @return A byte array containing the ASN.1 DER encoding of the supplied {@code condition}.
    */
   private static byte[] writeCompoundCondition(final CompoundCondition condition)
       throws DerEncodingException {
@@ -139,7 +140,7 @@ public class CryptoConditionWriter {
    * Encodes a PreimageSha256Fulfillment using ASN.1 DER encoding.
    *
    * @param fulfillment A {@link PreimageSha256Fulfillment} to encode.
-   * @return A {@link byte[]} containing the ASN.1 DER encoding of the supplied {@code fulfillment}.
+   * @return A byte array containing the ASN.1 DER encoding of the supplied {@code fulfillment}.
    */
   private static byte[] writeTypedFulfillment(final PreimageSha256Fulfillment fulfillment)
       throws DerEncodingException {
@@ -171,7 +172,7 @@ public class CryptoConditionWriter {
    * Encodes a PrefixSha256Fulfillment using ASN.1 DER encoding.
    *
    * @param fulfillment A {@link PrefixSha256Fulfillment} to encode.
-   * @return A {@link byte[]} containing the ASN.1 DER encoding of the supplied {@code fulfillment}.
+   * @return A byte array containing the ASN.1 DER encoding of the supplied {@code fulfillment}.
    */
   private static byte[] writeTypedFulfillment(final PrefixSha256Fulfillment fulfillment)
       throws DerEncodingException {
@@ -203,7 +204,7 @@ public class CryptoConditionWriter {
    * Encodes a RsaSha256Fulfillment using ASN.1 DER encoding.
    *
    * @param fulfillment A {@link RsaSha256Fulfillment} to encode.
-   * @return A {@link byte[]} containing the ASN.1 DER encoding of the supplied {@code fulfillment}.
+   * @return A byte array containing the ASN.1 DER encoding of the supplied {@code fulfillment}.
    */
   private static byte[] writeTypedFulfillment(final RsaSha256Fulfillment fulfillment)
       throws DerEncodingException {
@@ -234,7 +235,7 @@ public class CryptoConditionWriter {
    * Encodes a Ed25519Sha256Fulfillment using ASN.1 DER encoding.
    *
    * @param fulfillment A {@link Ed25519Sha256Fulfillment} to encode.
-   * @return A {@link byte[]} containing the ASN.1 DER encoding of the supplied {@code fulfillment}.
+   * @return A byte array containing the ASN.1 DER encoding of the supplied {@code fulfillment}.
    */
   private static byte[] writeTypedFulfillment(final Ed25519Sha256Fulfillment fulfillment)
       throws DerEncodingException {
@@ -264,7 +265,7 @@ public class CryptoConditionWriter {
    * Encodes a ThresholdSha256Fulfillment using ASN.1 DER encoding.
    *
    * @param fulfillment A {@link ThresholdSha256Fulfillment} to encode.
-   * @return A {@link byte[]} containing the ASN.1 DER encoding of the supplied {@code fulfillment}.
+   * @return A byte array containing the ASN.1 DER encoding of the supplied {@code fulfillment}.
    */
   private static byte[] writeTypedFulfillment(final ThresholdSha256Fulfillment fulfillment)
       throws DerEncodingException {

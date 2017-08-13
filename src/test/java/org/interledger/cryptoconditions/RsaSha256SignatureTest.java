@@ -3,11 +3,22 @@ package org.interledger.cryptoconditions;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.io.BaseEncoding;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import org.interledger.cryptoconditions.helpers.RsaTestVectorJson;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
 import java.io.File;
 import java.math.BigInteger;
 import java.net.URI;
@@ -23,12 +34,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.interledger.cryptoconditions.helpers.RsaTestVectorJson;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class RsaSha256SignatureTest extends AbstractCryptoConditionTest {
@@ -45,6 +50,12 @@ public class RsaSha256SignatureTest extends AbstractCryptoConditionTest {
   private final Signature rsaSigner;
   private final RsaTestVectorJson rsaJsonTestVector;
 
+  /**
+   * Required args Constructor.
+   *
+   * @param testVectorPair A {@link RsaTestVectorPair} to populate this test.
+   * @throws Exception If anything goes wrong.
+   */
   public RsaSha256SignatureTest(final RsaTestVectorPair testVectorPair) throws Exception {
     Objects.requireNonNull(testVectorPair);
     this.keyFactory = KeyFactory.getInstance("RSA");
@@ -111,8 +122,8 @@ public class RsaSha256SignatureTest extends AbstractCryptoConditionTest {
   @Test
   public void testSignsCorrectly() throws Exception {
 
-    final String privKeyPEM = rsaJsonTestVector.getPrivateKey();
-    final RSAPrivateKey privKey = this.buildRsaPrivKey(privKeyPEM);
+    final String privKeyPem = rsaJsonTestVector.getPrivateKey();
+    final RSAPrivateKey privKey = this.buildRsaPrivKey(privKeyPem);
 
     rsaJsonTestVector.getCases().stream().forEach(_case -> {
       try {
@@ -136,8 +147,8 @@ public class RsaSha256SignatureTest extends AbstractCryptoConditionTest {
   public void testVerifiesCorrectly()
       throws Exception {
 
-    final String privKeyPEM = rsaJsonTestVector.getPrivateKey();
-    final RSAPrivateKey privKey = this.buildRsaPrivKey(privKeyPEM);
+    final String privKeyPem = rsaJsonTestVector.getPrivateKey();
+    final RSAPrivateKey privKey = this.buildRsaPrivKey(privKeyPem);
 
     rsaJsonTestVector.getCases().stream().forEach(_case -> {
       try {

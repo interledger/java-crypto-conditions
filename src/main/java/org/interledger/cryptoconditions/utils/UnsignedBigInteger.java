@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 /**
- * Utility class for encoding and decoding a {@link BigInteger} as a {@link byte[]} without sign
+ * Utility class for encoding and decoding a {@link BigInteger} as a byte array without sign
  * prefix.
  *
  * @author adrianhopebailie
@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class UnsignedBigInteger {
 
   /**
-   * Get a positive {@link BigInteger} encoded as a {@link byte[]} with no sign-prefix.
+   * Get a positive {@link BigInteger} encoded as a byte array with no sign-prefix.
    *
    * @param value a positive BigInteger value
    * @return input value encoded as a byte[] with leading 0x00 prefix trimmed.

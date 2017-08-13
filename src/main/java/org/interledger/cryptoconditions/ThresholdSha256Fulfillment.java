@@ -100,18 +100,18 @@ public class ThresholdSha256Fulfillment extends FulfillmentBase<ThresholdSha256C
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object object) {
+    if (this == object) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (object == null || getClass() != object.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if (!super.equals(object)) {
       return false;
     }
 
-    ThresholdSha256Fulfillment that = (ThresholdSha256Fulfillment) o;
+    ThresholdSha256Fulfillment that = (ThresholdSha256Fulfillment) object;
 
     if (!subconditions.equals(that.subconditions)) {
       return false;

@@ -6,10 +6,28 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.io.BaseEncoding;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import org.interledger.cryptoconditions.der.DerEncodingException;
+import org.interledger.cryptoconditions.helpers.TestKeyFactory;
+import org.interledger.cryptoconditions.helpers.TestVector;
+import org.interledger.cryptoconditions.helpers.TestVectorFactory;
+import org.interledger.cryptoconditions.helpers.TestVectorJson;
+import org.interledger.cryptoconditions.utils.UnsignedBigInteger;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,23 +39,11 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import net.i2p.crypto.eddsa.EdDSAPublicKey;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.interledger.cryptoconditions.der.DerEncodingException;
-import org.interledger.cryptoconditions.helpers.TestKeyFactory;
-import org.interledger.cryptoconditions.helpers.TestVector;
-import org.interledger.cryptoconditions.helpers.TestVectorFactory;
-import org.interledger.cryptoconditions.helpers.TestVectorJson;
-import org.interledger.cryptoconditions.utils.UnsignedBigInteger;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This class tests the Java implementation of crypto-conditions based on a set of pre-computed and
  * validated test vectors found in the crypto-conditions spec repository.
- *
+ * <p/>
  * Specifically, this harness performs the following validations according to the source of the
  * test 'vectors' file in the crypto-conditions rfc project:
  *
@@ -53,7 +59,7 @@ import org.junit.runners.Parameterized.Parameters;
  *   <li>Create fulfillment from json, serialize fulfillment, should match fulfillment.</li>
  * </ul>
  * </pre>
- *
+ * <p/>
  * If a message field is provided, the condition should be evaluated against the message.
  * Otherwise, an empty message should be passed to the verification function.
  *

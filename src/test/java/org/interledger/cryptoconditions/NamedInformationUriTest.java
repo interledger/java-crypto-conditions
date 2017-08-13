@@ -5,10 +5,9 @@ import static org.hamcrest.core.Is.is;
 
 import com.google.common.collect.ImmutableMap;
 
-import org.interledger.cryptoconditions.CryptoConditionType;
-import org.interledger.cryptoconditions.NamedInformationUri;
 import org.interledger.cryptoconditions.CryptoConditionUri.QueryParams;
 import org.interledger.cryptoconditions.NamedInformationUri.HashFunction;
+
 import org.junit.Test;
 
 import java.util.Map;
@@ -131,8 +130,8 @@ public class NamedInformationUriTest {
         .toString();
     assertThat(actual,
         is(
-          "ni:///sha-256;dGVzdA?subtypes=prefix-sha-256,ed25519-sha-256,preimage-sha-256,spa+ce,"
-            + "%21%40%23%24%25%5E%26*"
+            "ni:///sha-256;dGVzdA?subtypes=prefix-sha-256,ed25519-sha-256,preimage-sha-256,spa+ce,"
+                + "%21%40%23%24%25%5E%26*"
         ));
   }
 }

@@ -1,13 +1,13 @@
 package org.interledger.cryptoconditions;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.EnumSet;
 import java.util.List;
 
 /**
+ * A helper class for asserting crypto conditions.
+ *
  * @deprecated Determine if this class should be removed since issues #52 allows URIs to be compared
- * for string equality.
+ *     for string equality.
  */
 @Deprecated
 public class CryptoConditionAssert {
