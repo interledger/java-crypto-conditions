@@ -9,6 +9,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 
 /**
@@ -25,6 +26,7 @@ public class RsaSha256Fulfillment extends FulfillmentBase<RsaSha256Condition>
 
   private final RSAPublicKey publicKey;
   private final byte[] signature;
+  private final String signatureBase64Url;
   private final RsaSha256Condition condition;
 
   /**
@@ -41,6 +43,7 @@ public class RsaSha256Fulfillment extends FulfillmentBase<RsaSha256Condition>
 
     this.publicKey = publicKey;
     this.signature = Arrays.copyOf(signature, signature.length);
+    this.signatureBase64Url = Base64.getUrlEncoder().encodeToString(signature);
     this.condition = new RsaSha256Condition(publicKey);
   }
 
@@ -53,11 +56,23 @@ public class RsaSha256Fulfillment extends FulfillmentBase<RsaSha256Condition>
 
   /**
    * Returns a copy of the signature used in this fulfillment.
+   *
+   * @deprecated Java 8 does not have the concept of an immutable byte array, so this method allows
+   * external callers to accidentally or intentionally mute the prefix. As such, this method may be
+   * removed in a future version. Prefer {@link #getSignatureBase64Url()} instead.
    */
+  @Deprecated
   public byte[] getSignature() {
     byte[] signature = new byte[this.signature.length];
     System.arraycopy(this.signature, 0, signature, 0, this.signature.length);
     return signature;
+  }
+
+  /**
+   * Returns the signature used in this fulfillment.
+   */
+  public String getSignatureBase64Url() {
+    return this.signatureBase64Url;
   }
 
   @Override
@@ -120,11 +135,11 @@ public class RsaSha256Fulfillment extends FulfillmentBase<RsaSha256Condition>
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("RsaSha256Fulfillment{");
-    sb.append("publicKey=").append(publicKey);
-    sb.append(", signature=").append(Arrays.toString(signature));
-    sb.append(", condition=").append(condition);
-    sb.append(", type=").append(getType());
-    sb.append('}');
+    sb.append("\n\tpublicKey=").append(publicKey);
+    sb.append(", \n\tsignature=").append(signatureBase64Url);
+    sb.append(", \n\tcondition=").append(condition);
+    sb.append(", \n\ttype=").append(getType());
+    sb.append("\n}");
     return sb.toString();
   }
 }

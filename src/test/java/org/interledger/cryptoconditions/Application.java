@@ -16,6 +16,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAKeyGenParameterSpec;
+import javax.xml.bind.DatatypeConverter;
 import net.i2p.crypto.eddsa.EdDSAEngine;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -23,7 +24,7 @@ import org.interledger.cryptoconditions.der.DerEncodingException;
 
 
 /**
- * Playground / test class. Will be removed at a future date.
+ * @deprecated Playground / test class. Will be removed at a future date.
  */
 @Deprecated
 // TODO: Turn this into a unit test?
@@ -158,7 +159,7 @@ public class Application {
 
   private static void hexDump(String label, byte[] bytes) {
     System.out.print("<" + label + ">");
-    System.out.println(HexDump.dumpHexString(bytes));
+    DatatypeConverter.printHexBinary(bytes);
     System.out.println("</" + label + ">");
   }
 

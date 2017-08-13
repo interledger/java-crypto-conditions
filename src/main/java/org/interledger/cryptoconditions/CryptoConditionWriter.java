@@ -149,7 +149,7 @@ public class CryptoConditionWriter {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       DerOutputStream out = new DerOutputStream(baos);
       out.writeTaggedObject(0,
-          Base64.getUrlDecoder().decode(fulfillment.getBase64UrlEncodedPreimage()));
+          Base64.getUrlDecoder().decode(fulfillment.getPreimage()));
       out.close();
       byte[] buffer = baos.toByteArray();
 

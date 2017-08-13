@@ -304,7 +304,7 @@ public class ValidVectorTest {
 
   @Test
   public void testParseFulfillmentAndCheckProperties() throws Exception {
-    byte[] fulfillmentBytes = HexDump.hexStringToByteArray(testVector.getFulfillment());
+    byte[] fulfillmentBytes = BaseEncoding.base16().decode(testVector.getFulfillment());
     Fulfillment fulfillment = CryptoConditionReader.readFulfillment(fulfillmentBytes);
 
     switch (fulfillment.getType()) {
@@ -312,7 +312,7 @@ public class ValidVectorTest {
         PreimageSha256Fulfillment preimageFulfillment = (PreimageSha256Fulfillment) fulfillment;
         assertEquals(testVector.getName() + " [compare preimage]",
             testVector.getJson().getPreimage(),
-            preimageFulfillment.getBase64UrlEncodedPreimage());
+            preimageFulfillment.getPreimage());
         break;
 
       case PREFIX_SHA256:

@@ -134,11 +134,11 @@ public class ThresholdSha256Fulfillment extends FulfillmentBase<ThresholdSha256C
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("ThresholdSha256Fulfillment{");
-    sb.append("subconditions=").append(subconditions);
-    sb.append(", subfulfillments=").append(subfulfillments);
-    sb.append(", condition=").append(condition);
-    sb.append(", type=").append(getType());
-    sb.append('}');
+    sb.append("\nsubconditions=").append(subconditions);
+    sb.append(", \n\tsubfulfillments=").append(subfulfillments);
+    sb.append(", \n\tcondition=").append(condition);
+    sb.append(", \n\ttype=").append(getType());
+    sb.append("\n}");
     return sb.toString();
   }
 }

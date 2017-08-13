@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 import net.i2p.crypto.eddsa.EdDSAEngine;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
@@ -24,6 +25,7 @@ public class Ed25519Sha256Fulfillment extends FulfillmentBase<Ed25519Sha256Condi
 
   private final EdDSAPublicKey publicKey;
   private final byte[] signature;
+  private final String signatureBase64Url;
   private final Ed25519Sha256Condition condition;
 
   /**
@@ -41,6 +43,7 @@ public class Ed25519Sha256Fulfillment extends FulfillmentBase<Ed25519Sha256Condi
 
     this.publicKey = publicKey;
     this.signature = Arrays.copyOf(signature, signature.length);
+    this.signatureBase64Url = Base64.getUrlEncoder().encodeToString(signature);
     this.condition = new Ed25519Sha256Condition(publicKey);
   }
 
@@ -53,11 +56,21 @@ public class Ed25519Sha256Fulfillment extends FulfillmentBase<Ed25519Sha256Condi
 
   /**
    * Returns a copy of the signature linked to this fulfillment.
+   *
+   * @deprecated Java 8 does not have the concept of an immutable byte array, so this method allows
+   * external callers to accidentally or intentionally mute the prefix. As such, this method may be
+   * removed in a future version. Prefer {@link #getSignatureBase64Url()} instead.
    */
+  @Deprecated
   public byte[] getSignature() {
-    byte[] signature = new byte[this.signature.length];
-    System.arraycopy(this.signature, 0, signature, 0, this.signature.length);
-    return signature;
+    return this.signature;
+  }
+
+  /**
+   * Returns a copy of the signature linked to this fulfillment.
+   */
+  public String getSignatureBase64Url() {
+    return this.signatureBase64Url;
   }
 
   @Override
@@ -123,11 +136,11 @@ public class Ed25519Sha256Fulfillment extends FulfillmentBase<Ed25519Sha256Condi
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("Ed25519Sha256Fulfillment{");
-    sb.append("publicKey=").append(publicKey);
-    sb.append(", signature=").append(Arrays.toString(signature));
-    sb.append(", condition=").append(condition);
-    sb.append(", type=").append(getType());
-    sb.append('}');
+    sb.append("\npublicKey=").append(publicKey);
+    sb.append(", \n\tsignature=").append(signatureBase64Url);
+    sb.append(", \n\tcondition=").append(condition);
+    sb.append(", \n\ttype=").append(getType());
+    sb.append("\n}");
     return sb.toString();
   }
 }

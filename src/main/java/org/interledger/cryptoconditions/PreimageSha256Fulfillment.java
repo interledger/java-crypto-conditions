@@ -13,7 +13,7 @@ public class PreimageSha256Fulfillment extends FulfillmentBase<PreimageSha256Con
     implements Fulfillment<PreimageSha256Condition> {
 
   private final PreimageSha256Condition condition;
-  private final String base64UrlEncodedPreimage;
+  private final String preimage;
 
   /**
    * Constructs an instance of the fulfillment.
@@ -25,7 +25,7 @@ public class PreimageSha256Fulfillment extends FulfillmentBase<PreimageSha256Con
 
     Objects.requireNonNull(preimage);
     this.condition = new PreimageSha256Condition(preimage);
-    this.base64UrlEncodedPreimage = Base64.getUrlEncoder().encodeToString(preimage);
+    this.preimage = Base64.getUrlEncoder().encodeToString(preimage);
   }
 
   @Override
@@ -33,8 +33,8 @@ public class PreimageSha256Fulfillment extends FulfillmentBase<PreimageSha256Con
     return this.condition;
   }
 
-  public final String getBase64UrlEncodedPreimage() {
-    return this.base64UrlEncodedPreimage;
+  public final String getPreimage() {
+    return this.preimage;
   }
 
   @Override
@@ -63,24 +63,24 @@ public class PreimageSha256Fulfillment extends FulfillmentBase<PreimageSha256Con
     if (!condition.equals(that.condition)) {
       return false;
     }
-    return base64UrlEncodedPreimage.equals(that.base64UrlEncodedPreimage);
+    return preimage.equals(that.preimage);
   }
 
   @Override
   public int hashCode() {
     int result = super.hashCode();
     result = 31 * result + condition.hashCode();
-    result = 31 * result + base64UrlEncodedPreimage.hashCode();
+    result = 31 * result + preimage.hashCode();
     return result;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("PreimageSha256Fulfillment{");
-    sb.append("condition=").append(condition);
-    sb.append(", base64UrlEncodedPreimage='").append(base64UrlEncodedPreimage).append('\'');
-    sb.append(", type=").append(getType());
-    sb.append('}');
+    sb.append("\ncondition=").append(condition);
+    sb.append(", \n\tpreimage='").append(preimage).append('\'');
+    sb.append(", \n\ttype=").append(getType());
+    sb.append("\n}");
     return sb.toString();
   }
 }

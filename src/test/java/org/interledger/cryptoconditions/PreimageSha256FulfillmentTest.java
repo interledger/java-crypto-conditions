@@ -20,7 +20,7 @@ public class PreimageSha256FulfillmentTest {
   public void testGettersAndSetters() throws Exception {
     final PreimageSha256Fulfillment actual = new PreimageSha256Fulfillment(
         "Hello World".getBytes());
-    assertThat(Base64.getUrlDecoder().decode(actual.getBase64UrlEncodedPreimage()),
+    assertThat(Base64.getUrlDecoder().decode(actual.getPreimage()),
         is("Hello World".getBytes()));
     assertThat(actual.getType(), is(CryptoConditionType.PREIMAGE_SHA256));
   }

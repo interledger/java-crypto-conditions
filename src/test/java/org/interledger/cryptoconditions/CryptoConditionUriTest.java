@@ -3,6 +3,7 @@ package org.interledger.cryptoconditions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.io.BaseEncoding;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.EnumSet;
@@ -23,7 +24,7 @@ public class CryptoConditionUriTest {
 
     assertEquals(CryptoConditionType.PREIMAGE_SHA256, condition.getType());
     assertEquals("E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
-        HexDump.toHexString(condition.getFingerprint()));
+        BaseEncoding.base16().encode(condition.getFingerprint()));
     assertEquals(0, condition.getCost());
   }
 
@@ -37,7 +38,7 @@ public class CryptoConditionUriTest {
 
     assertEquals(CryptoConditionType.PREFIX_SHA256, condition.getType());
     assertEquals("E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
-        HexDump.toHexString(condition.getFingerprint()));
+        BaseEncoding.base16().encode(condition.getFingerprint()));
     assertEquals(0, condition.getCost());
 
     assertTrue(condition instanceof CompoundCondition);

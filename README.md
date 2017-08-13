@@ -25,14 +25,14 @@ For ED25519 the library depends on [net.i2p.crypto.eddsa](https://github.com/str
 ## Usage
 
 ### Requirements
-This project uses Maven to manage dependencies and other aspects of the build. To install Maven, follow the instructions at [https://maven.apache.org/install.html](https://maven.apache.org/install.html).
+This project uses Maven to manage dependencies and other aspects of the build. 
+To install Maven, follow the instructions at [https://maven.apache.org/install.html](https://maven.apache.org/install.html).
 
 
 ### Get the code
 
 ``` sh
 git clone https://github.com/interledger/java-crypto-conditions
-
 cd java-crypto-conditions
 ```
 

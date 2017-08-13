@@ -3,6 +3,7 @@ package org.interledger.cryptoconditions;
 import static org.interledger.cryptoconditions.CryptoConditionType.PREFIX_SHA256;
 
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 
 /**
@@ -12,6 +13,7 @@ public class PrefixSha256Fulfillment extends FulfillmentBase<PrefixSha256Conditi
     implements Fulfillment<PrefixSha256Condition> {
 
   private final byte[] prefix;
+  private final String prefixBase64Url;
   private final long maxMessageLength;
   private final Fulfillment subfulfillment;
   private final PrefixSha256Condition condition;
@@ -31,6 +33,7 @@ public class PrefixSha256Fulfillment extends FulfillmentBase<PrefixSha256Conditi
     Objects.requireNonNull(subfulfillment, "Subfulfillment must not be null!");
 
     this.prefix = Arrays.copyOf(prefix, prefix.length);
+    this.prefixBase64Url = Base64.getUrlEncoder().encodeToString(prefix);
     this.maxMessageLength = maxMessageLength;
     // Fulfillments are immutable, so no need to perform any type of deep-copy here.
     this.subfulfillment = subfulfillment;
@@ -44,8 +47,26 @@ public class PrefixSha256Fulfillment extends FulfillmentBase<PrefixSha256Conditi
     return this.condition;
   }
 
+  /**
+   * Accessor for the prefix as an array of bytes.
+   *
+   * @return A {@link byte[]} containing the prefix for this fulfillment.
+   * @deprecated Java 8 does not have the concept of an immutable byte array, so this method allows
+   * external callers to accidentally or intentionally mute the prefix. As such, this method may be
+   * removed in a future version. Prefer {@link #getPrefixBase64Url()} instead.
+   */
+  @Deprecated
   public byte[] getPrefix() {
     return prefix;
+  }
+
+  /**
+   * Accessor for the prefix as a Base64Url-encoded String.
+   *
+   * @return A {@link String} containing Base64Url characters.
+   */
+  public String getPrefixBase64Url() {
+    return this.prefixBase64Url;
   }
 
   public long getMaxMessageLength() {
@@ -118,13 +139,13 @@ public class PrefixSha256Fulfillment extends FulfillmentBase<PrefixSha256Conditi
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("PrefixSha256Fulfillment{");
-    sb.append("prefix=").append(Arrays.toString(prefix));
-    sb.append(", maxMessageLength=").append(maxMessageLength);
-    sb.append(", subfulfillment=").append(subfulfillment);
-    sb.append(", condition=").append(condition);
-    sb.append(", type=").append(getType());
-    sb.append('}');
+    final StringBuilder sb = new StringBuilder("\nPrefixSha256Fulfillment{");
+    sb.append("\nprefix=").append(prefixBase64Url);
+    sb.append(", \n\tmaxMessageLength=").append(maxMessageLength);
+    sb.append(", \n\tsubfulfillment=").append(subfulfillment);
+    sb.append(", \n\tcondition=").append(condition);
+    sb.append(", \n\ttype=").append(getType());
+    sb.append("\n}");
     return sb.toString();
   }
 }
