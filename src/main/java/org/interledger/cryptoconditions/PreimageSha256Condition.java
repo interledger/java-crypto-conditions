@@ -18,14 +18,16 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
    * Required-args Constructor.  Constructs an instance of {@link PreimageSha256Condition} based
    * on a supplied preimage.
    *
-   * Note this constructor is package-private because it is only used from within {@link PreimageSha256Fulfillment}.
+   * @deprecated This constructor will be made package-private in future versions because it is only used from within
+   * {@link PreimageSha256Fulfillment}.
    *
-   * Developers that wish to create a new {@link PreimageSha256Condition} from the preimage should instead create a new
+   * <p>Developers that wish to create a new {@link PreimageSha256Condition} from the preimage should instead create a new
    * {@link PreimageSha256Fulfillment} and call {@link PreimageSha256Fulfillment#getCondition()}.
    *
    * @param preimage An instance of byte array containing preimage data.
    */
-  PreimageSha256Condition(final byte[] preimage) {
+  @Deprecated
+  public PreimageSha256Condition(final byte[] preimage) {
     super(
         CryptoConditionType.PREIMAGE_SHA256,
         calculateCost(preimage),
@@ -50,11 +52,13 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
 
   /**
    * Constructs the fingerprint for this condition.
-   * <p/>
-   * Note: This method is package-private as (opposed to private) for testing purposes.
+   *
+   * <p>Note: This method is package-private as (opposed to private) for testing purposes.
+   *
+   * @param preimage An instance of byte array containing preimage data.
    */
-  static final byte[] constructFingerprintContents(final byte[] prefix) {
-    return Objects.requireNonNull(prefix);
+  static final byte[] constructFingerprintContents(final byte[] preimage) {
+    return Objects.requireNonNull(preimage);
   }
 
   /**
