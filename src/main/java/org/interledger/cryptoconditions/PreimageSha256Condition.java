@@ -40,7 +40,6 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
    * that this constructor variant does not include a preimage, and is thus intended to be used
    * to construct a condition that does not include a preimage (for example, if a condition is
    * supplied by a remote system).
-   * <p/>
    *
    * @param cost        The cost associated with this condition.
    * @param fingerprint An instance of byte array that contains the calculated fingerprint for
