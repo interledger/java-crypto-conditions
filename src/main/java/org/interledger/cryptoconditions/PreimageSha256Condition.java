@@ -16,12 +16,16 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
 
   /**
    * Required-args Constructor.  Constructs an instance of {@link PreimageSha256Condition} based
-   * on a supplied preimage. This constructor variant is intended to be used by developers
-   * wishing to construct a Preimage condition from a secret preimage.
+   * on a supplied preimage.
+   *
+   * Note this constructor is package-private because it is only used from within {@link PreimageSha256Fulfillment}.
+   *
+   * Developers that wish to create a new {@link PreimageSha256Condition} from the preimage should instead create a new
+   * {@link PreimageSha256Fulfillment} and call {@link PreimageSha256Fulfillment#getCondition()}.
    *
    * @param preimage An instance of byte array containing preimage data.
    */
-  public PreimageSha256Condition(final byte[] preimage) {
+  PreimageSha256Condition(final byte[] preimage) {
     super(
         CryptoConditionType.PREIMAGE_SHA256,
         calculateCost(preimage),
@@ -37,12 +41,11 @@ public final class PreimageSha256Condition extends Sha256Condition implements Si
    * to construct a condition that does not include a preimage (for example, if a condition is
    * supplied by a remote system).
    * <p/>
-   * Note this constructor is package-private because it is used primarily for testing purposes.
    *
    * @param cost        The cost associated with this condition.
    * @param fingerprint An instance of byte array that contains the calculated fingerprint for
    */
-  PreimageSha256Condition(final long cost, final byte[] fingerprint) {
+  public PreimageSha256Condition(final long cost, final byte[] fingerprint) {
     super(PREIMAGE_SHA256, cost, fingerprint);
   }
 
